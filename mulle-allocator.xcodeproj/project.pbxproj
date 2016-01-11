@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		414945A81BEAB81400C92587 /* Libraries */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 414945A91BEAB81400C92587 /* Build configuration list for PBXAggregateTarget "Libraries" */;
+			buildPhases = (
+			);
+			dependencies = (
+				414945AD1BEAB81D00C92587 /* PBXTargetDependency */,
+				414945AF1BEAB81D00C92587 /* PBXTargetDependency */,
+			);
+			name = Libraries;
+			productName = Libraries;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		4149459F1BEAB59B00C92587 /* pointerarray.h in Headers */ = {isa = PBXBuildFile; fileRef = 414945961BEAADAA00C92587 /* pointerarray.h */; };
+		414945A01BEAB5A000C92587 /* mulle_test_allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 414945941BEAACC100C92587 /* mulle_test_allocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		414945A11BEAB5AE00C92587 /* mulle_test_allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = 414945931BEAACC100C92587 /* mulle_test_allocator.c */; };
+		4198C8A61BE7D89F00EE1FF5 /* mulle_allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = 4198C8A41BE7D89F00EE1FF5 /* mulle_allocator.c */; };
+		4198C8A71BE7D89F00EE1FF5 /* mulle_allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		414945A21BEAB5B200C92587 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 414785241ABAF290002DBAE4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 41F14FE51B68F098002189F1;
+			remoteInfo = mulle_container;
+		};
+		414945AC1BEAB81D00C92587 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 414785241ABAF290002DBAE4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 41F14FE51B68F098002189F1;
+			remoteInfo = mulle_container;
+		};
+		414945AE1BEAB81D00C92587 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 414785241ABAF290002DBAE4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4149459A1BEAB57900C92587;
+			remoteInfo = mulle_allocator_test;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		410E85191BDE954000FF7BF2 /* _Common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = _Common.xcconfig; sourceTree = "<group>"; };
+		411A28C11BCD446E00D39FF7 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		414945931BEAACC100C92587 /* mulle_test_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mulle_test_allocator.c; sourceTree = "<group>"; };
+		414945941BEAACC100C92587 /* mulle_test_allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_test_allocator.h; sourceTree = "<group>"; };
+		414945961BEAADAA00C92587 /* pointerarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pointerarray.h; sourceTree = "<group>"; };
+		4149459B1BEAB57900C92587 /* libmulle_test_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_test_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		417C02641BD8404E005A3751 /* Common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
+		417C02651BD8404E005A3751 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		417C02661BD8404E005A3751 /* IOS.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = IOS.xcconfig; sourceTree = "<group>"; };
+		417C02671BD8404E005A3751 /* OSX.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = OSX.xcconfig; sourceTree = "<group>"; };
+		417C02681BD8404E005A3751 /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		417C02691BD8404E005A3751 /* StaticLibrary.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = StaticLibrary.xcconfig; sourceTree = "<group>"; };
+		417C026A1BD8404E005A3751 /* StaticLibraryIOS.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = StaticLibraryIOS.xcconfig; sourceTree = "<group>"; };
+		417C026B1BD8404E005A3751 /* StaticLibraryOSX.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = StaticLibraryOSX.xcconfig; sourceTree = "<group>"; };
+		417C026C1BD8404E005A3751 /* ToolOSX.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ToolOSX.xcconfig; sourceTree = "<group>"; };
+		4198C8A41BE7D89F00EE1FF5 /* mulle_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mulle_allocator.c; sourceTree = "<group>"; };
+		4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_allocator.h; sourceTree = "<group>"; };
+		41F14FE61B68F098002189F1 /* libmulle_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		414945981BEAB57900C92587 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		41F14FE31B68F098002189F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		414785231ABAF290002DBAE4 = {
+			isa = PBXGroup;
+			children = (
+				417C02631BD8404E005A3751 /* mulle-configuration */,
+				411A28C11BCD446E00D39FF7 /* CMakeLists.txt */,
+				4147852E1ABAF290002DBAE4 /* src */,
+				4147852D1ABAF290002DBAE4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4147852D1ABAF290002DBAE4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				41F14FE61B68F098002189F1 /* libmulle_allocator.a */,
+				4149459B1BEAB57900C92587 /* libmulle_test_allocator.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4147852E1ABAF290002DBAE4 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */,
+				4198C8A41BE7D89F00EE1FF5 /* mulle_allocator.c */,
+				414945961BEAADAA00C92587 /* pointerarray.h */,
+				414945941BEAACC100C92587 /* mulle_test_allocator.h */,
+				414945931BEAACC100C92587 /* mulle_test_allocator.c */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		417C02631BD8404E005A3751 /* mulle-configuration */ = {
+			isa = PBXGroup;
+			children = (
+				410E85191BDE954000FF7BF2 /* _Common.xcconfig */,
+				417C02641BD8404E005A3751 /* Common.xcconfig */,
+				417C02651BD8404E005A3751 /* Debug.xcconfig */,
+				417C02661BD8404E005A3751 /* IOS.xcconfig */,
+				417C02671BD8404E005A3751 /* OSX.xcconfig */,
+				417C02681BD8404E005A3751 /* Release.xcconfig */,
+				417C02691BD8404E005A3751 /* StaticLibrary.xcconfig */,
+				417C026A1BD8404E005A3751 /* StaticLibraryIOS.xcconfig */,
+				417C026B1BD8404E005A3751 /* StaticLibraryOSX.xcconfig */,
+				417C026C1BD8404E005A3751 /* ToolOSX.xcconfig */,
+			);
+			path = "mulle-configuration";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4105ABF01BCB088A00D45AA8 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4198C8A71BE7D89F00EE1FF5 /* mulle_allocator.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		414945991BEAB57900C92587 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				414945A01BEAB5A000C92587 /* mulle_test_allocator.h in Headers */,
+				4149459F1BEAB59B00C92587 /* pointerarray.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4149459A1BEAB57900C92587 /* mulle_test_allocator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4149459C1BEAB57900C92587 /* Build configuration list for PBXNativeTarget "mulle_test_allocator" */;
+			buildPhases = (
+				414945971BEAB57900C92587 /* Sources */,
+				414945981BEAB57900C92587 /* Frameworks */,
+				414945991BEAB57900C92587 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				414945A31BEAB5B200C92587 /* PBXTargetDependency */,
+			);
+			name = mulle_test_allocator;
+			productName = mulle_allocator_test;
+			productReference = 4149459B1BEAB57900C92587 /* libmulle_test_allocator.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		41F14FE51B68F098002189F1 /* mulle_allocator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 41F14FE71B68F098002189F1 /* Build configuration list for PBXNativeTarget "mulle_allocator" */;
+			buildPhases = (
+				41F14FE21B68F098002189F1 /* Sources */,
+				4105ABF01BCB088A00D45AA8 /* Headers */,
+				41F14FE31B68F098002189F1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = mulle_allocator;
+			productName = mulle_aba;
+			productReference = 41F14FE61B68F098002189F1 /* libmulle_allocator.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		414785241ABAF290002DBAE4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0640;
+				ORGANIZATIONNAME = "Mulle kybernetiK";
+				TargetAttributes = {
+					4149459A1BEAB57900C92587 = {
+						CreatedOnToolsVersion = 7.1;
+					};
+					414945A81BEAB81400C92587 = {
+						CreatedOnToolsVersion = 7.1;
+					};
+					41F14FE51B68F098002189F1 = {
+						CreatedOnToolsVersion = 6.2;
+					};
+				};
+			};
+			buildConfigurationList = 414785271ABAF290002DBAE4 /* Build configuration list for PBXProject "mulle-allocator" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 414785231ABAF290002DBAE4;
+			productRefGroup = 4147852D1ABAF290002DBAE4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				414945A81BEAB81400C92587 /* Libraries */,
+				41F14FE51B68F098002189F1 /* mulle_allocator */,
+				4149459A1BEAB57900C92587 /* mulle_test_allocator */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		414945971BEAB57900C92587 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				414945A11BEAB5AE00C92587 /* mulle_test_allocator.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		41F14FE21B68F098002189F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4198C8A61BE7D89F00EE1FF5 /* mulle_allocator.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		414945A31BEAB5B200C92587 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 41F14FE51B68F098002189F1 /* mulle_allocator */;
+			targetProxy = 414945A21BEAB5B200C92587 /* PBXContainerItemProxy */;
+		};
+		414945AD1BEAB81D00C92587 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 41F14FE51B68F098002189F1 /* mulle_allocator */;
+			targetProxy = 414945AC1BEAB81D00C92587 /* PBXContainerItemProxy */;
+		};
+		414945AF1BEAB81D00C92587 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4149459A1BEAB57900C92587 /* mulle_test_allocator */;
+			targetProxy = 414945AE1BEAB81D00C92587 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		414785311ABAF290002DBAE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417C02651BD8404E005A3751 /* Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		414785321ABAF290002DBAE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417C02681BD8404E005A3751 /* Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		4149459D1BEAB57900C92587 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417C026B1BD8404E005A3751 /* StaticLibraryOSX.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		4149459E1BEAB57900C92587 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417C026B1BD8404E005A3751 /* StaticLibraryOSX.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		414945AA1BEAB81400C92587 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		414945AB1BEAB81400C92587 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		41F14FE81B68F098002189F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417C026B1BD8404E005A3751 /* StaticLibraryOSX.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		41F14FE91B68F098002189F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417C026B1BD8404E005A3751 /* StaticLibraryOSX.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		414785271ABAF290002DBAE4 /* Build configuration list for PBXProject "mulle-allocator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				414785311ABAF290002DBAE4 /* Debug */,
+				414785321ABAF290002DBAE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4149459C1BEAB57900C92587 /* Build configuration list for PBXNativeTarget "mulle_test_allocator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4149459D1BEAB57900C92587 /* Debug */,
+				4149459E1BEAB57900C92587 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		414945A91BEAB81400C92587 /* Build configuration list for PBXAggregateTarget "Libraries" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				414945AA1BEAB81400C92587 /* Debug */,
+				414945AB1BEAB81400C92587 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		41F14FE71B68F098002189F1 /* Build configuration list for PBXNativeTarget "mulle_allocator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				41F14FE81B68F098002189F1 /* Debug */,
+				41F14FE91B68F098002189F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 414785241ABAF290002DBAE4 /* Project object */;
+}

@@ -1,0 +1,11 @@
+# add projects that should be cloned with git in order
+# of their inter-dependencies
+#
+# possible repository URIs:
+# http://www.mulle-kybernetik.com/repositories/MulleScion
+# git@github.com:mulle-nat/MulleScion.git
+# ../MulleScion
+# /Volumes/Source/srcM/MulleScion
+#
+http://www.mulle-kybernetik.com/repositories/mulle-thread
+

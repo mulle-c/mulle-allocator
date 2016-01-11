@@ -1,0 +1,9 @@
+.bootstrap.auto/
+.bootstrap.local/
+dependencies/
+.repos/
+mulle-configuration/
+build/
+xcuserdata/
+project.xcworkspace/
+*~.*
