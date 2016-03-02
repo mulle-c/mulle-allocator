@@ -56,6 +56,7 @@
 /* Begin PBXFileReference section */
 		410E85191BDE954000FF7BF2 /* _Common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = _Common.xcconfig; sourceTree = "<group>"; };
 		411A28C11BCD446E00D39FF7 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		41300C941C870EEF00D1D1C1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		414945931BEAACC100C92587 /* mulle_test_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mulle_test_allocator.c; sourceTree = "<group>"; };
 		414945941BEAACC100C92587 /* mulle_test_allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_test_allocator.h; sourceTree = "<group>"; };
 		414945961BEAADAA00C92587 /* pointerarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pointerarray.h; sourceTree = "<group>"; };
@@ -92,12 +93,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		41300C931C870EEF00D1D1C1 /* stacktrace */ = {
+			isa = PBXGroup;
+			children = (
+				41300C941C870EEF00D1D1C1 /* main.m */,
+			);
+			path = stacktrace;
+			sourceTree = "<group>";
+		};
 		414785231ABAF290002DBAE4 = {
 			isa = PBXGroup;
 			children = (
 				417C02631BD8404E005A3751 /* mulle-configuration */,
 				411A28C11BCD446E00D39FF7 /* CMakeLists.txt */,
 				4147852E1ABAF290002DBAE4 /* src */,
+				41300C931C870EEF00D1D1C1 /* stacktrace */,
 				4147852D1ABAF290002DBAE4 /* Products */,
 			);
 			sourceTree = "<group>";
