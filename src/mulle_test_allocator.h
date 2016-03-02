@@ -37,10 +37,15 @@
 
 #include <stddef.h>
 
-void   mulle_test_allocator_reset_memory( void);
+
+void   mulle_test_allocator_reset( void);
+void   mulle_test_allocator_initialize( void);
+void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 
 // will be reset by mulle_test_allocator_reset_memory
 extern int       mulle_test_allocator_out_of_memory;
 extern size_t    mulle_test_allocator_max_size;
+
+extern struct mulle_allocator   mulle_test_allocator;
 
 #endif /* mulle_test_allocator_h */
