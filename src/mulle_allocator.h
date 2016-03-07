@@ -34,6 +34,7 @@
 
 
 #include <stddef.h>
+#include <stdlib.h>
 
 
 #define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (1 << 8) | 0)
@@ -55,6 +56,16 @@ struct mulle_allocator
 
 extern struct mulle_allocator   mulle_default_allocator;
 extern struct mulle_allocator   mulle_stdlib_allocator;
+
+
+static inline void   mulle_allocator_set_aba( struct mulle_allocator *p, void *aba, int (*f)( void *aba, int (*free)( void *), void *block))
+{
+   if( ! p)
+      p = &mulle_default_allocator;
+
+   p->aba     = aba;
+   p->abafree = f ? (void *) f : (void *) abort;
+}
 
 
 static inline void   *_mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
