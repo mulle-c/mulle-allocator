@@ -2,6 +2,9 @@
 
 * remove smart mode again. Add an aba_free vector, which makes the code using
 allocators easier to read IMO (and slightly faster).
+* added `mulle_allocator_set_aba`
+* added code, so that `mulle_aba_init` automatically updates the default 
+allocator with itself.
 
 # 1.0
 
