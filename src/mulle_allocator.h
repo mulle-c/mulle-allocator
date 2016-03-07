@@ -32,50 +32,73 @@
 #ifndef mulle_allocator_h__
 #define mulle_allocator_h__
 
+
 #include <stddef.h>
 
-#define MULLE_ALLOCATOR_VERSION  ((0 << 20) | (1 << 8) | 0)
+
+#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (0 << 8) | 0)
 
 //
-// mulle_allocator: just a way to pass around the memory scheme du jour
+// mulle_allocator: a way to pass around the memory scheme du jour
+//                  for transparent mulle_aba support, there is the
+//                  smart option.
 //
 struct mulle_allocator
 {
-   void   *(*calloc)( size_t, size_t);
-   void   *(*realloc)( void *, size_t);
-   void   (*free)( void *);
+   union
+   {
+      struct
+      {
+         void   *(*calloc)( size_t, size_t);
+         void   *(*realloc)( void *, size_t);
+         void   (*free)( void *);
+      } plain;
+      struct
+      {
+         void   *(*calloc)( struct mulle_allocator *, size_t, size_t);
+         void   *(*realloc)( struct mulle_allocator *, void *, size_t);
+         void   (*free)( struct mulle_allocator *, void *);
+      } smart;
+   } vectors;
+   unsigned int  mode;
 };
+
 
 extern struct mulle_allocator   mulle_default_allocator;
 extern struct mulle_allocator   mulle_stdlib_allocator;
 
-typedef void  *(*mulle_allocator_calloc_t)( size_t, size_t);
-typedef void  *(*mulle_allocator_realloc_t)( void *, size_t);
-typedef void   (*mulle_allocator_free_t)( void *);
-
 
 static inline void  *_mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
 {
-   return( (*p->realloc)( NULL, size));
+   if( p->mode)
+      return( (*p->vectors.smart.realloc)( p, NULL, size));
+   return( (*p->vectors.plain.realloc)( NULL, size));
 }
 
 
 static inline void  *_mulle_allocator_calloc( struct mulle_allocator *p, size_t n, size_t size)
 {
-   return( (*p->calloc)( n, size));
+   if( p->mode)
+      return( (*p->vectors.smart.calloc)( p, n, size));
+   return( (*p->vectors.plain.calloc)( n, size));
 }
 
 
 static inline void  *_mulle_allocator_realloc( struct mulle_allocator *p, void *block, size_t size)
 {
-   return( (*p->realloc)( block, size));
+   if( p->mode)
+      return( (*p->vectors.smart.realloc)( p, block, size));
+   return( (*p->vectors.plain.realloc)( block, size));
 }
 
 
 static inline void  _mulle_allocator_free( struct mulle_allocator *p, void *block)
 {
-   (*p->free)( block);
+   if( p->mode)
+      return( (*p->vectors.smart.free)( p, block));
+   (*p->vectors.plain.free)( block);
 }
+
 
 # pragma mark -
 # pragma mark API

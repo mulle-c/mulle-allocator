@@ -317,9 +317,10 @@ static void  test_free( void *p)
 
 struct mulle_allocator   mulle_test_allocator =
 {
-      test_calloc,
-      test_realloc,
-      test_free
+   test_calloc,
+   test_realloc,
+   test_free,
+   0
 };
 
 
@@ -329,8 +330,10 @@ struct mulle_allocator   mulle_test_allocator =
 void   mulle_test_allocator_set_tracelevel( unsigned int value)
 {
    assert( value <= 3);
+   if( (int) value != trace && (trace != -1 || value))
+      fprintf( stderr, "mulle_test_allocator: trace level set to %d\n", value);
+
    trace = value;
-   fprintf( stderr, "mulle_test_allocator: trace level set to %d\n", trace);
 }
 
 
