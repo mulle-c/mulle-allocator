@@ -320,7 +320,8 @@ struct mulle_allocator   mulle_test_allocator =
    test_calloc,
    test_realloc,
    test_free,
-   0
+   (void *) abort,
+   NULL
 };
 
 
@@ -380,7 +381,7 @@ void   mulle_test_allocator_reset()
 __attribute__((constructor))
 void   mulle_test_allocator_initialize()
 {
-   int     rval;
+   int    rval;
    char   *s;
 
    if( trace != -1)
