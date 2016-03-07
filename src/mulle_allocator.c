@@ -40,7 +40,7 @@
 
 struct mulle_allocator   mulle_stdlib_allocator =
 {
-   calloc, realloc, free
+   calloc, realloc, free, 0
 };
 
 
@@ -48,5 +48,5 @@ struct mulle_allocator   mulle_stdlib_allocator =
 
 struct mulle_allocator   mulle_default_allocator =
 {
-   calloc, realloc, free
+   calloc, realloc, free, 0
 };

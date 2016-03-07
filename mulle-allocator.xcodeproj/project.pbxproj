@@ -72,6 +72,8 @@
 		417C026C1BD8404E005A3751 /* ToolOSX.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ToolOSX.xcconfig; sourceTree = "<group>"; };
 		4198C8A41BE7D89F00EE1FF5 /* mulle_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mulle_allocator.c; sourceTree = "<group>"; };
 		4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_allocator.h; sourceTree = "<group>"; };
+		419DA4C91C8DCE7100220747 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		41D04ABC1C8DF2A300CC8F11 /* RELEASENOTES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = RELEASENOTES.md; sourceTree = "<group>"; };
 		41F14FE61B68F098002189F1 /* libmulle_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -104,6 +106,8 @@
 		414785231ABAF290002DBAE4 = {
 			isa = PBXGroup;
 			children = (
+				419DA4C91C8DCE7100220747 /* README.md */,
+				41D04ABC1C8DF2A300CC8F11 /* RELEASENOTES.md */,
 				417C02631BD8404E005A3751 /* mulle-configuration */,
 				411A28C11BCD446E00D39FF7 /* CMakeLists.txt */,
 				4147852E1ABAF290002DBAE4 /* src */,
@@ -290,6 +294,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 417C02651BD8404E005A3751 /* Debug.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.0;
 			};
 			name = Debug;
 		};
@@ -297,6 +302,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 417C02681BD8404E005A3751 /* Release.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1.0;
 			};
 			name = Release;
 		};
