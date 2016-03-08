@@ -42,7 +42,7 @@ void   mulle_test_allocator_reset( void);
 void   mulle_test_allocator_initialize( void);
 void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 
-// will be reset by mulle_test_allocator_reset_memory
+// will be reset by mulle_test_allocator_reset
 extern int       mulle_test_allocator_out_of_memory;
 extern size_t    mulle_test_allocator_max_size;
 
