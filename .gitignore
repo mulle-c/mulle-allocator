@@ -1,3 +1,5 @@
+.DS_Store
+stacktrace/
 .bootstrap.auto/
 .bootstrap.local/
 dependencies/
