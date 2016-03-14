@@ -77,23 +77,6 @@
 		41F14FE61B68F098002189F1 /* libmulle_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		414945981BEAB57900C92587 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		41F14FE31B68F098002189F1 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
 /* Begin PBXGroup section */
 		41300C931C870EEF00D1D1C1 /* stacktrace */ = {
 			isa = PBXGroup;
@@ -182,7 +165,6 @@
 			buildConfigurationList = 4149459C1BEAB57900C92587 /* Build configuration list for PBXNativeTarget "mulle_test_allocator" */;
 			buildPhases = (
 				414945971BEAB57900C92587 /* Sources */,
-				414945981BEAB57900C92587 /* Frameworks */,
 				414945991BEAB57900C92587 /* Headers */,
 			);
 			buildRules = (
@@ -201,7 +183,6 @@
 			buildPhases = (
 				41F14FE21B68F098002189F1 /* Sources */,
 				4105ABF01BCB088A00D45AA8 /* Headers */,
-				41F14FE31B68F098002189F1 /* Frameworks */,
 			);
 			buildRules = (
 			);
