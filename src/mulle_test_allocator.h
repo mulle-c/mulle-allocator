@@ -38,8 +38,13 @@
 #include <stddef.h>
 
 
-void   mulle_test_allocator_reset( void);
+/*  if you want to replace the default allocator, say
+ *    mulle_default_allocator = mulle_test_allocator;
+ *  before or after calling `mulle_test_allocator_initialize`
+ */
 void   mulle_test_allocator_initialize( void);
+
+void   mulle_test_allocator_reset( void);
 void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 
 // will be reset by mulle_test_allocator_reset

@@ -75,6 +75,7 @@
 		419DA4C91C8DCE7100220747 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		41D04ABC1C8DF2A300CC8F11 /* RELEASENOTES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = RELEASENOTES.md; sourceTree = "<group>"; };
 		41F14FE61B68F098002189F1 /* libmulle_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		41FC644A1C971BEA009E8702 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -91,8 +92,9 @@
 			children = (
 				419DA4C91C8DCE7100220747 /* README.md */,
 				41D04ABC1C8DF2A300CC8F11 /* RELEASENOTES.md */,
-				417C02631BD8404E005A3751 /* mulle-configuration */,
+				41FC644A1C971BEA009E8702 /* LICENSE */,
 				411A28C11BCD446E00D39FF7 /* CMakeLists.txt */,
+				417C02631BD8404E005A3751 /* mulle-configuration */,
 				4147852E1ABAF290002DBAE4 /* src */,
 				41300C931C870EEF00D1D1C1 /* stacktrace */,
 				4147852D1ABAF290002DBAE4 /* Products */,

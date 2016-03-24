@@ -6,7 +6,7 @@ shouldn't jump through the vectors directly, but use the supplied functions.
 By default `.aba` and `.abafree` are not available. For lock-free data 
 structures you may need to supply a ABA-safe freeing function.
 
-> Recommendation use [mulle-aba](https://www.mulle-kybernetik.com/software/git/mulle-aba/).
+> Recommendation use [mulle-aba](//www.mulle-kybernetik.com/software/git/mulle-aba/).
 
 
 # `mulle_test_allocator`
