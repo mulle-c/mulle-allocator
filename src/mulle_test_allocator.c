@@ -390,8 +390,6 @@ void   mulle_test_allocator_initialize()
    rval = mulle_thread_mutex_init( &alloc_lock);
    assert( ! rval);
    
-   mulle_default_allocator = mulle_test_allocator;  // put test in place
-   
    s = getenv( "MULLE_TEST_ALLOCATOR_TRACE");
    mulle_test_allocator_set_tracelevel( s ? atoi( s) : 0);
 }
