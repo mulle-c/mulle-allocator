@@ -37,7 +37,7 @@
 #include <stdlib.h>
 
 
-#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (1 << 8) | 0)
+#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (2 << 8) | 0)
 
 //
 // mulle_allocator: a way to pass around the memory scheme du jour

@@ -1,3 +1,9 @@
+# 1.2
+
+* improved the test allocator to use hashtables instead of an array to track
+  allocations and frees. As a bonus side effect, it can now also track 
+  erroneous frees.
+
 # 1.1
 
 * remove smart mode again. Add an aba_free vector, which makes the code using

@@ -39,7 +39,7 @@
 
 #include <string.h>
 
-
+// can store null pointers, so the "no" pointer is -1
 struct _pointerarray
 {
    size_t   count;
@@ -105,8 +105,8 @@ static inline void  *_pointerarray_get( struct _pointerarray *array, unsigned in
 
 static inline unsigned int   _pointerarray_index( struct _pointerarray *array, void *p)
 {
-   void       **curr;
-   void       **sentinel;
+   void   **curr;
+   void   **sentinel;
 
    curr     = array->pointers;
    sentinel = &curr[ array->used];
@@ -149,7 +149,7 @@ static inline void  _pointerarray_done( struct _pointerarray *array, void (*free
 }
 
 
-static inline void  array_free( struct _pointerarray *array, void (*free)( void *))
+static inline void  _pointerarray_free( struct _pointerarray *array, void (*free)( void *))
 {
    _pointerarray_done( array, free);
    (*free)( array);
