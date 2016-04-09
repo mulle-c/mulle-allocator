@@ -51,6 +51,9 @@ void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 extern int       mulle_test_allocator_out_of_memory;
 extern size_t    mulle_test_allocator_max_size;
 
+// use this to avoid reuse of memory areas
+extern int       mulle_test_allocator_dont_free;
+
 extern struct mulle_allocator   mulle_test_allocator;
 
 #endif /* mulle_test_allocator_h */

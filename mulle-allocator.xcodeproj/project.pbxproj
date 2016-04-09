@@ -74,6 +74,7 @@
 		4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_allocator.h; sourceTree = "<group>"; };
 		419DA4C91C8DCE7100220747 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		41D04ABC1C8DF2A300CC8F11 /* RELEASENOTES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = RELEASENOTES.md; sourceTree = "<group>"; };
+		41D53B811CB7BB0B006BFF0E /* pointerset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pointerset.h; sourceTree = "<group>"; };
 		41F14FE61B68F098002189F1 /* libmulle_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		41FC644A1C971BEA009E8702 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -113,9 +114,9 @@
 		4147852E1ABAF290002DBAE4 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				41D53B821CB7ED20006BFF0E /* Containers */,
 				4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */,
 				4198C8A41BE7D89F00EE1FF5 /* mulle_allocator.c */,
-				414945961BEAADAA00C92587 /* pointerarray.h */,
 				414945941BEAACC100C92587 /* mulle_test_allocator.h */,
 				414945931BEAACC100C92587 /* mulle_test_allocator.c */,
 			);
@@ -137,6 +138,15 @@
 				417C026C1BD8404E005A3751 /* ToolOSX.xcconfig */,
 			);
 			path = "mulle-configuration";
+			sourceTree = "<group>";
+		};
+		41D53B821CB7ED20006BFF0E /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				414945961BEAADAA00C92587 /* pointerarray.h */,
+				41D53B811CB7BB0B006BFF0E /* pointerset.h */,
+			);
+			name = Containers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

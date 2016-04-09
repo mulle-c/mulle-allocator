@@ -48,13 +48,15 @@
 #pragma mark -
 #pragma mark track allocations
 
-#include "pointerarray.h"
+#include "pointerset.h"
 
-struct _pointerarray            allocations;
-static mulle_thread_mutex_t     alloc_lock;
+static struct _pointerset     allocations;
+static struct _pointerset     frees;
+static mulle_thread_mutex_t   alloc_lock;
 
 int       mulle_test_allocator_out_of_memory;
 size_t    mulle_test_allocator_max_size;
+int       mulle_test_allocator_dont_free;
 
 static int  trace = -1;
 
@@ -183,6 +185,14 @@ static void   bail( void *p)
       char buf [ 256];
       extern int  getpid( void);
       
+      /* undo some environment stuff, there must be an easier way */
+      unsetenv( "DYLD_INSERT_LIBRARIES");
+      unsetenv( "MallocStackLogging");
+      unsetenv( "MallocStackLoggingNoCompact");
+      unsetenv( "MallocScribble");
+      unsetenv( "MallocPreScribble");
+      unsetenv( "MallocGuardEdges");
+      unsetenv( "MallocCheckHeapEach");
       sprintf( buf, "sudo malloc_history %d %p", getpid(), p);
       fprintf( stderr, "%s\n", buf);
       system( buf);
@@ -192,11 +202,9 @@ static void   bail( void *p)
 }
 
 
-
 static void  *test_realloc( void *q, size_t size)
 {
    void           *p;
-   unsigned int   i;
    
    if( ! may_alloc( size))
    {
@@ -214,22 +222,37 @@ static void  *test_realloc( void *q, size_t size)
       abort();
    }
    
-   if( q)
+   if( ! q)
    {
-      if( p != q)
-      {
-         i = _pointerarray_index( &allocations, q);  // analyzer it's ok, just a pointer comparison
-         assert( i != (unsigned int) -1);
-         _pointerarray_set( &allocations, i, p);
-      }
+      // just a normal malloc
+      _pointerset_remove( &frees, p);
+      assert( ! _pointerset_get( &allocations, p));
+      _pointerset_add( &allocations, p, calloc, free);
    }
    else
-      _pointerarray_add( &allocations, p, realloc);
+   {
+      // if p == q, then nothing happened
+      if( p != q)
+      {
+         assert( ! _pointerset_get( &frees, q));
+         assert( _pointerset_get( &allocations, q));
+         _pointerset_remove( &allocations, q);
+         _pointerset_add( &frees, q, calloc, free);
+         
+         _pointerset_remove( &frees, p);
+         assert( ! _pointerset_get( &allocations, p));
+         _pointerset_add( &allocations, p, calloc, free);
+      }
+   }
+   
    mulle_thread_mutex_unlock( &alloc_lock);
 
    if( trace)
    {
-      fprintf( stderr, "realloced %p-%p", p, &((char *)p)[ size ? size - 1 : 0]);
+      if( q)
+         fprintf( stderr, "realloced %p -> %p-%p", q, p, &((char *)p)[ size ? size - 1 : 0]);
+      else
+         fprintf( stderr, "alloced %p-%p", p, &((char *)p)[ size ? size - 1 : 0]);
       if( trace > 1)
          stacktrace( 1);
       fputc( '\n', stderr);
@@ -258,7 +281,10 @@ static void  *test_calloc( size_t n, size_t size)
       abort();
    }
    
-   _pointerarray_add( &allocations, p, realloc);
+   _pointerset_remove( &frees, p);
+   assert( ! _pointerset_get( &allocations, p));
+   _pointerset_add( &allocations, p, calloc, free);
+   
    mulle_thread_mutex_unlock( &alloc_lock);
 
    if( trace)
@@ -275,7 +301,7 @@ static void  *test_calloc( size_t n, size_t size)
 
 static void  test_free( void *p)
 {
-   unsigned int   i;
+   void           *q;
    
    if( ! p)
       return;
@@ -286,8 +312,22 @@ static void  test_free( void *p)
       abort();
    }
    
-   i = _pointerarray_index( &allocations, p);
-   if( i == (unsigned int) -1)
+   q = _pointerset_get( &allocations, p);
+   if( ! q)
+   {
+      q = _pointerset_get( &allocations, p);  // debug a problem
+      fprintf( stderr, "false free: %p", p);
+      if( trace > 1)
+         stacktrace( 1);
+      fputc( '\n', stderr);
+      
+      bail( p);
+   }
+   _pointerset_remove( &allocations, q);
+   
+   
+   q = _pointerset_get( &frees, p);
+   if( q)
    {
       fprintf( stderr, "double free: %p", p);
       if( trace > 1)
@@ -296,11 +336,12 @@ static void  test_free( void *p)
 
       bail( p);
    }
-   _pointerarray_set( &allocations, i, NULL);
+   _pointerset_add( &frees, p, calloc, free);
    
    mulle_thread_mutex_unlock( &alloc_lock);
    
-   free( p);
+   if( ! mulle_test_allocator_dont_free)
+      free( p);
    
    if( trace)
    {
@@ -340,9 +381,9 @@ void   mulle_test_allocator_set_tracelevel( unsigned int value)
 
 void   mulle_test_allocator_reset()
 {
-   struct  _pointerarray_enumerator   rover;
-   void                               *p;
-   void                               *first_leak;
+   struct _pointerset_enumerator   rover;
+   void                            *p;
+   void                            *first_leak;
    
    if( mulle_thread_mutex_lock( &alloc_lock))
    {
@@ -352,27 +393,26 @@ void   mulle_test_allocator_reset()
 
    first_leak = NULL;
    
-   rover = _pointerarray_enumerate( &allocations);
-   while( (p = _pointerarray_enumerator_next( &rover)) != (void *) -1)
+   rover = _pointerset_enumerate( &allocations);
+   while( p = _pointerset_enumerator_next( &rover))
    {
-      if( p)
-      {
-         fprintf( stderr, "leak %p\n", p);
-         if( ! first_leak)
-            first_leak = p;
-      }
+      fprintf( stderr, "leak %p\n", p);
+      if( ! first_leak)
+         first_leak = p;
    }
-   _pointerarray_enumerator_done( &rover);
+   _pointerset_enumerator_done( &rover);
 
    if( first_leak)
       bail( first_leak);
    
-   _pointerarray_done( &allocations, free);
+   _pointerset_done( &allocations, free);
+   _pointerset_done( &frees, free);
    
    mulle_test_allocator_out_of_memory = 0;
    mulle_test_allocator_max_size      = 0;
    
-   memset( &allocations, 0, sizeof( allocations));
+   _pointerset_init( &allocations);
+   _pointerset_init( &frees);
 
    mulle_thread_mutex_unlock( &alloc_lock);
 }
