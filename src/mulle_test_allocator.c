@@ -211,8 +211,13 @@ static void  *test_realloc( void *q, size_t size)
       errno = ENOMEM;
       return( NULL);
    }
-   
+
+   //
+   // dont_free doesn't work here, since we don't know the previous size
+   // we cant fake it with a malloc/memcpy combination
+   //
    p = realloc( q, size);
+   
    if( ! p)
       return( p);
 
@@ -432,4 +437,10 @@ void   mulle_test_allocator_initialize()
    
    s = getenv( "MULLE_TEST_ALLOCATOR_TRACE");
    mulle_test_allocator_set_tracelevel( s ? atoi( s) : 0);
+
+   s = getenv( "MULLE_TEST_ALLOCATOR_DONT_FREE");
+   mulle_test_allocator_dont_free = s ? atoi( s) : 0;
+
+   if( mulle_test_allocator_dont_free && trace)
+      fprintf( stderr, "mulle_test_allocator: memory will not really be freed\n");
 }
