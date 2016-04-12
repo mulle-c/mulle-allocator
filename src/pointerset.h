@@ -52,7 +52,7 @@ struct _pointerset
 };
 
 
-static inline struct _pointerset  *_pointerset_alloc( void *(*calloc)( size_t, size_t))
+static inline struct _pointerset  *_pointerset_create( void *(*calloc)( size_t, size_t))
 {
    return( (struct _pointerset *) (*calloc)( 1, sizeof( struct _pointerset)));
 }
@@ -172,7 +172,9 @@ static inline void   *_pointerset_sureadd( struct _pointerset *set,
    unsigned int   i;
    void           *q;
    
+   assert( set->count <= set->max);
    assert( set->used < set->max);
+   assert( set->max < set->mask + 1);
    
    hash = _pointerset_hash( set, pointer);
    i    = (unsigned int) hash;
@@ -229,8 +231,10 @@ static int   _pointerset_grow( struct _pointerset *set,
    
    copy.count = 0;
    copy.used  = 0;
-   copy.max   = size + (size >> 1);
+   copy.max   = copy_size - (copy_size >> 1);
    copy.mask  = copy_size - 1;
+   if( copy.max > copy.mask)
+      copy.max = copy_size;
    
    copy.pointers = (*calloc)( sizeof( void *), copy_size);
    if( ! copy.pointers)
@@ -250,6 +254,10 @@ static int   _pointerset_grow( struct _pointerset *set,
    (*free)( set->pointers);
    
    *set = copy;
+   
+   assert( set->count <= set->max);
+   assert( set->used < set->max);
+   assert( set->max < set->mask + 1);
    
    return( 0);
 }
@@ -340,6 +348,5 @@ static inline void  _pointerset_remove( struct _pointerset *set, void *pointer)
       ++i;
    }
 }
-
 
 #endif
