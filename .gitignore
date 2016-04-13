@@ -9,3 +9,7 @@ build/
 xcuserdata/
 project.xcworkspace/
 *~.*
+old/
+tmp/
+*.dSYM/
+*.exe
