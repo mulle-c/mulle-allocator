@@ -321,7 +321,7 @@ static void  test_free( void *p)
    if( ! q)
    {
       q = _pointerset_get( &allocations, p);  // debug a problem
-      fprintf( stderr, "false free: %p", p);
+      fprintf( stderr, "\n###\n### false free: %p", p);
       if( trace > 1)
          stacktrace( 1);
       fputc( '\n', stderr);
@@ -334,7 +334,7 @@ static void  test_free( void *p)
    q = _pointerset_get( &frees, p);
    if( q)
    {
-      fprintf( stderr, "double free: %p", p);
+      fprintf( stderr, "\n###\n### double free: %p", p);
       if( trace > 1)
          stacktrace( 1);
       fputc( '\n', stderr);
@@ -401,7 +401,7 @@ void   mulle_test_allocator_reset()
    rover = _pointerset_enumerate( &allocations);
    while( p = _pointerset_enumerator_next( &rover))
    {
-      fprintf( stderr, "leak %p\n", p);
+      fprintf( stderr, "### leak %p\n", p);
       if( ! first_leak)
          first_leak = p;
    }

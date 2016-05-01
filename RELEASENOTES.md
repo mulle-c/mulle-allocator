@@ -1,3 +1,8 @@
+# 1.3
+
+* fix a bug in pointerset
+
+
 # 1.2
 
 * improved the test allocator to use hashtables instead of an array to track
