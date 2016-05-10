@@ -1,7 +1,11 @@
+# 1.4
+
+* added mulle_strdup
+
 # 1.3
 
 * fix a bug in pointerset
-
+* added mulle_strdup
 
 # 1.2
 

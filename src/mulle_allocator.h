@@ -35,9 +35,9 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
-
-#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (3 << 8) | 0)
+#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (4 << 8) | 0)
 
 //
 // mulle_allocator: a way to pass around the memory scheme du jour
@@ -162,5 +162,34 @@ static inline int   mulle_abafree( void *block)
 {
    return( _mulle_allocator_abafree( &mulle_default_allocator, block));
 }
+
+
+# pragma mark -
+# pragma mark strdup convenience
+
+static inline char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
+{
+   size_t   len;
+   char     *dup;
+   
+   len = strlen( s) + 1;
+   dup = _mulle_allocator_malloc( p, len);
+   if( dup)
+      memcpy( dup, s, len);
+   return( dup);
+}
+
+
+static inline char   *mulle_allocator_strdup( struct mulle_allocator *p, char *s)
+{
+   return( _mulle_allocator_strdup( p ? p : &mulle_default_allocator, s));
+}
+
+
+static inline char   *mulle_strdup( char *s)
+{
+   return( mulle_allocator_strdup( &mulle_default_allocator, s));
+}
+
 
 #endif
