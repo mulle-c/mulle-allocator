@@ -1,3 +1,7 @@
+# 1.5
+
+* improve test realloc, by checking that passed in block is valid  
+
 # 1.4
 
 * added mulle_strdup

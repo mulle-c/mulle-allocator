@@ -204,7 +204,8 @@ static void   bail( void *p)
 
 static void  *test_realloc( void *q, size_t size)
 {
-   void           *p;
+   void   *p;
+   void   *old;
    
    if( ! may_alloc( size))
    {
@@ -212,46 +213,65 @@ static void  *test_realloc( void *q, size_t size)
       return( NULL);
    }
 
+   if( q)
+   {
+      if( mulle_thread_mutex_lock( &alloc_lock))
+      {
+         perror( "mulle_thread_mutex_lock:");
+         abort();
+      }
+
+      old = _pointerset_get( &allocations, q);
+      if( ! old)
+      {
+         fprintf( stderr, "\n###\n### false realloc: %p", q);
+         if( trace > 1)
+            stacktrace( 1);
+         fputc( '\n', stderr);
+      
+         bail( q);
+      }
+      mulle_thread_mutex_unlock( &alloc_lock);
+   }
+
    //
    // dont_free doesn't work here, since we don't know the previous size
    // we cant fake it with a malloc/memcpy combination
    //
    p = realloc( q, size);
-   
-   if( ! p)
-      return( p);
-
-   if( mulle_thread_mutex_lock( &alloc_lock))
+   if( p)
    {
-      perror( "mulle_thread_mutex_lock:");
-      abort();
-   }
-   
-   if( ! q)
-   {
-      // just a normal malloc
-      _pointerset_remove( &frees, p);
-      assert( ! _pointerset_get( &allocations, p));
-      _pointerset_add( &allocations, p, calloc, free);
-   }
-   else
-   {
-      // if p == q, then nothing happened
-      if( p != q)
+      if( mulle_thread_mutex_lock( &alloc_lock))
       {
-         assert( ! _pointerset_get( &frees, q));
-         assert( _pointerset_get( &allocations, q));
-         _pointerset_remove( &allocations, q);
-         _pointerset_add( &frees, q, calloc, free);
-         
+         perror( "mulle_thread_mutex_lock:");
+         abort();
+      }
+      
+      if( ! q)
+      {
+         // just a normal malloc
          _pointerset_remove( &frees, p);
          assert( ! _pointerset_get( &allocations, p));
          _pointerset_add( &allocations, p, calloc, free);
       }
+      else
+      {
+         // if p == q, then nothing happened
+         if( p != q)
+         {
+            assert( ! _pointerset_get( &frees, q));
+            assert( _pointerset_get( &allocations, q));
+            _pointerset_remove( &allocations, q);
+            _pointerset_add( &frees, q, calloc, free);
+            
+            _pointerset_remove( &frees, p);
+            assert( ! _pointerset_get( &allocations, p));
+            _pointerset_add( &allocations, p, calloc, free);
+         }
+      }
+      mulle_thread_mutex_unlock( &alloc_lock);
    }
    
-   mulle_thread_mutex_unlock( &alloc_lock);
-
    if( trace)
    {
       if( q)
@@ -320,7 +340,6 @@ static void  test_free( void *p)
    q = _pointerset_get( &allocations, p);
    if( ! q)
    {
-      q = _pointerset_get( &allocations, p);  // debug a problem
       fprintf( stderr, "\n###\n### false free: %p", p);
       if( trace > 1)
          stacktrace( 1);
@@ -329,7 +348,6 @@ static void  test_free( void *p)
       bail( p);
    }
    _pointerset_remove( &allocations, q);
-   
    
    q = _pointerset_get( &frees, p);
    if( q)

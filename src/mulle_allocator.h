@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (4 << 8) | 0)
+#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (5 << 8) | 0)
 
 //
 // mulle_allocator: a way to pass around the memory scheme du jour
@@ -88,7 +88,8 @@ static inline void   *_mulle_allocator_realloc( struct mulle_allocator *p, void 
 
 static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *block)
 {
-   (*p->free)( block);
+   if( block)
+      (*p->free)( block);
 }
 
 
