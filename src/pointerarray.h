@@ -37,7 +37,9 @@
 #pragma mark -
 #pragma mark _pointerarray, simple growing array all inlined used for testing
 
+#include <assert.h>
 #include <string.h>
+
 
 // can store null pointers, so the "no" pointer is -1
 struct _pointerarray

@@ -37,6 +37,7 @@
 #pragma mark -
 #pragma mark _pointerset, simple growing hashtable all inlined used for testing
 
+#include <assert.h>
 #include <string.h>
 
 

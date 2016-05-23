@@ -36,9 +36,10 @@
 
 #include <mulle_thread/mulle_thread.h>
 #include "mulle_allocator.h"
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #ifdef __APPLE__
 # include <execinfo.h>
 # include <stdio.h>
