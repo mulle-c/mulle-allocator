@@ -134,8 +134,8 @@ static int  boring( char *s, int size)
 
 static void   stacktrace( int offset)
 {
-   fprintf( stderr, " : [");
 #ifdef __APPLE__
+   fprintf( stderr, " : [");
    {
       void   *callstack[256];
       int    frames;
@@ -173,8 +173,8 @@ static void   stacktrace( int offset)
       }
       free( strs);
    }
-#endif
    fputc( ']', stderr);
+#endif
 }
 
 
