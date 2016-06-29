@@ -287,7 +287,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 417C02651BD8404E005A3751 /* Debug.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1.5;
+				CURRENT_PROJECT_VERSION = 1.6;
+				GCC_C_LANGUAGE_STANDARD = c99;
 			};
 			name = Debug;
 		};
@@ -295,7 +296,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 417C02681BD8404E005A3751 /* Release.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1.5;
+				CURRENT_PROJECT_VERSION = 1.6;
+				GCC_C_LANGUAGE_STANDARD = c99;
 			};
 			name = Release;
 		};
