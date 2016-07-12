@@ -64,7 +64,7 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p, void *a
       p = &mulle_default_allocator;
 
    p->aba     = aba;
-   p->abafree = f ? (void *) f : (void *) abort;
+   p->abafree = f ? (int (*)()) f : (int (*)()) abort;
 }
 
 

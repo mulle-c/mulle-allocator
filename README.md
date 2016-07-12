@@ -24,7 +24,7 @@ stdlib allocator:
 ```
 struct mulle_allocator   mulle_stdlib_allocator =
 {
-   calloc, realloc, free, (void *) abort, NULL
+   calloc, realloc, free, abort, NULL
 };
 ```
 
