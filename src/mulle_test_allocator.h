@@ -56,4 +56,8 @@ extern int       mulle_test_allocator_dont_free;
 
 extern struct mulle_allocator   mulle_test_allocator;
 
+// unlocked functions, rarely useful
+void   _mulle_test_allocator_reset( void);
+void   _mulle_test_allocator_detect_leaks( void);
+
 #endif /* mulle_test_allocator_h */

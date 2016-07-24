@@ -1,5 +1,6 @@
 # 1.6
   
+* test allocator exposes a bit more internal functionality
 
 # 1.5
 

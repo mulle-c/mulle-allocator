@@ -95,6 +95,8 @@ static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *blo
 
 static inline int   _mulle_allocator_abafree( struct mulle_allocator *p, void *block)
 {
+   if( ! block)
+      return( 0);
    return( (*p->abafree)( p->aba, p->free, block));
 }
 

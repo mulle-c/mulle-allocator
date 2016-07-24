@@ -403,18 +403,25 @@ void   mulle_test_allocator_set_tracelevel( unsigned int value)
 }
 
 
-void   mulle_test_allocator_reset()
+void   _mulle_test_allocator_reset()
+{
+   _pointerset_done( &allocations, free);
+   _pointerset_done( &frees, free);
+   
+   mulle_test_allocator_out_of_memory = 0;
+   mulle_test_allocator_max_size      = 0;
+   
+   _pointerset_init( &allocations);
+   _pointerset_init( &frees);
+}
+
+
+void   _mulle_test_allocator_detect_leaks()
 {
    struct _pointerset_enumerator   rover;
    void                            *p;
    void                            *first_leak;
    
-   if( mulle_thread_mutex_lock( &alloc_lock))
-   {
-      perror( "mulle_thread_mutex_lock:");
-      abort();
-   }
-
    first_leak = NULL;
    
    rover = _pointerset_enumerate( &allocations);
@@ -428,18 +435,23 @@ void   mulle_test_allocator_reset()
 
    if( first_leak)
       bail( first_leak);
-   
-   _pointerset_done( &allocations, free);
-   _pointerset_done( &frees, free);
-   
-   mulle_test_allocator_out_of_memory = 0;
-   mulle_test_allocator_max_size      = 0;
-   
-   _pointerset_init( &allocations);
-   _pointerset_init( &frees);
+}
+
+
+void   mulle_test_allocator_reset()
+{
+   if( mulle_thread_mutex_lock( &alloc_lock))
+   {
+      perror( "mulle_thread_mutex_lock:");
+      abort();
+   }
+
+   _mulle_test_allocator_detect_leaks();
+   _mulle_test_allocator_reset();
 
    mulle_thread_mutex_unlock( &alloc_lock);
 }
+
 
 
 __attribute__((constructor))
