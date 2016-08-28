@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 3.0)
 
 project (mulle-container)
 
+cmake_policy(SET CMP0054 NEW)
+
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/mulle-configuration)
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
   include( Debug)
