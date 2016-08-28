@@ -34,6 +34,7 @@
 
 #include "mulle_test_allocator.h"
 
+#include <mulle_c11/mulle_c11.h>
 #include <mulle_thread/mulle_thread.h>
 #include "mulle_allocator.h"
 #include <assert.h>
@@ -451,7 +452,6 @@ void   mulle_test_allocator_reset()
 
    mulle_thread_mutex_unlock( &alloc_lock);
 }
-
 
 
 //
