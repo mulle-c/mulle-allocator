@@ -454,7 +454,10 @@ void   mulle_test_allocator_reset()
 
 
 
-__attribute__((constructor))
+//
+// TODO: this doesn't work with non-clang compilers
+// 
+MULLE_C_CONSTRUCTOR
 void   mulle_test_allocator_initialize()
 {
    int    rval;
