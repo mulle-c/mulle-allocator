@@ -48,13 +48,13 @@ void   mulle_test_allocator_reset( void);
 void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 
 // will be reset by mulle_test_allocator_reset
-extern int       mulle_test_allocator_out_of_memory;
-extern size_t    mulle_test_allocator_max_size;
+MULLE_C_EXTERN_GLOBAL int       mulle_test_allocator_out_of_memory;
+MULLE_C_EXTERN_GLOBAL size_t    mulle_test_allocator_max_size;
 
 // use this to avoid reuse of memory areas
-extern int       mulle_test_allocator_dont_free;
+MULLE_C_EXTERN_GLOBAL int       mulle_test_allocator_dont_free;
 
-extern struct mulle_allocator   mulle_test_allocator;
+MULLE_C_EXTERN_GLOBAL struct mulle_allocator   mulle_test_allocator;
 
 // unlocked functions, rarely useful
 void   _mulle_test_allocator_reset( void);

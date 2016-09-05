@@ -465,12 +465,17 @@ void   mulle_test_allocator_initialize()
 
    if( trace != -1)
       return;
-   
+
+   fprintf( stderr, "mulle_test_allocator: initalize\n");
+
    rval = mulle_thread_mutex_init( &alloc_lock);
    assert( ! rval);
    
    s = getenv( "MULLE_TEST_ALLOCATOR_TRACE");
    mulle_test_allocator_set_tracelevel( s ? atoi( s) : 0);
+
+   if( trace)
+      fprintf( stderr, "mulle_test_allocator: activated\n");
 
    s = getenv( "MULLE_TEST_ALLOCATOR_DONT_FREE");
    mulle_test_allocator_dont_free = s ? atoi( s) : 0;
