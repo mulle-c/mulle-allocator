@@ -57,7 +57,7 @@ static struct _pointerset     frees;
 static mulle_thread_mutex_t   alloc_lock;
 static int                    trace = -1;
 
-struct _mulle_test_allocator_config    mulle_test_allocator_config;
+MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config;
 
 
 static int   may_alloc( size_t size)
@@ -378,7 +378,7 @@ static void  test_free( void *p)
 #pragma mark -
 #pragma mark global variable
 
-struct mulle_allocator   mulle_test_allocator =
+MULLE_C_GLOBAL struct mulle_allocator   mulle_test_allocator =
 {
    test_calloc,
    test_realloc,
