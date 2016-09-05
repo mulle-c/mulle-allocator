@@ -36,6 +36,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mulle_c11/mulle_c11.h>
 
 #define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (6 << 8) | 0)
 

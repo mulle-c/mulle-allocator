@@ -36,6 +36,7 @@
 #define mulle_test_allocator_h__
 
 #include <stddef.h>
+#include <mulle_c11/mulle_c11.h>
 
 
 /*  if you want to replace the default allocator, say
