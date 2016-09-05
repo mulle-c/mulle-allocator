@@ -55,20 +55,17 @@
 static struct _pointerset     allocations;
 static struct _pointerset     frees;
 static mulle_thread_mutex_t   alloc_lock;
+static int                    trace = -1;
 
-int       mulle_test_allocator_out_of_memory;
-size_t    mulle_test_allocator_max_size;
-int       mulle_test_allocator_dont_free;
-
-static int  trace = -1;
+struct _mulle_test_allocator_config    mulle_test_allocator_config;
 
 
 static int   may_alloc( size_t size)
 {
-   if( mulle_test_allocator_out_of_memory)
+   if( mulle_test_allocator_config.out_of_memory)
       return( 0);
 
-   return( ! mulle_test_allocator_max_size ||  size > mulle_test_allocator_max_size);
+   return( ! mulle_test_allocator_config.max_size ||  size > mulle_test_allocator_config.max_size);
 }
 
 
@@ -365,7 +362,7 @@ static void  test_free( void *p)
 
    mulle_thread_mutex_unlock( &alloc_lock);
 
-   if( ! mulle_test_allocator_dont_free)
+   if( ! mulle_test_allocator_config.dont_free)
       free( p);
 
    if( trace)
@@ -409,8 +406,8 @@ void   _mulle_test_allocator_reset()
    _pointerset_done( &allocations, free);
    _pointerset_done( &frees, free);
 
-   mulle_test_allocator_out_of_memory = 0;
-   mulle_test_allocator_max_size      = 0;
+   mulle_test_allocator_config.out_of_memory = 0;
+   mulle_test_allocator_config.max_size      = 0;
 
    _pointerset_init( &allocations);
    _pointerset_init( &frees);
@@ -472,9 +469,9 @@ void   mulle_test_allocator_initialize()
    s = getenv( "MULLE_TEST_ALLOCATOR_TRACE");
    mulle_test_allocator_set_tracelevel( s ? atoi( s) : 0);
 
-   s = getenv( "MULLE_TEST_ALLOCATOR_DONT_FREE");
-   mulle_test_allocator_dont_free = s ? atoi( s) : 0;
+   s = getenv( "mulle_test_allocator_config.dont_free");
+   mulle_test_allocator_config.dont_free = s ? atoi( s) : 0;
 
-   if( mulle_test_allocator_dont_free && trace)
+   if( mulle_test_allocator_config.dont_free && trace)
       fprintf( stderr, "mulle_test_allocator: memory will not really be freed\n");
 }
