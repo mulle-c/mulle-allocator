@@ -57,12 +57,16 @@ static struct _pointerset     frees;
 static mulle_thread_mutex_t   alloc_lock;
 static int                    trace = -1;
 
-MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config = 
+//
+// unintialized data gets name mangled by cl.exe
+// initialized data fortunately not
+//
+MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config  = 
 {
 #ifdef _WIN32
    1
 #endif      
-}
+};
 
 
 
