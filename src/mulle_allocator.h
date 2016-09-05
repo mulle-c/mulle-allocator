@@ -54,8 +54,8 @@ struct mulle_allocator
 };
 
 
-extern struct mulle_allocator   mulle_default_allocator;
-extern struct mulle_allocator   mulle_stdlib_allocator;
+MULLE_C_EXTERN_GLOBAL struct mulle_allocator   mulle_default_allocator;
+MULLE_C_EXTERN_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
 
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p, void *aba, int (*f)( void *aba, int (*free)( void *), void *block))
