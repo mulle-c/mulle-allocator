@@ -50,6 +50,7 @@ void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 
 struct _mulle_test_allocator_config
 {
+	int      _windows;
 	int      out_of_memory;
 	size_t   max_size;
 	int      dont_free;  // use this to avoid reuse of memory areas

@@ -57,7 +57,13 @@ static struct _pointerset     frees;
 static mulle_thread_mutex_t   alloc_lock;
 static int                    trace = -1;
 
-MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config;
+MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config = 
+{
+#ifdef _WIN32
+   1
+#endif      
+}
+
 
 
 static int   may_alloc( size_t size)
