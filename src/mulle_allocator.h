@@ -40,6 +40,12 @@
 
 #define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (6 << 8) | 0)
 
+#ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
+# define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL
+#endif
+#define MULLE_ALLOCATOR_GLOBAL           MULLE_C_GLOBAL
+
+
 //
 // mulle_allocator: a way to pass around the memory scheme du jour
 //                  for transparent mulle_aba support, there is the
@@ -55,8 +61,8 @@ struct mulle_allocator
 };
 
 
-MULLE_C_EXTERN_GLOBAL struct mulle_allocator   mulle_default_allocator;
-MULLE_C_EXTERN_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
+MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_default_allocator;
+MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
 
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p, void *aba, int (*f)( void *aba, int (*free)( void *), void *block))
