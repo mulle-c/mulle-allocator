@@ -32,6 +32,8 @@
 #ifndef mulle_allocator_struct_h__
 #define mulle_allocator_struct_h__
 
+#include <stddef.h>
+
 //
 // mulle_allocator: a way to pass around the memory scheme du jour
 //                  for transparent mulle_aba support, there is the
