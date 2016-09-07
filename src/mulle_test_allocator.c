@@ -62,8 +62,7 @@ MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_confi
 #ifdef _WIN32
    1
 #endif      
-}
-
+};
 
 
 static int   may_alloc( size_t size)
