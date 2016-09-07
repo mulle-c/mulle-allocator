@@ -1,7 +1,7 @@
-//  mulle-container
+//  mulle-allocator
 //
-//  Created by Nat! on 02/11/15.
-//  Copyright © 2015 Mulle kybernetiK. All rights reserved.
+//  Created by Nat! on 06/09/16.
+//  Copyright © 2016 Mulle kybernetiK. All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:
@@ -29,23 +29,19 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include <stdlib.h>
-#include <mulle_c11/mulle_c11.h>
-#include "mulle_allocator_struct.h"
+#ifndef mulle_test_allocator_struct_h__
+#define mulle_test_allocator_struct_h__
 
-
-#pragma mark -
-#pragma mark _mulle_allocator
-
-MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
+/*  if you want to replace the default allocator, say
+ *    mulle_default_allocator = mulle_test_allocator;
+ *  before or after calling `mulle_test_allocator_initialize`
+ */
+struct _mulle_test_allocator_config
 {
-   calloc, realloc, free, (int (*)()) abort, NULL
+	int      _windows;
+	int      out_of_memory;
+	size_t   max_size;
+	int      dont_free;  // use this to avoid reuse of memory areas
 };
 
-
-// this will be patched by the foundation
-
-MULLE_C_GLOBAL struct mulle_allocator   mulle_default_allocator =
-{
-   calloc, realloc, free, (int (*)()) abort, NULL
-};
+#endif

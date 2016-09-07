@@ -35,29 +35,19 @@
 #ifndef mulle_test_allocator_h__
 #define mulle_test_allocator_h__
 
-#include "mulle_allocator.h"
+#include <mulle_allocator/mulle_allocator.h>
+
+#include "mulle_test_allocator_struct.h"
 
 
-/*  if you want to replace the default allocator, say
- *    mulle_default_allocator = mulle_test_allocator;
- *  before or after calling `mulle_test_allocator_initialize`
- */
+MULLE_ALLOCATOR_EXTERN_GLOBAL struct _mulle_test_allocator_config   mulle_test_allocator_config;
+MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator                mulle_test_allocator;
+
 void   mulle_test_allocator_initialize( void);
 
 void   mulle_test_allocator_reset( void);
 void   mulle_test_allocator_set_tracelevel( unsigned int value); // 0,1,2
 
-struct _mulle_test_allocator_config
-{
-	int      _windows;
-	int      out_of_memory;
-	size_t   max_size;
-	int      dont_free;  // use this to avoid reuse of memory areas
-};
-
-// will be reset by mulle_test_allocator_reset
-MULLE_ALLOCATOR_EXTERN_GLOBAL struct _mulle_test_allocator_config   mulle_test_allocator_config;
-MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator                mulle_test_allocator;
 
 // unlocked functions, rarely useful
 void   _mulle_test_allocator_reset( void);
