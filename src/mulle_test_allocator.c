@@ -31,12 +31,10 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-
-#include "mulle_test_allocator.h"
-
 #include <mulle_c11/mulle_c11.h>
 #include <mulle_thread/mulle_thread.h>
 #include "mulle_allocator.h"
+#include "mulle_test_allocator_struct.h"
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -57,11 +55,12 @@ static struct _pointerset     frees;
 static mulle_thread_mutex_t   alloc_lock;
 static int                    trace = -1;
 
+
 //
 // unintialized data gets name mangled by cl.exe
 // initialized data fortunately not
 //
-MULLE_ALLOCATOR_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config  = 
+MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config  = 
 {
 #ifdef _WIN32
    1

@@ -32,33 +32,17 @@
 #ifndef mulle_allocator_h__
 #define mulle_allocator_h__
 
-
+#include "mulle_allocator_struct.h"
+#include <mulle_c11/mulle_c11.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mulle_c11/mulle_c11.h>
 
 #define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (6 << 8) | 0)
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
 # define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL
 #endif
-#define MULLE_ALLOCATOR_GLOBAL           MULLE_C_GLOBAL
-
-
-//
-// mulle_allocator: a way to pass around the memory scheme du jour
-//                  for transparent mulle_aba support, there is the
-//                  smart option.
-//
-struct mulle_allocator
-{
-   void   *(*calloc)( size_t n, size_t size);
-   void   *(*realloc)( void *block, size_t size);
-   void   (*free)( void *block);
-   int    (*abafree)( void *aba, void (*free)( void *), void *block);
-   void   *aba;
-};
 
 
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_default_allocator;

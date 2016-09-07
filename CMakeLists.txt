@@ -14,6 +14,7 @@ endif()
 
 set(HEADERS
 src/mulle_allocator.h
+src/mulle_allocator_struct.h
 )
 
 add_library(mulle_allocator
@@ -22,6 +23,7 @@ src/mulle_allocator.c
 
 set(TEST_HEADERS
 src/mulle_test_allocator.h
+src/mulle_test_allocator_struct.h
 )
 
 add_library(mulle_test_allocator

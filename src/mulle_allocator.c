@@ -29,16 +29,15 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-
-#include "mulle_allocator.h"
-
 #include <stdlib.h>
+#include <mulle_c11/mulle_c11.h>
+#include "mulle_allocator_struct.h"
 
 
 #pragma mark -
 #pragma mark _mulle_allocator
 
-MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
+MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 {
    calloc, realloc, free, (int (*)()) abort, NULL
 };
@@ -46,7 +45,7 @@ MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 
 // this will be patched by the foundation
 
-MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator =
+MULLE_C_GLOBAL struct mulle_allocator   mulle_default_allocator =
 {
    calloc, realloc, free, (int (*)()) abort, NULL
 };
