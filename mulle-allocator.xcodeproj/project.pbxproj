@@ -22,6 +22,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		4111AFD21D80461500DFB901 /* mulle_allocator_struct.h in Headers */ = {isa = PBXBuildFile; fileRef = 4111AFD11D80461500DFB901 /* mulle_allocator_struct.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4111AFD41D80461D00DFB901 /* mulle_test_allocator_struct.h in Headers */ = {isa = PBXBuildFile; fileRef = 4111AFD31D80461D00DFB901 /* mulle_test_allocator_struct.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4149459F1BEAB59B00C92587 /* pointerarray.h in Headers */ = {isa = PBXBuildFile; fileRef = 414945961BEAADAA00C92587 /* pointerarray.h */; };
 		414945A01BEAB5A000C92587 /* mulle_test_allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 414945941BEAACC100C92587 /* mulle_test_allocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		414945A11BEAB5AE00C92587 /* mulle_test_allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = 414945931BEAACC100C92587 /* mulle_test_allocator.c */; };
@@ -55,6 +57,8 @@
 
 /* Begin PBXFileReference section */
 		410E85191BDE954000FF7BF2 /* _Common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = _Common.xcconfig; sourceTree = "<group>"; };
+		4111AFD11D80461500DFB901 /* mulle_allocator_struct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_allocator_struct.h; sourceTree = "<group>"; };
+		4111AFD31D80461D00DFB901 /* mulle_test_allocator_struct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mulle_test_allocator_struct.h; sourceTree = "<group>"; };
 		411A28C11BCD446E00D39FF7 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		41300C941C870EEF00D1D1C1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		414945931BEAACC100C92587 /* mulle_test_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mulle_test_allocator.c; sourceTree = "<group>"; };
@@ -75,6 +79,7 @@
 		419DA4C91C8DCE7100220747 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		41D04ABC1C8DF2A300CC8F11 /* RELEASENOTES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = RELEASENOTES.md; sourceTree = "<group>"; };
 		41D53B811CB7BB0B006BFF0E /* pointerset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pointerset.h; sourceTree = "<group>"; };
+		41E283E51D8043FC00A85233 /* Library.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Library.xcconfig; sourceTree = "<group>"; };
 		41F14FE61B68F098002189F1 /* libmulle_allocator.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmulle_allocator.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		41FC644A1C971BEA009E8702 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,8 +121,10 @@
 			children = (
 				41D53B821CB7ED20006BFF0E /* Containers */,
 				4198C8A51BE7D89F00EE1FF5 /* mulle_allocator.h */,
+				4111AFD11D80461500DFB901 /* mulle_allocator_struct.h */,
 				4198C8A41BE7D89F00EE1FF5 /* mulle_allocator.c */,
 				414945941BEAACC100C92587 /* mulle_test_allocator.h */,
+				4111AFD31D80461D00DFB901 /* mulle_test_allocator_struct.h */,
 				414945931BEAACC100C92587 /* mulle_test_allocator.c */,
 			);
 			path = src;
@@ -131,6 +138,7 @@
 				417C02651BD8404E005A3751 /* Debug.xcconfig */,
 				417C02661BD8404E005A3751 /* IOS.xcconfig */,
 				417C02671BD8404E005A3751 /* OSX.xcconfig */,
+				41E283E51D8043FC00A85233 /* Library.xcconfig */,
 				417C02681BD8404E005A3751 /* Release.xcconfig */,
 				417C02691BD8404E005A3751 /* StaticLibrary.xcconfig */,
 				417C026A1BD8404E005A3751 /* StaticLibraryIOS.xcconfig */,
@@ -157,6 +165,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4198C8A71BE7D89F00EE1FF5 /* mulle_allocator.h in Headers */,
+				4111AFD21D80461500DFB901 /* mulle_allocator_struct.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,6 +174,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				414945A01BEAB5A000C92587 /* mulle_test_allocator.h in Headers */,
+				4111AFD41D80461D00DFB901 /* mulle_test_allocator_struct.h in Headers */,
 				4149459F1BEAB59B00C92587 /* pointerarray.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
