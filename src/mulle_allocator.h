@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (6 << 8) | 0)
+#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (6 << 8) | 1)
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
 # define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL
@@ -165,7 +165,7 @@ static inline char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *
 {
    size_t   len;
    char     *dup;
-   
+
    len = strlen( s) + 1;
    dup = _mulle_allocator_malloc( p, len);
    if( dup)

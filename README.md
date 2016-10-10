@@ -1,11 +1,13 @@
 
 # `mulle_allocator`
 
-`mulle_allocator`: a way to pass around the memory scheme du jour. In general
-you shouldn't jump through the vectors directly, but use the supplied inline
-functions.
+`mulle_allocator` is a way to pass around the memory scheme du jour. It also
+has a companion library `mulle_test_allocator` that checks for leaks, double
+frees and so forth. It simplifies the implementation of data structures and
+makes them more flexible.
 
-The struct looks like this:
+
+The `mulle_allocator` struct that you pass around looks like this:
 
 ```
 struct mulle_allocator
@@ -18,49 +20,63 @@ struct mulle_allocator
 };
 ```
 
-The default allocator `mulle_default_allocator` is defined identical to the
-stdlib allocator:
+> By default `.aba` and `.abafree` are not available.
+> If you need ABA safe freeing, it is recommended to use [mulle-aba](//www.mulle-kybernetik.com/software/git/mulle-aba/).
+
+
+In general you will not jump through the vectors directly, but use
+supplied inline functions like `mulle_allocator_malloc`. Your code can then
+use the allocator like so:
 
 ```
-struct mulle_allocator   mulle_stdlib_allocator =
+static char   *prefix_with_vfl( char *s, struct mulle_allocator *allocator)
 {
-   calloc, realloc, free, abort, NULL
-};
-```
+   size_t   len;
+   size_t   dstlen;
+   char     *dst;
 
-By default `.aba` and `.abafree` are not available. For some lock-free data
-structures you may need to supply a ABA-safe freeing function.
-
-> Recommendation use [mulle-aba](//www.mulle-kybernetik.com/software/git/mulle-aba/).
-
-
-# `mulle_test_allocator`
-
-## How to use it
-
-Link against `mulle_test_allocator` to search for leaks and mistaken frees in 
-your code. And wrap the test allocator around your code like this:
-
-```
-int  main( int argc, char *argv[])
-{
-   mulle_test_allocator_initialize();
-   mulle_default_allocator = mulle_test_allocator;
+   len    = s ? strlen( s) : 0;
+   dstlen = len + 4;
+   dst    = mulle_allocator_malloc( allocator, dstlen + 1);
+   if( dst)
    {
-      // do stuff
+      memcpy( dst, "VfL ", 4);
+      memcpy( &dst[ 4], s, len);
+      dst[ dstlen] = 0;
    }
-   mulle_test_allocator_reset();
+   return( dst);
 }
 ```
 
-> This will check all allocations going through `mulle_allocator_malloc` and
-friends. Direct calls to `malloc` can not be tracked.
 
-## Debug Support
+## Install
 
-Debug support can be turned on and off with environment variables
+On OS X and Linux you can use [homebrew](//brew.sh), respectively [linuxbrew](//linuxbrew.sh) to install the library:
 
-Variable                       | Description
------------------------------- | ------------------------------------
-MULLE_TEST_ALLOCATOR_TRACE     | Trace allocations and deallocations. A value larger than 1, adds a stacktrace to the output (on participating platforms). A value larger than 2 increases the verbosity of the stacktrace.
-MULLE_TEST_ALLOCATOR_DONT_FREE | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
+```
+brew tap mulle-kybernetik/software
+brew install mulle-allocator
+```
+
+On other platforms you can use **mulle-install** from [mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build) to install the library:
+
+```
+mulle-install --prefix /usr/local --branch release https://www.mulle-kybernetik.com/repositories/mulle-allocator
+```
+
+
+Otherwise read:
+
+* [How to Build](dox/BUILD.md)
+
+
+## API
+
+* [Allocator](dox/API_ALLOCATOR.md)
+* [Test Allocator](dox/API_TEST_ALLOCATOR.md)
+
+
+### Platforms and Compilers
+
+All platforms and compilers supported by [mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) and [mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/).
+

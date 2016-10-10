@@ -460,7 +460,7 @@ void   mulle_test_allocator_reset()
 
 
 //
-// TODO: this doesn't work with non-clang compilers
+// TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
 MULLE_C_CONSTRUCTOR
 void   mulle_test_allocator_initialize()
@@ -477,7 +477,7 @@ void   mulle_test_allocator_initialize()
    s = getenv( "MULLE_TEST_ALLOCATOR_TRACE");
    mulle_test_allocator_set_tracelevel( s ? atoi( s) : 0);
 
-   s = getenv( "mulle_test_allocator_config.dont_free");
+   s = getenv( "MULLE_TEST_ALLOCATOR_DONT_FREE");
    mulle_test_allocator_config.dont_free = s ? atoi( s) : 0;
 
    if( mulle_test_allocator_config.dont_free && trace)
