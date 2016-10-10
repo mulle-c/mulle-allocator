@@ -1,10 +1,10 @@
 
 # `mulle_allocator`
 
-`mulle_allocator` is a way to pass around the memory scheme du jour. It also
-has a companion library `mulle_test_allocator` that checks for leaks, double
-frees and so forth. It simplifies the implementation of data structures and
-makes them more flexible.
+`mulle_allocator` is a way to pass around the memory scheme du jour in **C**.
+It also has a companion library `mulle_test_allocator` that checks for leaks,
+double frees and so forth. It simplifies the implementation of data structures
+and makes them more flexible.
 
 
 The `mulle_allocator` struct that you pass around looks like this:

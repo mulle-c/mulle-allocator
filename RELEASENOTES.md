@@ -1,3 +1,9 @@
+1.6.2
+===
+
+* improve documentation
+
+
 1.6.1
 ===
 
