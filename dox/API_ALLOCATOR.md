@@ -1,4 +1,6 @@
-# API
+# mulle-allocator API
+
+Familiarize yourself with [stdlib memory allocation](//wikipedia.org/wiki/C_dynamic_memory_allocation) first, because **mulle-vararg** is based on it.
 
 
 ## Global Variables
@@ -21,11 +23,16 @@ it directly but `mulle_default_allocator` instead. A use case for
 `mulle_stdlib_allocator` is, when you are interfacing with other code, that
 expects this memory to be allocated by stdlib.
 
-You can modify `mulle_default_allocator` though.
+You can modify `mulle_default_allocator` though. Do that as early as possible,
+before the use of the allocator.
 
 
 ## Functions
 
+> Ensure that allocators do not change once they are passsed. A function
+> that accepts an allocator may store a reference or a copy of it in a
+> created data structure.
+> This is valid and intended.
 
 ### stdlib interface
 
