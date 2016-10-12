@@ -60,11 +60,11 @@ static int                    trace = -1;
 // unintialized data gets name mangled by cl.exe
 // initialized data fortunately not
 //
-MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config  = 
+MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_config  =
 {
 #ifdef _WIN32
    1
-#endif      
+#endif
 };
 
 
@@ -344,18 +344,6 @@ static void  test_free( void *p)
       abort();
    }
 
-   q = _pointerset_get( &allocations, p);
-   if( ! q)
-   {
-      fprintf( stderr, "\n###\n### false free: %p", p);
-      if( trace > 1)
-         stacktrace( 1);
-      fputc( '\n', stderr);
-
-      bail( p);
-   }
-   _pointerset_remove( &allocations, q);
-
    q = _pointerset_get( &frees, p);
    if( q)
    {
@@ -367,6 +355,18 @@ static void  test_free( void *p)
       bail( p);
    }
    _pointerset_add( &frees, p, calloc, free);
+
+   q = _pointerset_get( &allocations, p);
+   if( ! q)
+   {
+      fprintf( stderr, "\n###\n### false free: %p", p);
+      if( trace > 1)
+         stacktrace( 1);
+      fputc( '\n', stderr);
+
+      bail( p);
+   }
+   _pointerset_remove( &allocations, q);
 
    mulle_thread_mutex_unlock( &alloc_lock);
 
