@@ -1,8 +1,9 @@
-1.6.2
+1.7
 ===
 
 * improve documentation
-
+* improve error output, so that double free is tested first
+* add tests
 
 1.6.1
 ===
