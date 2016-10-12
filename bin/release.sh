@@ -54,19 +54,21 @@ git_must_be_clean()
 
 [ ! -d "${HOMEBREWTAP}" ] && fail "failed to locate \"${HOMEBREWTAP}\""
 
-set -e
-
-git_must_be_clean
+git_must_be_clean || exit 1
 
 branch="`git rev-parse --abbrev-ref HEAD`"
 
-git push "${ORIGIN}" "${branch}"
+#
+# make it a release
+#
+git checkout release     || exit 1
+git rebase "${branch}"   || exit 1
 
-# seperate step, as it's tedious to remove tag when
-# previous push fails
+# if rebase fails, we shouldn't be hitting tag now
+git tag "${TAG}"         || exit 1
 
-git tag "${TAG}"
-git push "${ORIGIN}" "${branch}" --tags
+git push "${ORIGIN}" release --tags  || exit 1
+git push github release --tags       || exit 1
 
 ./bin/generate-brew-formula.sh "${VERSION}" > "${HOMEBREWTAP}/${RBFILE}"
 (
@@ -74,6 +76,7 @@ git push "${ORIGIN}" "${branch}" --tags
    git add "${RBFILE}" ;
    git commit -m "${TAG} release of ${NAME}" "${RBFILE}" ;
    git push origin master
-)
+)  || exit 1
 
-git checkout "${branch}"
+git checkout "${branch}"          || exit 1
+git push "${ORIGIN}" "${branch}"  || exit 1
