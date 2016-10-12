@@ -3,7 +3,9 @@
 //  mulle-aba-test
 //
 //  Created by Nat! on 10.03.15.
-//  Copyright (c) 2015 Mulle kybernetiK. All rights reserved.
+//  Copyright (c) 2015 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2015 Codeon GmbH.
+//  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or without
 //  modification, are permitted provided that the following conditions are met:

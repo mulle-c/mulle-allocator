@@ -1,13 +1,77 @@
+---
+layout: post
+author: Nat!
+title: 
+open_comments: false
+date: 2016-10-12 16:46
+---
 
-# `mulle_allocator`
+# mulle_allocator
 
-`mulle_allocator` is a way to pass around the memory scheme du jour in **C**.
-With its companion library `mulle_test_allocator` it can checks for leaks and
-wrong frees and wrong pointers to realloc. It simplifies the implementation
-of data structures and makes them more flexible.
+... a leak and double free checker
+
+... a way to pass around the memory scheme du jour
+
+... simple API, just like malloc, realloc, free
 
 
-The `mulle_allocator` struct that you pass around looks like this:
+**mulle_allocator** comes as two libraries: `mulle_allocator` and
+`mulle_test_allocator`. The API of both is identical, but `mulle_test_allocator` provides the error detection, which you may want to leave out. 
+
+
+##  Use `mulle_test_allocator` for leak detection
+
+If you use `mulle_malloc` and friends instead of `malloc` in your code,
+you can easily check for leaks during tests using the `mulle_test_allocator`
+library.
+
+So instead of:
+
+```
+   s = strdup( "VfL Bochum 1848");
+   foo( s);
+   free( s);
+```
+
+write
+
+
+```
+   s = mulle_strdup( "VfL Bochum 1848");
+   foo( s);
+   mulle_free( s);
+```
+
+
+Then wrap your test code inside
+
+```
+mulle_test_allocator_initialize();
+mulle_default_allocator = mulle_test_allocator;
+{
+   // do stuff
+}
+mulle_test_allocator_reset();
+```
+
+and `mulle_test_allocator_reset` will tell you about your leaks.
+All allocator routines will check for erroneus frees and wrong pointers.
+
+
+##  Use `mulle_allocator` to make data structures more flexible
+
+You can make your code more flexible by incorporating a pointer to the
+`mulle_allocator` struct into your data structure.
+
+The advantages are:
+
+1. For testing you can isolate your leaks with a separate allocator from other
+leaks. This makes it easier to pinpoint problems in your code.
+2. Allow your data structure to reside in memory, that is not allocated by
+<stdib.h> (e.g. shared memory)
+
+
+The `mulle_allocator` struct looks like this:
 
 ```
 struct mulle_allocator
@@ -23,16 +87,17 @@ struct mulle_allocator
 > By default `.aba` and `.abafree` are not available.
 > If you need ABA safe freeing, it is recommended to use [mulle-aba](//www.mulle-kybernetik.com/software/git/mulle-aba/).
 
-
 In general you will not jump through the vectors directly, but use
-supplied inline functions like `mulle_allocator_malloc`. Your data structure
-code would typically use the allocator in this fashion:
+supplied inline functions like `mulle_allocator_malloc` to allocate memory
+using the allocator.
+
+Your data structure code could use the allocator in this fashion:
 
 ```
 struct my_string
 {
-   struct mulle_allocator  *allocator;
-   char                    s[ 1];
+   struct mulle_allocator   *allocator;
+   char                     s[ 1];
 };
 
 
@@ -46,7 +111,8 @@ struct my_string   *my_string_alloc( char *s, struct mulle_allocator *allocator)
    if( dst)
    {
       dst->allocator = allocator;
-      memcpy( p->s, s, len + 1);
+      memcpy( p->s, s, len);
+      p->s[ len] = 0;
    }
    return( dst);
 }
@@ -71,14 +137,15 @@ struct my_other_string
 
 struct my_other_string   *my_other_string_alloc( char *s, struct mulle_allocator *allocator)
 {
-   size_t              len;
-   struct my_string    *p;
+   size_t                    len;
+   struct my_other_string    *p;
 
    len = s ? strlen( s) : 0;
    dst = mulle_allocator_malloc( allocator, sizeof( struct my_other_string) + len);
    if( dst)
    {
-      memcpy( p->s, s, len + 1);
+      memcpy( p->s, s, len);
+      p->s[ len] = 0;
    }
    return( dst);
 }
@@ -87,23 +154,10 @@ struct my_other_string   *my_other_string_alloc( char *s, struct mulle_allocator
 static inline void   my_other_string_free( struct my_other_string *p,
                                            struct mulle_allocator *allocator)
 {
-   mulle_allocator_free( p->allocator, p);
+   mulle_allocator_free( allocator, p);
 }
 ```
 
-Now writing test codes to check for leaks in your data structures becomes very
-easy. Wrap you code inside:
-
-```
-mulle_test_allocator_initialize();
-mulle_default_allocator = mulle_test_allocator;
-{
-   // do stuff
-}
-mulle_test_allocator_reset();
-```
-
-And `mulle_test_allocator_reset` will tell you about your leaks.
 
 
 ## Install
