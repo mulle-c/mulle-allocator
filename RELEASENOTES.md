@@ -1,3 +1,8 @@
+1.7.5
+===
+
+* improve documentation
+
 1.7.4
 ===
 

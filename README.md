@@ -1,6 +1,6 @@
 # mulle_allocator
 
-... is a leak and double free checker for tests and at runtime
+... is a leak and double free checker for tests (and at runtime)
 
 ... provides a way to pass around the memory scheme du jour
 
@@ -21,17 +21,20 @@ library.
 So instead of:
 
 ```
+   malloc( 1848);
+   calloc( 18, 48);
    s = strdup( "VfL Bochum 1848");
-   foo( s);
+   realloc( s, 18);
    free( s);
 ```
 
 write
 
-
 ```
+   mulle_malloc( 1848);
+   mulle_calloc( 18, 48);
    s = mulle_strdup( "VfL Bochum 1848");
-   foo( s);
+   mulle_realloc( s, 18);
    mulle_free( s);
 ```
 
@@ -48,19 +51,22 @@ mulle_test_allocator_reset();
 ```
 
 and `mulle_test_allocator_reset` will tell you about your leaks.
-All test allocator routines will check for erroneus frees and wrong pointers.
+All `mulle_test_allocator` routines will check for erroneus frees and
+wrong pointers.
 
 
 ##  Use `mulle_allocator` to make your code more flexible
 
 You can make your code, and especially your data structures, more flexible by
-using `mulle_allocator`, decoupling your datastructure from **stdib**. This
-enables your data structure for example to reside in shared memory without
-having to provide extra functions. Your API consumers just have to pass their
-own allocators.
+using `mulle_allocator`, by decoupling your data structure from **stdib**. This
+enables your data structure to reside in shared memory for example, without
+you having to provide extra functions. Your API consumers just have to pass
+their own allocators.
 
-Also it it helpfuil to isolate your datastructure memory allocation during tests
-so other, possibly benign, code leaks do not obscure the test.
+Also it it helpful to isolate your datastructure memory allocation during tests.
+This way, other, possibly benign, code leaks, do not obscure the test.
+
+## What it is
 
 The `mulle_allocator` struct looks like this:
 
