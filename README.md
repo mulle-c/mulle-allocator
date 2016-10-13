@@ -1,22 +1,16 @@
----
-layout: post
-author: Nat!
-title: 
-open_comments: false
-date: 2016-10-12 16:46
----
-
 # mulle_allocator
 
-... a leak and double free checker
+... is a leak and double free checker
 
-... a way to pass around the memory scheme du jour
+... provides a way to pass around the memory scheme du jour
 
-... simple API, just like malloc, realloc, free
+... has identical API to malloc, realloc, free
 
 
 **mulle_allocator** comes as two libraries: `mulle_allocator` and
-`mulle_test_allocator`. The API of both is identical, but `mulle_test_allocator` provides the error detection, which you may want to leave out. 
+`mulle_test_allocator`. The API of both is identical, but
+`mulle_test_allocator` provides the error detection, which you may
+want to include or leave out.
 
 
 ##  Use `mulle_test_allocator` for leak detection
@@ -55,20 +49,20 @@ mulle_test_allocator_reset();
 ```
 
 and `mulle_test_allocator_reset` will tell you about your leaks.
-All allocator routines will check for erroneus frees and wrong pointers.
+All test allocator routines will check for erroneus frees and wrong pointers.
 
 
-##  Use `mulle_allocator` to make data structures more flexible
+##  Use `mulle_allocator` to make your code more flexible
 
-You can make your code more flexible by incorporating a pointer to the
-`mulle_allocator` struct into your data structure.
+You can make your code more flexible by using `mulle_allocator` instead of
+stdlib directly. That goes especially for your data structures.
 
 The advantages are:
 
 1. For testing you can isolate your leaks with a separate allocator from other
-leaks. This makes it easier to pinpoint problems in your code.
+code leaks. This makes it easier to pinpoint problems in your code.
 2. Allow your data structure to reside in memory, that is not allocated by
-<stdib.h> (e.g. shared memory)
+<stdib.h> (e.g. shared memory) without having to provide extra functions.
 
 
 The `mulle_allocator` struct looks like this:
@@ -107,20 +101,21 @@ struct my_string   *my_string_alloc( char *s, struct mulle_allocator *allocator)
    struct my_string    *p;
 
    len = s ? strlen( s) : 0;
-   dst = mulle_allocator_malloc( allocator, sizeof( struct my_string) + len);
-   if( dst)
+   p   = mulle_allocator_malloc( allocator, sizeof( struct my_string) + len);
+   if( p)
    {
       dst->allocator = allocator;
       memcpy( p->s, s, len);
       p->s[ len] = 0;
    }
-   return( dst);
+   return( p);
 }
 
 
 static inline void   my_string_free( struct my_string *p)
 {
-   mulle_allocator_free( p->allocator, p);
+   if( p)
+      mulle_allocator_free( p->allocator, p);
 }
 
 ```
@@ -141,13 +136,13 @@ struct my_other_string   *my_other_string_alloc( char *s, struct mulle_allocator
    struct my_other_string    *p;
 
    len = s ? strlen( s) : 0;
-   dst = mulle_allocator_malloc( allocator, sizeof( struct my_other_string) + len);
-   if( dst)
+   p   = mulle_allocator_malloc( allocator, sizeof( struct my_other_string) + len);
+   if( p)
    {
       memcpy( p->s, s, len);
       p->s[ len] = 0;
    }
-   return( dst);
+   return( p);
 }
 
 
@@ -159,17 +154,21 @@ static inline void   my_other_string_free( struct my_other_string *p,
 ```
 
 
-
 ## Install
 
-On OS X and Linux you can use [homebrew](//brew.sh), respectively [linuxbrew](//linuxbrew.sh) to install the library:
+On OS X and Linux you can use
+[homebrew](//brew.sh), respectively
+[linuxbrew](//linuxbrew.sh)
+to install the library:
 
 ```
 brew tap mulle-kybernetik/software
 brew install mulle-allocator
 ```
 
-On other platforms you can use **mulle-install** from [mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build) to install the library:
+On other platforms you can use **mulle-install** from
+[mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build)
+to install the library:
 
 ```
 mulle-install --prefix /usr/local --branch release https://www.mulle-kybernetik.com/repositories/mulle-allocator
@@ -189,5 +188,7 @@ Otherwise read:
 
 ### Platforms and Compilers
 
-All platforms and compilers supported by [mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) and [mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/).
+All platforms and compilers supported by
+[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) and
+[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/).
 

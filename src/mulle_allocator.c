@@ -39,7 +39,8 @@
 #pragma mark -
 #pragma mark _mulle_allocator
 
-MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
+MULLE_C_GLOBAL
+struct mulle_allocator   mulle_stdlib_allocator =
 {
    calloc, realloc, free, (int (*)()) abort, NULL
 };
@@ -47,7 +48,8 @@ MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 
 // this will be patched by the foundation
 
-MULLE_C_GLOBAL struct mulle_allocator   mulle_default_allocator =
+MULLE_C_GLOBAL
+struct mulle_allocator   mulle_default_allocator =
 {
    calloc, realloc, free, (int (*)()) abort, NULL
 };

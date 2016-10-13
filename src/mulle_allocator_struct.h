@@ -38,8 +38,7 @@
 
 //
 // mulle_allocator: a way to pass around the memory scheme du jour
-//                  for transparent mulle_aba support, there is the
-//                  smart option.
+//                  you can usually leave aba/abafree uninitialized
 //
 struct mulle_allocator
 {
