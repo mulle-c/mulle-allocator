@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (7 << 8) | 1)
+#define MULLE_ALLOCATOR_VERSION  ((1 << 20) | (7 << 8) | 3)
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
 # define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL

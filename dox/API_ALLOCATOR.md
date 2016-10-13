@@ -8,8 +8,8 @@ Familiarize yourself with [stdlib memory allocation](//wikipedia.org/wiki/C_dyna
 mulle_allocator provides two allocators: `mulle_stdlib_allocator` and
 `mulle_default_allocator`.
 
-The default allocator `mulle_default_allocator` is defined identical to the
-`mulle_stdlib_allocator` allocator, which is defined like this:
+The default allocator `mulle_default_allocator` is initially defined identical
+to the `mulle_stdlib_allocator` allocator, which is defined like this:
 
 ```
 struct mulle_allocator   mulle_stdlib_allocator =
@@ -21,10 +21,10 @@ struct mulle_allocator   mulle_stdlib_allocator =
 Your code should not modify `mulle_stdlib_allocator` and usually you do not use
 it directly but `mulle_default_allocator` instead. A use case for
 `mulle_stdlib_allocator` is, when you are interfacing with other code, that
-expects this memory to be allocated by stdlib.
+expects memory to be allocated by stdlib to free or realloc it.
 
-You can modify `mulle_default_allocator` though. Do that as early as possible,
-before the use of the allocator.
+You can modify `mulle_default_allocator`. Do that before the first use
+`mulle_default_allocator`.
 
 
 ## Functions
@@ -34,9 +34,10 @@ before the use of the allocator.
 > created data structure.
 > This is valid and intended.
 
+
 ### stdlib interface
 
-mulle_allocator functions in general usage are like the stdlib allocation
+mulle_allocator functions are just like the stdlib allocation
 functions with a `mulle_? prefix (they will use the `mulle_default_allocator`):
 
 stdlib  | mulle_allocator
