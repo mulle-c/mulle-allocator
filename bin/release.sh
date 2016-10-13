@@ -1,82 +1,49 @@
-#! /bin/sh
+#! /bin/sh -x
 
-NAME="mulle-allocator"  # not the ruby name
+NAME="mulle-allocator"    # your project name as known by git and homebrew
+
+# source mulle-homebrew.sh (clumsily)
+
+. ./bin/mulle-homebrew/mulle-homebrew.sh
+
+# --- HOMEBREW FORMULA ---
+# Information needed to construct a proper brew formula
+#
+HOMEPAGE="https://www.mulle-kybernetik.com/software/git/${NAME}"
+DESC="Flexible memory allocation scheme with leak checker"
+PROJECT="MulleAllocator"  # for ruby, it requires camel-case
+ARCHIVEURL='https://www.mulle-kybernetik.com/software/git/${NAME}/tarball/${VERSION}'  # ARCHIVEURL will be evaled later! keep it in single quotes
+DEPENDENCIES="mulle-c11
+mulle-thread"             # other required brew dependencies separated by linefeed
+
+
+# --- HOMEBREW TAP ---
+# Specify to where and under what bame to publish via your brew tap
+#
+RBFILE="${NAME}.rb"                    # ruby file for brew
+HOMEBREWTAP="../homebrew-software"     # your tap repository path
+
+
+# --- GIT AND HOMEBREW VERSIONING ---
+# you have to figure out how to provide the script with a version
+# the easiest way is to use the predefined `get_header_version`.
+# Which is provided by `mulle-homebrew.sh`
+#
 HEADER="src/mulle_allocator.h"
 VERSIONNAME="MULLE_ALLOCATOR_VERSION"
-ORIGIN=public
+VERSION="`get_header_version ${HEADER}`"
 
-RBFILE="${NAME}.rb"
-HOMEBREWTAP="../homebrew-software"
+# --- GIT ---
+# tag to tag your release
+# and the origin where
+ORIGIN=public                        # git repo to push
+TAG="${1:-${TAGPREFIX}${VERSION}}"
 
 
-get_version()
+main()
 {
-   local filename
-
-   filename="$1"
-   fgrep "${VERSIONNAME}" "${filename}" | \
-   sed 's|(\([0-9]*\) \<\< [0-9]*)|\1|g' | \
-   sed 's|^.*(\(.*\))|\1|' | \
-   sed 's/ | /./g'
+   git_main "${ORIGIN}" "${TAG}" || exit 1
+   homebrew_main || exit 1
 }
 
-VERSION="`get_version ${HEADER}`"
-TAG="${1:-${VERSION}}"
-
-
-directory="`mulle-bootstrap library-path 2> /dev/null`"
-[ ! -d "${directory}" ] && echo "failed to locate mulle-bootstrap library" >&2 && exit 1
-
-PATH="${directory}:$PATH"
-
-. "mulle-bootstrap-logging.sh"
-
-
-git_must_be_clean()
-{
-   local name
-   local clean
-
-   name="${1:-${PWD}}"
-
-   if [ ! -d .git ]
-   then
-      fail "\"${name}\" is not a git repository"
-   fi
-
-   clean=`git status -s --untracked-files=no`
-   if [ "${clean}" != "" ]
-   then
-      fail "repository \"${name}\" is tainted"
-   fi
-}
-
-
-[ ! -d "${HOMEBREWTAP}" ] && fail "failed to locate \"${HOMEBREWTAP}\""
-
-git_must_be_clean || exit 1
-
-branch="`git rev-parse --abbrev-ref HEAD`"
-
-#
-# make it a release
-#
-git checkout release     || exit 1
-git rebase "${branch}"   || exit 1
-
-# if rebase fails, we shouldn't be hitting tag now
-git tag "${TAG}"         || exit 1
-
-git push "${ORIGIN}" release --tags  || exit 1
-git push github release --tags       || exit 1
-
-./bin/generate-brew-formula.sh "${VERSION}" > "${HOMEBREWTAP}/${RBFILE}"
-(
-   cd "${HOMEBREWTAP}" ;
-   git add "${RBFILE}" ;
-   git commit -m "${TAG} release of ${NAME}" "${RBFILE}" ;
-   git push origin master
-)  || exit 1
-
-git checkout "${branch}"          || exit 1
-git push "${ORIGIN}" "${branch}"  || exit 1
+main "$@"

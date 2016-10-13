@@ -22,3 +22,5 @@ tests/test/doublefree
 tests/test/badfree
 tests/test/leak
 tests/test/noleak
+bin/mulle-homebrew/
+tests/test/noleak
