@@ -11,7 +11,7 @@ PROJECTNAME="`basename "${PROJECTDIR}"`"
 LIBRARY_SHORTNAME="mulle_test_allocator"
 ADDITIONAL_LIBS=mulle_allocator
 
-. "../mulle-tests/test-c-common.sh"
-. "../mulle-tests/test-tools-common.sh"
-. "../mulle-tests/test-staticlib-common.sh"
-. "../mulle-tests/run-test-common.sh"
+. "mulle-tests/test-c-common.sh"
+. "mulle-tests/test-tools-common.sh"
+. "mulle-tests/test-staticlib-common.sh"
+. "mulle-tests/run-test-common.sh"

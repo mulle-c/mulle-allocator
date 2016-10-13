@@ -24,3 +24,4 @@ tests/test/leak
 tests/test/noleak
 bin/mulle-homebrew/
 tests/test/noleak
+/tests/mulle-tests/
