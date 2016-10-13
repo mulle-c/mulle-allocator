@@ -9,7 +9,6 @@
 
 * remove debug flag from release
 
-
 1.7.1
 ===
 
