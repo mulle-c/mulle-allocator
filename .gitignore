@@ -25,3 +25,4 @@ tests/test/noleak
 bin/mulle-homebrew/
 tests/test/noleak
 /tests/mulle-tests/
+tests/test/goodfree
