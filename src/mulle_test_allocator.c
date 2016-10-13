@@ -207,6 +207,11 @@ static void   bail( void *p)
       system( buf);
    }
 #endif
+   
+/* abort is clumsy on WIN32 */
+#ifdef _WIN32
+   exit( 1);
+#endif
    abort();
 }
 
