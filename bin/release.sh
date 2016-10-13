@@ -10,7 +10,7 @@ NAME="mulle-allocator"    # your project name as known by git and homebrew
 # Information needed to construct a proper brew formula
 #
 HOMEPAGE="https://www.mulle-kybernetik.com/software/git/${NAME}"
-DESC="Flexible memory allocation scheme with leak checker"
+DESC="Flexible C memory allocation scheme with leak checking"
 PROJECT="MulleAllocator"  # for ruby, it requires camel-case
 ARCHIVEURL='https://www.mulle-kybernetik.com/software/git/${NAME}/tarball/${VERSION}'  # ARCHIVEURL will be evaled later! keep it in single quotes
 DEPENDENCIES="mulle-c11

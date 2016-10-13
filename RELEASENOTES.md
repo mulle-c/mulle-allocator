@@ -1,3 +1,8 @@
+1.7.1
+===
+
+* Improve documentation, but a release branch up
+
 1.7
 ===
 
