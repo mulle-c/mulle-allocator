@@ -58,15 +58,15 @@ wrong pointers.
 ##  Use `mulle_allocator` to make your code more flexible
 
 You can make your code, and especially your data structures, more flexible by
-using `mulle_allocator`, by decoupling your data structure from **stdib**. This
-enables your data structure to reside in shared memory for example, without
-you having to provide extra functions. Your API consumers just have to pass
-their own allocators.
+using `mulle_allocator` As this decoupled your data structure from **stdib**, it
+enables your data structure to reside in shared memory for example with no
+additional code. Your API consumers just have to pass their own allocators.
 
 Also it it helpful to isolate your datastructure memory allocation during tests.
 This way, other, possibly benign, code leaks, do not obscure the test.
 
-## What it is
+
+## What is an allocator ?
 
 The `mulle_allocator` struct looks like this:
 
@@ -88,7 +88,8 @@ In general you will not jump through the vectors directly, but use
 supplied inline functions like `mulle_allocator_malloc` to allocate memory
 using the allocator.
 
-Your data structure code could use the allocator in this fashion:
+A pointer to this structure could be passed to your data structure code. It
+would use the allocator in this fashion:
 
 ```
 struct my_string
