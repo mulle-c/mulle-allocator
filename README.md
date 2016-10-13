@@ -192,3 +192,9 @@ All platforms and compilers supported by
 [mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) and
 [mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/).
 
+
+## Author
+
+[Nat!](//www.mulle-kybernetik.com/weblog) for
+[Mulle kybernetiK](//www.mulle-kybernetik.com) and
+[Codeon GmbH](//www.codeon.de)
