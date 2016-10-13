@@ -1,6 +1,7 @@
 # mulle-allocator API
 
-Familiarize yourself with [stdlib memory allocation](//wikipedia.org/wiki/C_dynamic_memory_allocation) first, because **mulle-vararg** is based on it.
+Familiarize yourself with [stdlib memory allocation](//wikipedia.org/wiki/C_dynamic_memory_allocation) first, because **mulle-allocator** is pretty
+much the same (and using it).
 
 
 ## Global Variables
@@ -19,11 +20,11 @@ struct mulle_allocator   mulle_stdlib_allocator =
 ```
 
 Your code should not modify `mulle_stdlib_allocator` and usually you do not use
-it directly but `mulle_default_allocator` instead. A use case for
+it directly but you use `mulle_default_allocator` instead. A use case for
 `mulle_stdlib_allocator` is, when you are interfacing with other code, that
 expects memory to be allocated by stdlib to free or realloc it.
 
-You can modify `mulle_default_allocator`. Do that before the first use
+You can modify `mulle_default_allocator`. You must do that before the first use
 `mulle_default_allocator`.
 
 
@@ -31,14 +32,13 @@ You can modify `mulle_default_allocator`. Do that before the first use
 
 > Ensure that allocators do not change once they are passsed. A function
 > that accepts an allocator may store a reference or a copy of it in a
-> created data structure.
-> This is valid and intended.
+> created data structure. This is valid and intended.
 
 
 ### stdlib interface
 
-mulle_allocator functions are just like the stdlib allocation
-functions with a `mulle_? prefix (they will use the `mulle_default_allocator`):
+`mulle_allocator` functions are just like the stdlib allocation
+functions with a `mulle_ prefix (they will use the `mulle_default_allocator`):
 
 stdlib  | mulle_allocator
 --------|--------------------------

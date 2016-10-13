@@ -3,7 +3,7 @@
 ## How to use it
 
 Link against `mulle_test_allocator` to search for leaks and mistaken frees in
-your code. And wrap the test allocator around your code like this:
+your code. Wrap the test allocator around your code like this:
 
 ```
 int  main( int argc, char *argv[])

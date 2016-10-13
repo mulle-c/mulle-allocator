@@ -1,6 +1,6 @@
 # mulle_allocator
 
-... is a leak and double free checker
+... is a leak and double free checker for tests and at runtime
 
 ... provides a way to pass around the memory scheme du jour
 
@@ -8,9 +8,8 @@
 
 
 **mulle_allocator** comes as two libraries: `mulle_allocator` and
-`mulle_test_allocator`. The API of both is identical, but
-`mulle_test_allocator` provides the error detection, which you may
-want to include or leave out.
+`mulle_test_allocator`. `mulle_test_allocator` provides the error detection,
+which you may want to include or leave out.
 
 
 ##  Use `mulle_test_allocator` for leak detection
@@ -54,16 +53,14 @@ All test allocator routines will check for erroneus frees and wrong pointers.
 
 ##  Use `mulle_allocator` to make your code more flexible
 
-You can make your code more flexible by using `mulle_allocator` instead of
-stdlib directly. That goes especially for your data structures.
+You can make your code, and especially your data structures, more flexible by
+using `mulle_allocator`, decoupling your datastructure from **stdib**. This
+enables your data structure for example to reside in shared memory without
+having to provide extra functions. Your API consumers just have to pass their
+own allocators.
 
-The advantages are:
-
-1. For testing you can isolate your leaks with a separate allocator from other
-code leaks. This makes it easier to pinpoint problems in your code.
-2. Allow your data structure to reside in memory, that is not allocated by
-<stdib.h> (e.g. shared memory) without having to provide extra functions.
-
+Also it it helpfuil to isolate your datastructure memory allocation during tests
+so other, possibly benign, code leaks do not obscure the test.
 
 The `mulle_allocator` struct looks like this:
 
