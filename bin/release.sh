@@ -1,4 +1,4 @@
-#! /bin/sh -x
+#! /bin/sh 
 
 NAME="mulle-allocator"    # your project name as known by git and homebrew
 
