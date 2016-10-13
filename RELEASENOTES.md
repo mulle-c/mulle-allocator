@@ -1,7 +1,20 @@
+1.7.3
+===
+
+* more tidying up for release
+
+
+1.7.2
+===
+
+* remove debug flag from release
+
+
 1.7.1
 ===
 
 * Improve documentation, but a release branch up
+
 
 1.7
 ===
@@ -9,6 +22,7 @@
 * improve documentation
 * improve error output, so that double free is tested first
 * add tests
+
 
 1.6.1
 ===

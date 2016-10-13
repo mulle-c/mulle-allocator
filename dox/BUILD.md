@@ -22,34 +22,32 @@ that abstracts a small set of non-standardized compiler features.
 
 #### mulle-thread
 
-[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/) unifies
-atomic and thread operations across multiple platforms.
+[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-c11/) contains
+the necessary mutex for test allocators locking.
 
 #### mulle-configuration
 
-[mulle-configuration](//www.mulle-kybernetik.com/software/git/mulle-c11/) are
-configuration files for building with Xcode or cmake.
+[mulle-configuration](//www.mulle-kybernetik.com/software/git/mulle-configuration/) are
+configuration files for building with Xcode or cmake. This is expected to
+exist in the project directory root.
+
+#### mulle-homebrew
+
+[mulle-homebrew](//www.mulle-kybernetik.com/software/git/mulle-homebrew/) is
+support for generating homebrew formulae. This is expected to
+exist in `./bin`, if you want to release a fork.
+
+#### mulle-tests
+
+[mulle-tests](//www.mulle-kybernetik.com/software/git/mulle-tests/) are
+scripts to provide an environment for running the tests. This is expected to
+exist in `./tests`, if you want to run tests.
 
 
 ### Windows: Installing further prerequisites
 
-You need to install some more prerequisites first.
-
-* Install [Visual Studio 2015 Community Edition](//beta.visualstudio.com/downloads/)
-or better (free). Make sure that you install Windows C++ support. Also add git support.
-* [Git for Windows](//git-scm.com/download/win) is included in VS 2015, make sure it's there
-* [Python 2 for Windows](//www.python.org/downloads/windows/). Make sure that python is installed in **PATH**, which is not the default.
-* [CMake for Windows](//cmake.org/download/). CMake should also add itself to **PATH**.
-
-Reboot, so that Windows picks up the **PATH** changes (Voodoo).
-
-Now the tricky part is to get the "Git bash" shell running with the proper VS
-environment.  Assuming you kept default settings the "Git bash" is
-`C:\Program Files\Git\git-bash.exe`. Open the "Developer Command Prompt for VS 2015"
-from the start menu and execute the git-bash from there. A second window with
-the bash should open.
-
-Check that you have the proper environment for VS compilation with `env`.
+Check the [mulle-build README.md](//www.mulle-kybernetik.com/software/git/mulle-build/README.md)
+for instrutions how to get the "Git for Windows" bash going.
 
 
 ### OSX: Install mulle-build using homebrew
@@ -102,16 +100,3 @@ Build library in release mode and install into `tmp` :
 mulle-clean ;
 mulle-install --prefix /tmp
 ```
-
-
-### Compile Flags
-
-For development use no flags.
-
-For production use NDEBUG
-
-* DEBUG : turns on some compile time facilities to aid debugging `mulle-allocator` itself.
-* MULLE_ATOMIC_TRACE : turns on a very detailed amount of tracing for some atomic operations.
-
-
-

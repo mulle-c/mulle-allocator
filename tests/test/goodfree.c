@@ -6,7 +6,7 @@ static void  run_test( void)
 {
    void  *p;
 
-   p = mulle_malloc( 1848);  // just leak
+   p = mulle_malloc( 1848);
    mulle_free( p);
 }
 
