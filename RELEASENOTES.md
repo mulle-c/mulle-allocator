@@ -1,4 +1,4 @@
-1.7.3-1.7.7
+1.7.3-1.7.8
 ===
 
 * improve documentation

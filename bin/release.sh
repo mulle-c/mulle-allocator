@@ -1,10 +1,13 @@
-#! /bin/sh 
+#! /bin/sh
 
 NAME="mulle-allocator"    # your project name as known by git and homebrew
 
 # source mulle-homebrew.sh (clumsily)
 
 . ./bin/mulle-homebrew/mulle-homebrew.sh
+
+# options are trailing (!)
+homebrew_parse_options
 
 # --- HOMEBREW FORMULA ---
 # Information needed to construct a proper brew formula
@@ -43,7 +46,7 @@ TAG="${1:-${TAGPREFIX}${VERSION}}"
 main()
 {
    git_main "${ORIGIN}" "${TAG}" || exit 1
-   homebrew_main || exit 1
+   homebrew_main
 }
 
 main "$@"
