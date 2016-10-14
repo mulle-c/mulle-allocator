@@ -6,8 +6,8 @@ NAME="mulle-allocator"    # your project name as known by git and homebrew
 
 . ./bin/mulle-homebrew/mulle-homebrew.sh
 
-# options are trailing (!)
-homebrew_parse_options
+# options are trailing (!) e.g. ./release.sh foo -vv
+homebrew_parse_options "$@"
 
 # --- HOMEBREW FORMULA ---
 # Information needed to construct a proper brew formula
