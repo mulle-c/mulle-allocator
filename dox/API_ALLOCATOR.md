@@ -6,7 +6,7 @@ much the same (and using it).
 
 ## Global Variables
 
-mulle_allocator provides two allocators: `mulle_stdlib_allocator` and
+**mulle-allocator** provides two allocators: `mulle_stdlib_allocator` and
 `mulle_default_allocator`.
 
 The default allocator `mulle_default_allocator` is initially defined identical
@@ -37,8 +37,8 @@ You can modify `mulle_default_allocator`. You must do that before the first use
 
 ### stdlib interface
 
-`mulle_allocator` functions are just like the stdlib allocation
-functions with a `mulle_ prefix (they will use the `mulle_default_allocator`):
+**mulle-allocator** functions are just like the stdlib allocation
+functions with a `mulle_` prefix (they will use the `mulle_default_allocator`):
 
 stdlib  | mulle_allocator
 --------|--------------------------
@@ -53,7 +53,7 @@ strdup  | `mulle_strdup`
 
 ### allocator interface
 
-If you want to specify a custom allocator, you use the `mulle_allocator` prefix
+If you want to specify a custom allocator, you use the `mulle_allocator_` prefix
 and a pointer to your allocator as the first parameter (if the pointer is NULL
 `mulle_default_allocator` will be used):
 

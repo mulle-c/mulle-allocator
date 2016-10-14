@@ -68,7 +68,7 @@ This way, other, possibly benign, code leaks, do not obscure the test.
 
 ## What is an allocator ?
 
-The `mulle_allocator` struct is a mostly a collection of function pointers and
+The `mulle_allocator` struct is mostly a collection of function pointers and
 looks like this:
 
 ```
