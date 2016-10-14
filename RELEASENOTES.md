@@ -1,14 +1,4 @@
-1.7.6
-===
-
-* improve documentation
-
-1.7.5
-===
-
-* improve documentation
-
-1.7.4
+1.7.3-1.7.7
 ===
 
 * improve documentation
@@ -28,7 +18,7 @@
 1.7.1
 ===
 
-* Improve documentation, but a release branch up
+* Improve documentation, put a release branch up
 
 
 1.7
