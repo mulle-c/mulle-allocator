@@ -2,10 +2,15 @@
 
 ## How to use it
 
+
 Link against `mulle_test_allocator` to search for leaks and mistaken frees in
 your code. Wrap the test allocator around your code like this:
 
 ```
+#include <mulle_allocator/mulle_allocator.h>
+#include <mulle_test_allocator/mulle_test_allocator.h>
+
+
 int  main( int argc, char *argv[])
 {
    mulle_test_allocator_initialize();
