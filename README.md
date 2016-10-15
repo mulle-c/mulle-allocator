@@ -1,5 +1,7 @@
 # mulle_allocator
 
+Release on [github](//github.com/mulle-nat/mulle-allocator): [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
+
 ... is a leak and double free checker for tests (and at runtime)
 
 ... provides a way to pass around the memory scheme du jour
@@ -59,8 +61,9 @@ wrong pointers.
 
 You can make your code, and especially your data structures, more flexible by
 using `mulle_allocator` As this decoupled your data structure from **stdib**, it
-enables your data structure to reside in shared memory for example with no
-additional code. Your API consumers just have to pass their own allocators.
+enables your data structure to reside in shared or wired memory for example
+with no additional code. Your API consumers just have to pass their own
+allocators.
 
 Also it it helpful to isolate your datastructure memory allocation during tests.
 This way, other, possibly benign, code leaks, do not obscure the test.

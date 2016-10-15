@@ -3,6 +3,11 @@
 Familiarize yourself with [stdlib memory allocation](//wikipedia.org/wiki/C_dynamic_memory_allocation) first, because **mulle-allocator** is pretty
 much the same (and using it).
 
+## How to use it
+
+Link against `mulle_allocator` and
+`#include <mulle_allocator/mulle_allocator.h>` in your code.
+
 
 ## Global Variables
 

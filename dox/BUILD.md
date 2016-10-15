@@ -10,11 +10,6 @@ static libraries along with a bunch of headers.
 
 ## Prerequisites
 
-#### mulle-build
-
-[mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build) is required
-to assemble the dependencies together and build the library.
-
 #### mulle-c11
 
 [mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) is a header
@@ -22,14 +17,23 @@ that abstracts a small set of non-standardized compiler features.
 
 #### mulle-thread
 
-[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-c11/) contains
+[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/) contains
 the necessary mutex for test allocators locking.
 
 #### mulle-configuration
 
-[mulle-configuration](//www.mulle-kybernetik.com/software/git/mulle-configuration/) are
-configuration files for building with Xcode or cmake. This is expected to
+[mulle-configuration](//www.mulle-kybernetik.com/software/git/mulle-configuration/)
+are configuration files for building with Xcode or cmake. This is expected to
 exist in the project directory root.
+
+
+## Nice to have
+
+#### mulle-build
+
+[mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build) is used
+to assemble the dependencies together and build the library.
+
 
 #### mulle-homebrew
 
@@ -61,7 +65,14 @@ brew install mulle-build
 
 ### Linux: Install mulle-build using linuxbrew
 
-Install the [linuxbrew](//linuxbrew.sh/) package manager, then
+Install the [linuxbrew](//linuxbrew.sh/) package manager, then it seems you
+may need `python-setuptools` dependency as well:
+
+```
+sudo apt-get install python-setuptools
+```
+
+and then
 
 ```
 brew tap mulle-kybernetik/software
