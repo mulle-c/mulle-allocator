@@ -13,7 +13,7 @@ your code. Wrap the test allocator around your code like this:
 
 int  main( int argc, char *argv[])
 {
-   mulle_test_allocator_initialize();
+   mulle_test_allocator_reset();
    mulle_default_allocator = mulle_test_allocator;
    {
       // do stuff
@@ -28,8 +28,8 @@ friends. Direct calls to `malloc` can not be tracked.
 
 Debug support can be turned on and off with environment variables
 
-Variable                       | Description
------------------------------- | ------------------------------------
-MULLE_TEST_ALLOCATOR_TRACE     | Trace allocations and deallocations. A value larger than 1, adds a stacktrace to the output (on participating platforms). A value larger than 2 increases the verbosity of the stacktrace.
-MULLE_TEST_ALLOCATOR_DONT_FREE | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
+Variable                         | Description
+-------------------------------- | ------------------------------------
+`MULLE_TEST_ALLOCATOR_TRACE`     | Trace allocations and deallocations. A value larger than 1, adds a stacktrace to the output (on participating platforms). A value larger than 2 increases the verbosity of the stacktrace.
+`MULLE_TEST_ALLOCATOR_DONT_FREE` | Memory is not actually freed, this can be useful, when reuse of memory makes the trace too confusing. Obviously this can burn memory away quickly.
 
