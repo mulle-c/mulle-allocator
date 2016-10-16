@@ -13,7 +13,7 @@ your code. Wrap the test allocator around your code like this:
 
 int  main( int argc, char *argv[])
 {
-   mulle_test_allocator_reset();
+   mulle_test_allocator_initialize(); // or mulle_test_allocator_reset
    mulle_default_allocator = mulle_test_allocator;
    {
       // do stuff
@@ -25,6 +25,8 @@ int  main( int argc, char *argv[])
 > This will check all allocations going through `mulle_allocator_malloc` and
 friends. Direct calls to `malloc` can not be tracked.
 
+
+## Environment Variables
 
 Debug support can be turned on and off with environment variables
 

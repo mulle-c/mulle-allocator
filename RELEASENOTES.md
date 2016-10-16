@@ -1,3 +1,10 @@
+1.8.0
+===
+
+* to make it more painless on windows, let `mulle_test_allocator_reset` call
+`mulle_test_allocator_initialize` if needed.
+
+
 1.7.3-1.7.11
 ===
 
