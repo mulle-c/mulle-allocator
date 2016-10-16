@@ -72,6 +72,8 @@ MULLE_C_GLOBAL struct _mulle_test_allocator_config    mulle_test_allocator_confi
 
 static int   may_alloc( size_t size)
 {
+   assert( trace != -1 && "mulle_test_allocator_initialize has not run yet");
+
    if( mulle_test_allocator_config.out_of_memory)
       return( 0);
 
@@ -340,7 +342,9 @@ static void  *test_calloc( size_t n, size_t size)
 
 static void  test_free( void *p)
 {
-   void           *q;
+   void   *q;
+
+   assert( trace != -1 && "mulle_test_allocator_initialize has not run yet");
 
    if( ! p)
       return;
@@ -393,7 +397,8 @@ static void  test_free( void *p)
 #pragma mark -
 #pragma mark global variable
 
-MULLE_C_GLOBAL struct mulle_allocator   mulle_test_allocator =
+MULLE_C_GLOBAL 
+struct mulle_allocator   mulle_test_allocator =
 {
    test_calloc,
    test_realloc,
@@ -450,27 +455,11 @@ void   _mulle_test_allocator_detect_leaks()
       bail( first_leak);
 }
 
-
-void   mulle_test_allocator_reset()
-{
-   if( mulle_thread_mutex_lock( &alloc_lock))
-   {
-      perror( "mulle_thread_mutex_lock:");
-      abort();
-   }
-
-   _mulle_test_allocator_detect_leaks();
-   _mulle_test_allocator_reset();
-
-   mulle_thread_mutex_unlock( &alloc_lock);
-}
-
-
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
 MULLE_C_CONSTRUCTOR
-void   mulle_test_allocator_initialize()
+void   mulle_test_allocator_initialize( void)
 {
    int    rval;
    char   *s;
@@ -490,3 +479,23 @@ void   mulle_test_allocator_initialize()
    if( mulle_test_allocator_config.dont_free && trace)
       fprintf( stderr, "mulle_test_allocator: memory will not really be freed\n");
 }
+
+
+void   mulle_test_allocator_reset()
+{
+   if( trace == -1)
+      mulle_test_allocator_initialize();  // for windows, tests can get by calling 
+                                          // mulle_test_allocator_reset first
+   if( mulle_thread_mutex_lock( &alloc_lock))
+   {
+      perror( "mulle_thread_mutex_lock:");
+      abort();
+   }
+
+   _mulle_test_allocator_detect_leaks();
+   _mulle_test_allocator_reset();
+
+   mulle_thread_mutex_unlock( &alloc_lock);
+}
+
+
