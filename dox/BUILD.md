@@ -15,16 +15,17 @@ static libraries along with a bunch of headers.
 [mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) is a header
 that abstracts a small set of non-standardized compiler features.
 
-#### mulle-thread
-
-[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/) contains
-the necessary mutex for test allocators locking.
-
 #### mulle-configuration
 
 [mulle-configuration](//www.mulle-kybernetik.com/software/git/mulle-configuration/)
 are configuration files for building with Xcode or cmake. This is expected to
 exist in the project directory root.
+
+#### mulle-thread
+
+[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/) contains
+the necessary mutex for test allocators locking.
+
 
 
 ## Nice to have
@@ -82,9 +83,9 @@ brew install mulle-build
 ### All: Install mulle-build using git
 
 ```
-git clone https://www.mulle-kybernetik.com/repositories/mulle-bootstrap
+git clone --branch release https://www.mulle-kybernetik.com/repositories/mulle-bootstrap
 ( cd mulle-bootstrap ; ./install.sh )
-git clone https://www.mulle-kybernetik.com/repositories/mulle-build
+git clone --branch release https://www.mulle-kybernetik.com/repositories/mulle-build
 ( cd mulle-build ; ./install.sh )
 ```
 
@@ -94,7 +95,7 @@ git clone https://www.mulle-kybernetik.com/repositories/mulle-build
 Grab the latest **mulle-allocator** release and go into the project directory:
 
 ```
-git clone https://www.mulle-kybernetik.com/repositories/mulle-allocator
+git clone --branch release https://www.mulle-kybernetik.com/repositories/mulle-allocator
 cd mulle-allocator
 ```
 
