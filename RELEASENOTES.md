@@ -1,3 +1,8 @@
+1.8.1
+===
+
+* improve .travis.yml
+
 1.8.0
 ===
 
