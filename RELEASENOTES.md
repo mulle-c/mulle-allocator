@@ -1,3 +1,10 @@
+2.0.0
+===
+
+A drastic change. The allocator structure has gained a fail pointe and the
+semantics of calloc, realloc are now defined to be unfailing. Check the
+README.md for background.
+
 1.8.1
 ===
 

@@ -34,7 +34,9 @@
 #ifndef mulle_allocator_struct_h__
 #define mulle_allocator_struct_h__
 
+#include <mulle_c11/mulle_c11.h>
 #include <stddef.h>
+
 
 //
 // mulle_allocator: a way to pass around the memory scheme du jour
@@ -45,6 +47,7 @@ struct mulle_allocator
    void   *(*calloc)( size_t n, size_t size);
    void   *(*realloc)( void *block, size_t size);
    void   (*free)( void *block);
+   void   (*fail)( void *block, size_t size) MULLE_C_NO_RETURN;
    int    (*abafree)( void *aba, void (*free)( void *), void *block);
    void   *aba;
 };

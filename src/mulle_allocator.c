@@ -31,9 +31,20 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include <stdlib.h>
 #include <mulle_c11/mulle_c11.h>
 #include "mulle_allocator_struct.h"
+// #include "mulle_allocator.h"  // don't include for windows
+#include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+
+MULLE_C_NO_RETURN
+void   mulle_allocator_fail( void *block, size_t size)
+{
+   perror( "memory allocation:");
+   exit( 1);
+}
 
 
 #pragma mark -
@@ -42,7 +53,7 @@
 MULLE_C_GLOBAL
 struct mulle_allocator   mulle_stdlib_allocator =
 {
-   calloc, realloc, free, (int (*)()) abort, NULL
+   calloc, realloc, free, mulle_allocator_fail, (int (*)()) abort, NULL
 };
 
 
@@ -51,5 +62,8 @@ struct mulle_allocator   mulle_stdlib_allocator =
 MULLE_C_GLOBAL
 struct mulle_allocator   mulle_default_allocator =
 {
-   calloc, realloc, free, (int (*)()) abort, NULL
+   calloc, realloc, free, mulle_allocator_fail, (int (*)()) abort, NULL
 };
+
+
+

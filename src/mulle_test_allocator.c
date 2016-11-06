@@ -37,6 +37,7 @@
 #include <mulle_thread/mulle_thread.h>
 #include "mulle_allocator.h"
 #include "mulle_test_allocator_struct.h"
+// #include "mulle_test_allocator.h"  // don't include for windows
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -403,7 +404,8 @@ struct mulle_allocator   mulle_test_allocator =
    test_calloc,
    test_realloc,
    test_free,
-   (void *) abort,
+   mulle_allocator_fail,
+   (void (*)()) abort,
    NULL
 };
 
