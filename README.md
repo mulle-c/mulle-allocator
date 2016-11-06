@@ -8,6 +8,8 @@ Release on [github](//github.com/mulle-nat/mulle-allocator): [![Build Status](ht
 
 ... has identical API to malloc, realloc, free
 
+... frees your code from having to check for errors when allocating memory
+
 
 **mulle_allocator** comes as two libraries: `mulle_allocator` and
 `mulle_test_allocator`. `mulle_test_allocator` provides the error detection,
@@ -80,6 +82,7 @@ struct mulle_allocator
    void   *(*calloc)( size_t n, size_t size);
    void   *(*realloc)( void *block, size_t size);
    void   (*free)( void *block);
+   void   (*fail)( void *block, size_t size) MULLE_C_NO_RETURN;
    int    (*abafree)( void *aba, void (*free)( void *), void *block);
    void   *aba;
 };
@@ -88,9 +91,10 @@ struct mulle_allocator
 > By default `.aba` and `.abafree` are not available.
 > If you need ABA safe freeing, it is recommended to use [mulle-aba](//www.mulle-kybernetik.com/software/git/mulle-aba/).
 
-In general you will not jump through the vectors directly, but use
+You should not jump through the vectors directly, but use
 supplied inline functions like `mulle_allocator_malloc` to allocate memory
-using the allocator.
+using the allocator, since they perform the necessary return value checks 
+(see below: Dealing with memory shortage)
 
 A pointer to this structure could be passed to your data structure code. It
 would use the allocator in this fashion:
@@ -110,20 +114,16 @@ struct my_string   *my_string_alloc( char *s, struct mulle_allocator *allocator)
 
    len = s ? strlen( s) : 0;
    p   = mulle_allocator_malloc( allocator, sizeof( struct my_string) + len);
-   if( p)
-   {
-      dst->allocator = allocator;
-      memcpy( p->s, s, len);
-      p->s[ len] = 0;
-   }
+   dst->allocator = allocator;
+   memcpy( p->s, s, len);
+   p->s[ len] = 0;
    return( p);
 }
 
 
 static inline void   my_string_free( struct my_string *p)
 {
-   if( p)
-      mulle_allocator_free( p->allocator, p);
+   mulle_allocator_free( p->allocator, p);
 }
 
 ```
@@ -145,11 +145,8 @@ struct my_other_string   *my_other_string_alloc( char *s, struct mulle_allocator
 
    len = s ? strlen( s) : 0;
    p   = mulle_allocator_malloc( allocator, sizeof( struct my_other_string) + len);
-   if( p)
-   {
-      memcpy( p->s, s, len);
-      p->s[ len] = 0;
-   }
+   memcpy( p->s, s, len);
+   p->s[ len] = 0;
    return( p);
 }
 
@@ -160,6 +157,52 @@ static inline void   my_other_string_free( struct my_other_string *p,
    mulle_allocator_free( allocator, p);
 }
 ```
+
+##  NEW in 2.0! Dealing with memory shortage
+
+By the C standard `malloc` returns **NULL** and sets `errno` to `ENOMEM`, if 
+it can't satisfy the memory request. Here are the two most likely scenarios why 
+this happens:
+
+The caller specified a huge amount of memory, that the OS can't give you. 
+Typically (size_t) -1 can never work. This is considered to be a bug on the 
+callers part.
+
+Or the programm has exhausted all available memory space to the process. Here 
+is what happens on various OS:
+
+OS                |  malloc fate
+------------------|-------------------------------------------
+FreeBSD           | `malloc` hangs, probably waiting for memory to be freed by other threads
+MacOS X           | `malloc` slowly brings the system to a crawl, no error observed
+Linux             | `malloc` returns an error
+Windows           | unknown
+
+The gist is, that in portable programs it doesn't really make sense to rely
+on `malloc` returning **NULL** and doing something clever based on it.  
+
+If we define the `mulle-allocator`'s `malloc` to always return a valid memory 
+block, discounting erroneous parameters as programmers error to be caught 
+during development, memory calling code simplifies from:
+
+```
+p = mulle_alloc( size);
+if( ! p)
+   return( -1);
+memcpy( p, q, size);
+```
+
+to
+
+```
+p = mulle_alloc( size);
+memcpy( p, q, size);
+```
+
+So the `mulle_default_allocator` and `mulle_stdlib_allocator` have been written
+accordingly, never to return, if the allocation went bad. If the allocator
+function detects that an allocation can not be satisfied it jumps through it's
+fail vector. This will print an error message and exit the program.
 
 
 ## Install

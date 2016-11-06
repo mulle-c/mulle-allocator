@@ -227,10 +227,7 @@ static int   _pointerset_grow( struct _pointerset *set,
       copy_size = size * 2;
    
    if( copy_size < 2)
-   {
       copy_size = 2;
-      size      = 1;
-   }
    
    copy.count = 0;
    copy.used  = 0;
