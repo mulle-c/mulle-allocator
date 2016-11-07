@@ -1,6 +1,6 @@
 # mulle_allocator
 
-[![Build Status](https://travis-ci.org/mulle-clang/mulle-allocator.svg)](https://travis-ci.org/mulle-clang/mulle-allocator)
+[![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg)](https://travis-ci.org/mulle-objc/mulle-allocator)
 
 ... is a leak and double free checker for tests (and at runtime)
 
