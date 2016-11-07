@@ -1,3 +1,9 @@
+2.1.0
+===
+
+Add mulle_allocator_set_fail for niceness
+
+
 2.0.0
 ===
 

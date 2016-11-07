@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (0 << 8) | 0)
+#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (1 << 8) | 0)
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
 # define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL
@@ -54,7 +54,12 @@ MULLE_C_NO_RETURN
 void   mulle_allocator_fail( void *block, size_t size);
 
 
-static inline void   mulle_allocator_set_aba( struct mulle_allocator *p, void *aba, int (*f)( void *aba, int (*free)( void *), void *block))
+# pragma mark -
+# pragma mark Petty Accessors
+
+static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
+                                              void *aba,
+                                              int (*f)( void *aba, int (*free)( void *), void *block))
 {
    if( ! p)
       p = &mulle_default_allocator;
@@ -62,6 +67,20 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p, void *a
    p->aba     = aba;
    p->abafree = f ? (int (*)()) f : (int (*)()) abort;
 }
+
+
+static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
+                                               void (*f)( void *block, size_t size) MULLE_C_NO_RETURN)
+{
+   if( ! p)
+      p = &mulle_default_allocator;
+
+   p->fail = f ? f : mulle_allocator_fail;
+}
+
+
+# pragma mark -
+# pragma mark Vectoring
 
 
 MULLE_C_NON_NULL_RETURN
@@ -152,7 +171,7 @@ static inline int   mulle_allocator_abafree( struct mulle_allocator *p, void *bl
 
 
 # pragma mark -
-# pragma mark Convenience
+# pragma mark Convenience API
 
 MULLE_C_NON_NULL_RETURN
 static inline void   *mulle_malloc( size_t size)
@@ -202,6 +221,9 @@ static inline char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *
    return( dup);
 }
 
+
+# pragma mark -
+# pragma mark strdup API
 
 static inline char   *mulle_allocator_strdup( struct mulle_allocator *p, char *s)
 {
