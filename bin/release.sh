@@ -7,8 +7,8 @@
 
 PROJECT="MulleAllocator"    # requires camel-case
 DESC="Flexible C memory allocation scheme with leak checking"
-DEPENDENCIES="mulle-c11
-mulle-thread"               # names not camel case
+DEPENDENCIES='${REMOTEROOTDIR}/software/mulle-c11
+${REMOTEROOTDIR}/software/mulle-thread'  # no camel case, will be evaled later!
 LANGUAGE=c                  # c,cpp, objc
 
 #
@@ -16,8 +16,8 @@ LANGUAGE=c                  # c,cpp, objc
 #
 # source mulle-homebrew.sh (clumsily)
 
-. ./bin/repository-info.sh
-. ./bin/mulle-homebrew/mulle-homebrew.sh
+. ./bin/repository-info.sh || exit 1
+. ./bin/mulle-homebrew/mulle-homebrew.sh || exit 1
 
 # parse options
 homebrew_parse_options "$@"
@@ -47,7 +47,7 @@ VERSION="`get_header_version "${HEADER}" "${VERSIONNAME}"`"
 # --- HOMEBREW FORMULA ---
 # Information needed to construct a proper brew formula
 #
-HOMEPAGE="${HOME}/${NAME}"
+HOMEPAGE="${REMOTEURL}/${NAME}"
 
 
 # --- HOMEBREW TAP ---

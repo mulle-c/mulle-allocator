@@ -40,7 +40,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (0 << 8) | 0)
+//
+// community version is always even
+//
+#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (0 << 8) | 2)
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
 # define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL
@@ -68,7 +71,7 @@ MULLE_C_NON_NULL_RETURN
 static inline void   *_mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
 {
    void   *q;
-   
+
    q = (*p->realloc)( NULL, size);
    if( ! q)
       (*p->fail)( NULL, size);
@@ -80,7 +83,7 @@ MULLE_C_NON_NULL_RETURN
 static inline void   *_mulle_allocator_calloc( struct mulle_allocator *p, size_t n, size_t size)
 {
    void   *q;
-   
+
    q = (*p->calloc)( n, size);
    if( ! q)
       (*p->fail)( NULL, n * size);
@@ -92,7 +95,7 @@ MULLE_C_NON_NULL_RETURN
 static inline void   *_mulle_allocator_realloc( struct mulle_allocator *p, void *block, size_t size)
 {
    void   *q;
-   
+
    q = (*p->realloc)( block, size);
    if( ! q)
       (*p->fail)( block, size);
