@@ -1,14 +1,22 @@
 #! /bin/sh
+#
+# (c) 2016 Nat! for Mulle kybernetiK
+#
+# BSD3-License
+#
 
 PROJECT="MulleAllocator"    # requires camel-case
 DESC="Flexible C memory allocation scheme with leak checking"
 DEPENDENCIES="mulle-c11
-mulle-thread"            # names not camel case
-ORIGIN=public            # git repo to push
-LANGUAGE=c               # c,cpp, objc
+mulle-thread"               # names not camel case
+LANGUAGE=c                  # c,cpp, objc
 
+#
+# Ideally you don't hafta change anything below this line
+#
 # source mulle-homebrew.sh (clumsily)
 
+. ./bin/repository-info.sh
 . ./bin/mulle-homebrew/mulle-homebrew.sh
 
 # parse options
@@ -39,12 +47,11 @@ VERSION="`get_header_version "${HEADER}" "${VERSIONNAME}"`"
 # --- HOMEBREW FORMULA ---
 # Information needed to construct a proper brew formula
 #
-HOMEPAGE="https://www.mulle-kybernetik.com/software/git/${NAME}"
-ARCHIVEURL='https://www.mulle-kybernetik.com/software/git/${NAME}/tarball/${VERSION}'  # ARCHIVEURL will be evaled later! keep it in single quotes
+HOMEPAGE="${HOME}/${NAME}"
 
 
 # --- HOMEBREW TAP ---
-# Specify to where and under what bame to publish via your brew tap
+# Specify to where and under what name to publish via your brew tap
 #
 RBFILE="${NAME}.rb"                    # ruby file for brew
 HOMEBREWTAP="../homebrew-software"     # your tap repository path
