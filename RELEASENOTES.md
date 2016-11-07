@@ -1,3 +1,8 @@
+2.0.2
+===
+
+* fix stuff for community release
+
 2.0.0
 ===
 
