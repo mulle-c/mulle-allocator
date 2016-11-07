@@ -1,6 +1,6 @@
 # mulle_allocator
 
-Release on [github](//github.com/mulle-nat/mulle-allocator): [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
+[![Build Status](https://travis-ci.org/mulle-clang/mulle-allocator.svg)](https://travis-ci.org/mulle-clang/mulle-allocator)
 
 ... is a leak and double free checker for tests (and at runtime)
 
