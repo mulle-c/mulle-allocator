@@ -1,8 +1,12 @@
-2.1.0
+2.1.1
 ===
 
 Add mulle_allocator_set_fail for niceness
 
+2.0.2
+===
+
+* fix stuff for community release
 
 2.0.0
 ===
