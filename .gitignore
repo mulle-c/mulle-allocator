@@ -12,6 +12,7 @@ build/
 xcuserdata/
 project.xcworkspace/
 stacktrace/
+malloc-error/
 
 /addictions/
 /dependencies/
@@ -30,3 +31,13 @@ tests/test/goodfree
 tests/test/fail-calloc
 tests/test/fail-malloc
 tests/test/fail-realloc
+
+/.bootstrap.auto
+
+/.bootstrap.local
+
+/dependencies
+
+/addictions
+
+/.repos

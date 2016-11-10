@@ -13,11 +13,10 @@
 `mulle_test_allocator`. `mulle_test_allocator` provides the error detection,
 which you may want to include or leave out.
 
-Fork         | Branch  | Version | Build Status
--------------|-------- |---------|----------------
-[Mulle kybernetiK](//github.com/mulle-nat/mulle-allocator)  | release | ![GitHub version](https://badge.fury.io/gh/mulle-nat%2Fmulle-allocator.svg) | [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
-[Community](https://github.com/mulle-objc/mulle-allocator/tree/release)      | release | ![GitHub version](https://badge.fury.io/gh/mulle-objc%2Fmulle-allocator.svg) |  [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-objc/mulle-allocator)
-[Community](//github.com/mulle-objc/mulle-allocator)    | master | current |  [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg?branch=master)](https://travis-ci.org/mulle-objc/mulle-allocator)
+Fork      |  Build Status | Release Version
+----------|---------------|-----------------------------------
+[Mulle kybernetiK](//github.com/mulle-nat/mulle-allocator) | [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-nat/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
+[Community](https://github.com/mulle-objc/mulle-allocator/tree/release) | [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg)](https://travis-ci.org/mulle-objc/mulle-allocator) | ![Community tag](https://img.shields.io/github/tag/mulle-objc/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-objc/mulle-allocator)
 
 
 ##  Use `mulle_test_allocator` for leak detection
