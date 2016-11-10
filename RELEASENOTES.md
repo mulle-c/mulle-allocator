@@ -1,3 +1,9 @@
+2.1.2
+===
+
+* fix version check, merge with mulle-nat
+
+
 2.0.2
 ===
 

@@ -15,11 +15,11 @@ stacktrace/
 
 /addictions/
 /dependencies/
-/tests/mulle-tests/
+/tests/mulle-tests
 /tests/include/
 /tests/lib/
-/mulle-configuration/
-/bin/mulle-homebrew/
+/mulle-configuration
+/bin/mulle-homebrew
 
 tests/test/doublefree
 tests/test/badfree
