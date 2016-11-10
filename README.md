@@ -225,7 +225,7 @@ On other platforms you can use **mulle-install** from
 to install the library:
 
 ```
-mulle-install --prefix /usr/local --branch release https://www.mulle-kybernetik.com/repositories/mulle-allocator
+mulle-install --prefix /usr/local --branch release https://github.com/mulle-objc/mulle-allocator
 ```
 
 
