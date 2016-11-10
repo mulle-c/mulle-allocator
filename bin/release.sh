@@ -7,14 +7,15 @@
 
 PROJECT="MulleAllocator"    # requires camel-case
 DESC="Flexible C memory allocation scheme with leak checking"
-DEPENDENCIES='${REMOTEROOTDIR}/software/mulle-c11
-${REMOTEROOTDIR}/software/mulle-thread'  # no camel case, will be evaled later!
+DEPENDENCIES='${DEPENDENCY_TAP}/mulle-c11
+${DEPENDENCY_TAP}/mulle-thread'  # no camel case, will be evaled later!
 LANGUAGE=c                  # c,cpp, objc
 
 #
 # Ideally you don't hafta change anything below this line
 #
 # source mulle-homebrew.sh (clumsily)
+MULLE_BOOTSTRAP_FAIL_PREFIX="release.sh"
 
 . ./bin/repository-info.sh || exit 1
 . ./bin/mulle-homebrew/mulle-homebrew.sh || exit 1
@@ -35,6 +36,7 @@ do
    esac
 done
 
+
 #
 # these can usually be deduced, if you follow the conventions
 #
@@ -43,11 +45,7 @@ HEADER="`get_header_from_name "${NAME}"`"
 VERSIONNAME="`get_versionname_from_project "${PROJECT}"`"
 VERSION="`get_header_version "${HEADER}" "${VERSIONNAME}"`"
 
-
-# --- HOMEBREW FORMULA ---
-# Information needed to construct a proper brew formula
-#
-HOMEPAGE="${REMOTEURL}/${NAME}"
+HOMEPAGE="`eval echo "${HOMEPAGE}"`"
 
 
 # --- HOMEBREW TAP ---

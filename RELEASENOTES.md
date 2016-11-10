@@ -3,6 +3,10 @@
 
 * fix version check, merge with mulle-nat
 
+2.1.1
+===
+
+Add mulle_allocator_set_fail for niceness
 
 2.0.2
 ===
