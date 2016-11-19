@@ -216,12 +216,11 @@ On OS X and Linux you can use
 to install the library:
 
 ```
-brew tap mulle-kybernetik/software
-brew install mulle-allocator
+brew install mulle-objc/software/mulle-allocator
 ```
 
 On other platforms you can use **mulle-install** from
-[mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build)
+[mulle-build](//github.com/mulle-nat/mulle-build)
 to install the library:
 
 ```
