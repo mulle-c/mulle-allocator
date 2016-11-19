@@ -1,6 +1,4 @@
-# mulle_allocator
-
-[![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg)](https://travis-ci.org/mulle-objc/mulle-allocator)
+# mulle-allocator
 
 ... is a leak and double free checker for tests (and at runtime)
 
@@ -14,6 +12,11 @@
 **mulle_allocator** comes as two libraries: `mulle_allocator` and
 `mulle_test_allocator`. `mulle_test_allocator` provides the error detection,
 which you may want to include or leave out.
+
+Fork      |  Build Status | Release Version
+----------|---------------|-----------------------------------
+[Mulle kybernetiK](//github.com/mulle-nat/mulle-allocator) | [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-nat/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
+[Community](https://github.com/mulle-objc/mulle-allocator/tree/release) | [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg)](https://travis-ci.org/mulle-objc/mulle-allocator) | ![Community tag](https://img.shields.io/github/tag/mulle-objc/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-objc/mulle-allocator)
 
 
 ##  Use `mulle_test_allocator` for leak detection
@@ -93,7 +96,7 @@ struct mulle_allocator
 
 You should not jump through the vectors directly, but use
 supplied inline functions like `mulle_allocator_malloc` to allocate memory
-using the allocator, since they perform the necessary return value checks 
+using the allocator, since they perform the necessary return value checks
 (see below: Dealing with memory shortage)
 
 A pointer to this structure could be passed to your data structure code. It
@@ -160,15 +163,15 @@ static inline void   my_other_string_free( struct my_other_string *p,
 
 ##  NEW in 2.0! Dealing with memory shortage
 
-By the C standard `malloc` returns **NULL** and sets `errno` to `ENOMEM`, if 
-it can't satisfy the memory request. Here are the two most likely scenarios why 
+By the C standard `malloc` returns **NULL** and sets `errno` to `ENOMEM`, if
+it can't satisfy the memory request. Here are the two most likely scenarios why
 this happens:
 
-The caller specified a huge amount of memory, that the OS can't give you. 
-Typically (size_t) -1 can never work. This is considered to be a bug on the 
+The caller specified a huge amount of memory, that the OS can't give you.
+Typically (size_t) -1 can never work. This is considered to be a bug on the
 callers part.
 
-Or the programm has exhausted all available memory space to the process. Here 
+Or the programm has exhausted all available memory space to the process. Here
 is what happens on various OS:
 
 OS                |  malloc fate
@@ -179,10 +182,10 @@ Linux             | `malloc` returns an error
 Windows           | unknown
 
 The gist is, that in portable programs it doesn't really make sense to rely
-on `malloc` returning **NULL** and doing something clever based on it.  
+on `malloc` returning **NULL** and doing something clever based on it.
 
-If we define the `mulle-allocator`'s `malloc` to always return a valid memory 
-block, discounting erroneous parameters as programmers error to be caught 
+If we define the `mulle-allocator`'s `malloc` to always return a valid memory
+block, discounting erroneous parameters as programmers error to be caught
 during development, memory calling code simplifies from:
 
 ```
@@ -213,16 +216,15 @@ On OS X and Linux you can use
 to install the library:
 
 ```
-brew tap mulle-kybernetik/software
-brew install mulle-allocator
+brew install mulle-objc/software/mulle-allocator
 ```
 
 On other platforms you can use **mulle-install** from
-[mulle-build](//www.mulle-kybernetik.com/software/git/mulle-build)
+[mulle-build](//github.com/mulle-nat/mulle-build)
 to install the library:
 
 ```
-mulle-install --prefix /usr/local --branch release https://www.mulle-kybernetik.com/repositories/mulle-allocator
+mulle-install --prefix /usr/local --branch release https://github.com/mulle-objc/mulle-allocator
 ```
 
 

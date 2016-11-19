@@ -1,3 +1,13 @@
+2.1.3
+===
+
+* merge community release
+
+2.1.2
+===
+
+* fix version check, merge with mulle-nat
+
 2.1.1
 ===
 
