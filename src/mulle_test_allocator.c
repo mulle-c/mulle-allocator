@@ -210,7 +210,7 @@ static void   bail( void *p)
       system( buf);
    }
 #endif
-   
+
 /* abort is clumsy on WIN32 */
 #ifdef _WIN32
    exit( 1);
@@ -278,7 +278,7 @@ static void  *test_realloc( void *q, size_t size)
          {
             assert( ! _pointerset_get( &frees, q));
             assert( _pointerset_get( &allocations, q));
-            _pointerset_remove( &allocations, q);
+            _pointerset_remove( &allocations, q); // just a pointere remove
             _pointerset_add( &frees, q, calloc, free);
 
             _pointerset_remove( &frees, p);
@@ -398,7 +398,7 @@ static void  test_free( void *p)
 #pragma mark -
 #pragma mark global variable
 
-MULLE_C_GLOBAL 
+MULLE_C_GLOBAL
 struct mulle_allocator   mulle_test_allocator =
 {
    test_calloc,
@@ -486,7 +486,7 @@ void   mulle_test_allocator_initialize( void)
 void   mulle_test_allocator_reset()
 {
    if( trace == -1)
-      mulle_test_allocator_initialize();  // for windows, tests can get by calling 
+      mulle_test_allocator_initialize();  // for windows, tests can get by calling
                                           // mulle_test_allocator_reset first
    if( mulle_thread_mutex_lock( &alloc_lock))
    {

@@ -66,7 +66,7 @@ static int   _pointerarray_grow( struct _pointerarray *array, void *(*realloc)( 
    new_size = array->size * 2;
    if( new_size < 2)
       new_size = 2;
-   
+
    array->pointers = (*realloc)( array->pointers, sizeof( void *) * new_size);
    if( ! array->pointers)
    {
@@ -91,10 +91,10 @@ static inline int   _pointerarray_add( struct _pointerarray *array, void  *point
          assert( 0);
          return( -1);
       }
-   
+
    array->pointers[ array->used++] = pointer;
    array->count++;
-   
+
    return( 0);
 }
 
@@ -130,13 +130,13 @@ static inline void   _pointerarray_set( struct _pointerarray *array, unsigned in
 
    assert( array);
    assert( i < array->used);
-   
+
    old = array->pointers[ i];
    if( p)
       array->count += old == NULL;
    else
       array->count -= old != NULL;
-   
+
    array->pointers[ i] = p;
 }
 
@@ -170,12 +170,12 @@ struct _pointerarray_enumerator
 static inline struct  _pointerarray_enumerator   _pointerarray_enumerate( struct _pointerarray *array)
 {
    struct _pointerarray_enumerator   rover;
-   
+
    rover.curr     = &array->pointers[ 0];
    rover.sentinel = &rover.curr[ array->used];
-   
+
    assert( rover.sentinel >= rover.curr);
-   
+
    return( rover);
 }
 

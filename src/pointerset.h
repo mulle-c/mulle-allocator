@@ -82,7 +82,7 @@ static inline void  _pointerset_free( struct _pointerset *set, void (*free)( voi
 #pragma mark -
 #pragma mark hash
 
-                              
+
 // from code.google.com/p/smhasher/wiki/MurmurHash3
 static inline uint32_t  avalanche32( uint32_t h)
 {
@@ -93,8 +93,8 @@ static inline uint32_t  avalanche32( uint32_t h)
    h ^= h >> 16;
    return h;
 }
-                              
-                              
+
+
 static inline uint64_t   avalanche64(uint64_t h)
 {
    h ^= h >> 33;
@@ -104,16 +104,16 @@ static inline uint64_t   avalanche64(uint64_t h)
    h ^= h >> 33;
    return h;
 }
-                              
-                              
+
+
 static inline uintptr_t   avalanche( uintptr_t h)
 {
    if( sizeof( uintptr_t) == sizeof( uint64_t))
       return( avalanche64( h));
    return( avalanche32( h));
 }
-                             
-                              
+
+
 
 static inline uintptr_t  _pointerset_hash( struct _pointerset *set, void *p)
 {
@@ -134,12 +134,12 @@ struct _pointerset_enumerator
 static inline struct  _pointerset_enumerator   _pointerset_enumerate( struct _pointerset *set)
 {
    struct _pointerset_enumerator   rover;
-   
+
    rover.curr     = &set->pointers[ 0];
    rover.sentinel = set->pointers ? &rover.curr[ set->mask + 1] : rover.curr;
-   
+
    assert( rover.sentinel >= rover.curr);
-   
+
    return( rover);
 }
 
@@ -147,7 +147,7 @@ static inline struct  _pointerset_enumerator   _pointerset_enumerate( struct _po
 static inline void   *_pointerset_enumerator_next( struct _pointerset_enumerator *rover)
 {
    void   *p;
-   
+
    for(;;)
    {
       if( rover->curr >= rover->sentinel)
@@ -174,14 +174,14 @@ static inline void   *_pointerset_sureadd( struct _pointerset *set,
    uintptr_t      hash;
    unsigned int   i;
    void           *q;
-   
+
    assert( set->count <= set->max);
    assert( set->used < set->max);
    assert( set->max < set->mask + 1);
-   
+
    hash = _pointerset_hash( set, pointer);
    i    = (unsigned int) hash;
-   
+
    for(;;)
    {
       i &= set->mask;
@@ -200,10 +200,10 @@ static inline void   *_pointerset_sureadd( struct _pointerset *set,
          set->count++;
          return( pointer);
       }
-   
+
       if( q == pointer)
          return( NULL);
-      
+
       ++i;
    }
 }
@@ -218,50 +218,50 @@ static int   _pointerset_grow( struct _pointerset *set,
    struct _pointerset_enumerator   rover;
    struct _pointerset              copy;
    void                            *p;
-   
+
    size      = set->mask + 1;
    copy_size = size;
-   
+
    // if set is only half used, don't double
    if( set->count * 2 > set->max)
       copy_size = size * 2;
-   
+
    if( copy_size < 2)
       copy_size = 2;
-   
+
    copy.count = 0;
    copy.used  = 0;
    copy.max   = copy_size - (copy_size >> 1);
    copy.mask  = copy_size - 1;
    if( copy.max > copy.mask)
       copy.max = copy_size;
-   
+
    copy.pointers = (*calloc)( sizeof( void *), copy_size);
    if( ! copy.pointers)
    {
       set->mask     = 0;
       set->pointers = NULL;
       assert( 0);
-      
+
       return( -1);
    }
-   
+
    rover =_pointerset_enumerate( set);
    while( p = _pointerset_enumerator_next( &rover))
       _pointerset_sureadd( &copy, p);
    _pointerset_enumerator_done( &rover);
-   
+
    (*free)( set->pointers);
-   
+
    *set = copy;
-   
+
    assert( set->count <= set->max);
    assert( set->used < set->max);
    assert( set->max < set->mask + 1);
-   
+
    return( 0);
 }
-                              
+
 
 static inline void   *_pointerset_add( struct _pointerset *set,
                                        void  *pointer,
@@ -277,7 +277,7 @@ static inline void   *_pointerset_add( struct _pointerset *set,
          assert( 0);
          return( (void *) -1);
       }
-   
+
    return( _pointerset_sureadd( set, pointer));
 }
 
@@ -290,24 +290,24 @@ static inline void  *_pointerset_get( struct _pointerset *set, void *pointer)
    uintptr_t      hash;
    unsigned int   i;
    void           *q;
-   
+
    assert( set);
    assert( pointer);
    assert( pointer != (void *) -1);
-   
+
    hash = _pointerset_hash( set, pointer);
    i    = (unsigned int) hash;
 
    if( ! set->pointers)
       return( NULL);
-   
+
    for(;;)
    {
       i &= set->mask;
       q  = set->pointers[ i];
       if( ! q || q == pointer)
          return( q);
-      
+
       ++i;
    }
 }
@@ -318,33 +318,33 @@ static inline void  _pointerset_remove( struct _pointerset *set, void *pointer)
    uintptr_t      hash;
    unsigned int   i;
    void           *q;
-   
+
    assert( set);
    assert( pointer);
    assert( pointer != (void *) -1);
-   
+
    hash = _pointerset_hash( set, pointer);
    i    = (unsigned int) hash;
-   
+
    if( ! set->pointers)
       return;
-   
+
    for(;;)
    {
       i &= set->mask;
       q  = set->pointers[ i];
       if( ! q)
          return;
-   
+
       if( q == pointer)
       {
          assert( set->count);
-         
+
          set->pointers[ i] = (void *) -1;
          set->count--;
          return;
       }
-      
+
       ++i;
    }
 }
