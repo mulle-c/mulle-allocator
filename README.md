@@ -65,13 +65,13 @@ wrong pointers.
 ##  Use `mulle_allocator` to make your code more flexible
 
 You can make your code, and especially your data structures, more flexible by
-using `mulle_allocator` As this decoupled your data structure from **stdib**, it
-enables your data structure to reside in shared or wired memory for example
+using `mulle_allocator` as this decoupled your data structure from **stdib**.
+This enables your data structure to reside in shared or wired memory for example
 with no additional code. Your API consumers just have to pass their own
 allocators.
 
-Also it it helpful to isolate your datastructure memory allocation during tests.
-This way, other, possibly benign, code leaks, do not obscure the test.
+Also it can be helpful to isolate your datastructure memory allocation during
+tests. This way, other, possibly benign, code leaks, do not obscure the test.
 
 
 ## What is an allocator ?

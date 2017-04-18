@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0)
 
-project (mulle-container)
+project (mulle-allocator)
 
 cmake_policy(SET CMP0054 NEW)
 
@@ -12,7 +12,7 @@ else()
 endif()
 
 
-set(HEADERS
+set( HEADERS
 src/mulle_allocator.h
 src/mulle_allocator_struct.h
 )
@@ -21,7 +21,7 @@ add_library(mulle_allocator
 src/mulle_allocator.c
 )
 
-set(TEST_HEADERS
+set( TEST_HEADERS
 src/mulle_test_allocator.h
 src/mulle_test_allocator_struct.h
 )

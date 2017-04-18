@@ -1,3 +1,8 @@
+2.1.5
+===
+
+* small fixes in documentation and some build internals
+
 2.1.3
 ===
 
