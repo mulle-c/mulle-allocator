@@ -405,8 +405,7 @@ struct mulle_allocator   mulle_test_allocator =
    test_realloc,
    test_free,
    mulle_allocator_fail,
-   (void (*)()) abort,
-   NULL
+   (int (*)(void *, void (*)(void *), void *)) abort
 };
 
 

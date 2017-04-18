@@ -9,6 +9,7 @@
 old/
 tmp/
 build/
+build*.d/
 xcuserdata/
 project.xcworkspace/
 stacktrace/
