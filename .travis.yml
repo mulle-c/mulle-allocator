@@ -20,4 +20,4 @@ before_install:
 
 script:
    - mulle-build
-   - mulle-test
+   - mulle-test -vvv -V
