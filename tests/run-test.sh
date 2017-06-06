@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#! /usr/bin/env bash
 #  run-test.sh
 #  MulleObjC
 #
@@ -13,7 +13,7 @@ ADDITIONAL_LIBS=mulle_allocator
 
 . "mulle-tests/test-c-common.sh"
 RELEASE_CL_CFLAGS="${RELEASE_CL_CFLAGS} -DMULLE_ALLOCATOR_EXTERN_GLOBAL=extern"
-DEBUG_CL_CFLAGS="${DEBUG_CL_CFLAGS} -DMULLE_ALLOCATOR_EXTERN_GLOBAL=extern" 
+DEBUG_CL_CFLAGS="${DEBUG_CL_CFLAGS} -DMULLE_ALLOCATOR_EXTERN_GLOBAL=extern"
 
 . "mulle-tests/test-tools-common.sh"
 . "mulle-tests/test-staticlib-common.sh"
