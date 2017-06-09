@@ -6,6 +6,7 @@
 *.dSYM/
 *.exe
 *.debug
+*.old
 old/
 tmp/
 build/

@@ -65,12 +65,12 @@ wrong pointers.
 ##  Use `mulle_allocator` to make your code more flexible
 
 You can make your code, and especially your data structures, more flexible by
-using `mulle_allocator` as this decoupled your data structure from **stdib**.
-This enables your data structure to reside in shared or wired memory for example
+using `mulle_allocator` as this decouples your data structure from **stdib**.
+It enables your data structure to reside in shared or wired memory for example
 with no additional code. Your API consumers just have to pass their own
 allocators.
 
-Also it can be helpful to isolate your datastructure memory allocation during
+Also it can be helpful to isolate your data structure memory allocation during
 tests. This way, other, possibly benign, code leaks, do not obscure the test.
 
 
@@ -99,8 +99,11 @@ supplied inline functions like `mulle_allocator_malloc` to allocate memory
 using the allocator, since they perform the necessary return value checks
 (see below: Dealing with memory shortage)
 
-A pointer to this structure could be passed to your data structure code. It
-would use the allocator in this fashion:
+#### Embedding the allocator in your data structure
+
+A pointer to the allocator could be kept in your data structure. This
+simplifies your API, as the allocator is only needed during creation. Here is
+an example how you could use the allocator in this fashion:
 
 ```
 struct my_string
@@ -131,8 +134,10 @@ static inline void   my_string_free( struct my_string *p)
 
 ```
 
+#### Not embedding the allocator in your data structure
+
 But if you don't want to store the allocator inside the data structure, you
-can of course also just pass it in again:
+can of course also just let it get passed it in again, when it is required:
 
 ```
 struct my_other_string
@@ -160,6 +165,10 @@ static inline void   my_other_string_free( struct my_other_string *p,
    mulle_allocator_free( allocator, p);
 }
 ```
+
+The disadvantage is, that passing in different allocators opens is a new
+possible source of bugs.
+
 
 ##  NEW in 2.0! Dealing with memory shortage
 
