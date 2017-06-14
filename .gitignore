@@ -43,3 +43,5 @@ tests/test/fail-realloc
 /addictions
 
 /.repos
+bin/tap-info.sh
+tap-info.sh
