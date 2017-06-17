@@ -7,6 +7,8 @@
 *.exe
 *.debug
 *.old
+*.bak
+
 old/
 tmp/
 build/
