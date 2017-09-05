@@ -74,7 +74,7 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
 
 
 static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
-                                               void (*f)( void *block, size_t size) MULLE_C_NO_RETURN)
+                                               void (*f)( void *block, size_t size) _MULLE_C_NO_RETURN)
 {
    if( ! p)
       p = &mulle_default_allocator;

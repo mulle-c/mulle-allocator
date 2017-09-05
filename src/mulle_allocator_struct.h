@@ -47,7 +47,7 @@ struct mulle_allocator
    void   *(*calloc)( size_t n, size_t size);
    void   *(*realloc)( void *block, size_t size);
    void   (*free)( void *block);
-   void   (*fail)( void *block, size_t size) MULLE_C_NO_RETURN;
+   void   (*fail)( void *block, size_t size) _MULLE_C_NO_RETURN;
    int    (*abafree)( void *aba, void (*free)( void *), void *block);
    void   *aba;
 };
