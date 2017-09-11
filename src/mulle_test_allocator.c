@@ -192,9 +192,10 @@ static void   stacktrace( int offset)
 static void   bail( void *p)
 {
 #ifdef __APPLE__
+   if( getenv( "MULLE_TEST_ALLOCATOR_HISTORY"))
    {
       /* start malloc_history */
-      char buf [ 256];
+      char        buf [ 256];
       extern int  getpid( void);
 
       /* undo some environment stuff, there must be an easier way */
