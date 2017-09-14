@@ -1,1 +1,1 @@
-${MULLE_REPOSITORIES:-https://github.com/mulle-nat}/mulle-thread;;;${MULLE_THREAD_BRANCH:-release}
+${MULLE_REPOSITORIES:-https://github.com/mulle-nat}/mulle-thread;;${MULLE_THREAD_BRANCH:-release}
