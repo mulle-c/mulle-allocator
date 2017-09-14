@@ -1,3 +1,7 @@
+### 2.2.1
+
+* adapt to changes in mulle-c11
+
 ### 2.1.11
 
 * make it a cmake "C" projezt

@@ -40,10 +40,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#if MULLE_C11_VERSION < ((1 << 20) | (3 << 8) | 0)
+# error "mulle_c11 is too old"
+#endif
+
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (1 << 8) | 11)
+#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (2 << 8) | 1)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
