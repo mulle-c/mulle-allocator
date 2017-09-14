@@ -1,10 +1,1 @@
-#
-# override the repositories like so:
-#    echo "https://www.mulle-kybernetik.com/repositories" > .bootstrap.local/MULLE_REPOSITORIES
-#
-# override the branches like so:
-#    echo "master" > .bootstrap.local/MULLE_THREAD_BRANCH
-
-# thread pulls c11
-
-${MULLE_REPOSITORIES:-https://github.com/mulle-nat}/mulle-thread;;${MULLE_THREAD_BRANCH:-release}
+${MULLE_REPOSITORIES:-https://github.com/mulle-nat}/mulle-thread;;;${MULLE_THREAD_BRANCH:-release}
