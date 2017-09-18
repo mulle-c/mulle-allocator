@@ -1,3 +1,7 @@
+### 2.2.3
+
+* refinements for mulle-configuration 3.1
+
 ### 2.2.1
 
 * adapt to changes in mulle-c11
