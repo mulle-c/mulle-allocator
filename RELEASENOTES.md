@@ -1,3 +1,7 @@
+### 2.2.5
+
+* travis is moving to trusty and fix missing file
+
 ### 2.2.3
 
 * refinements for mulle-configuration 3.1
