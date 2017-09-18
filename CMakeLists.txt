@@ -11,28 +11,30 @@ else()
 endif()
 
 
-set( HEADERS
-src/mulle_allocator.h
-src/mulle_allocator_struct.h
+set( MULLE_ALLOCATOR_LIBRARY ON)
+set( MULLE_TEST_ALLOCATOR_LIBRARY ON)
+
+include( CMakeSourcesAndHeaders.txt)
+include( CMakeDependencies.txt)
+
+
+set( PUBLIC_HEADERS
+${HEADERS}
+CMakeDependencies.txt
 )
 
-add_library(mulle_allocator
-src/mulle_allocator.c
+add_library( mulle_allocator
+${SOURCES}
+${HEADERS}
 )
 
-set( TEST_HEADERS
-src/mulle_test_allocator.h
-src/mulle_test_allocator_struct.h
+add_library( mulle_test_allocator
+${TEST_SOURCES}
+${TEST_HEADERS}
 )
 
-add_library(mulle_test_allocator
-src/mulle_test_allocator.c
-)
+INSTALL( TARGETS mulle_allocator DESTINATION "lib")
+INSTALL( FILES ${PUBLIC_HEADERS} DESTINATION "include/mulle_allocator")
 
-INSTALL(TARGETS mulle_allocator DESTINATION "lib")
-INSTALL(FILES ${HEADERS} DESTINATION "include/mulle_allocator")
-
-INSTALL(TARGETS mulle_test_allocator DESTINATION "lib")
-INSTALL(FILES ${TEST_HEADERS} DESTINATION "include/mulle_test_allocator")
-
-
+INSTALL( TARGETS mulle_test_allocator DESTINATION "lib")
+INSTALL( FILES ${TEST_HEADERS} DESTINATION "include/mulle_test_allocator")
