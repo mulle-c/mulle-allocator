@@ -1,3 +1,7 @@
+### 2.2.7
+
+* fixed scion wrapper command
+
 ### 2.2.5
 
 * travis is moving to trusty and fix missing file
