@@ -48,7 +48,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (2 << 8) | 3)
+#define MULLE_ALLOCATOR_VERSION  ((2 << 20) | (2 << 8) | 5)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
