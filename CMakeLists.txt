@@ -38,3 +38,6 @@ INSTALL( FILES ${PUBLIC_HEADERS} DESTINATION "include/mulle_allocator")
 
 INSTALL( TARGETS mulle_test_allocator DESTINATION "lib")
 INSTALL( FILES ${TEST_HEADERS} DESTINATION "include/mulle_test_allocator")
+
+include( MulleTest)
+
