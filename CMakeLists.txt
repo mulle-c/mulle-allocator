@@ -28,10 +28,21 @@ ${SOURCES}
 ${HEADERS}
 )
 
+# PRIVATE is a guess
+target_compile_definitions( mulle_allocator
+PRIVATE ${MULLE_ALLOCATOR_DEFINITIONS}
+)
+
 add_library( mulle_test_allocator
 ${TEST_SOURCES}
 ${TEST_HEADERS}
 )
+
+# PRIVATE is a guess
+target_compile_definitions( mulle_test_allocator
+PRIVATE ${MULLE_ALLOCATOR_DEFINITIONS}
+)
+
 
 INSTALL( TARGETS mulle_allocator DESTINATION "lib")
 INSTALL( FILES ${PUBLIC_HEADERS} DESTINATION "include/mulle_allocator")
