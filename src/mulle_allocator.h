@@ -39,6 +39,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 
 #if MULLE_C11_VERSION < ((1 << 20) | (3 << 8) | 0)
@@ -140,6 +141,16 @@ static inline int   _mulle_allocator_abafree( struct mulle_allocator *p, void *b
    if( ! block)
       return( 0);
    return( (*p->abafree)( p->aba, p->free, block));
+}
+
+
+static inline void   mulle_allocator_assert( struct mulle_allocator *p)
+{
+   assert( (p ? p : &mulle_default_allocator));
+   assert( (p ? p : &mulle_default_allocator)->calloc);
+   assert( (p ? p : &mulle_default_allocator)->realloc);
+   assert( (p ? p : &mulle_default_allocator)->free);
+   assert( (p ? p : &mulle_default_allocator)->fail);
 }
 
 
