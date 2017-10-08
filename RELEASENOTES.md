@@ -1,3 +1,7 @@
+### 2.2.11
+
+* add mulle_allocator_assert as a quick check to see if an allocator is valid
+
 ### 2.2.9
 
 * support new mulle-tests
