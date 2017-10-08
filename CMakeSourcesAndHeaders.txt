@@ -1,3 +1,8 @@
+set( INCLUDE_DIRS
+src
+)
+
+
 set( HEADERS
 src/mulle_allocator.h
 src/mulle_allocator_struct.h
