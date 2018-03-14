@@ -2,7 +2,7 @@
 
 PROJECTDIR="`dirname "$PWD"`"
 PROJECTNAME="`basename "${PROJECTDIR}"`"
-LIBRARY_SHORTNAME="mulle_test_allocator"
+LIBRARY_SHORTNAME="mulle-test-allocator"
 
 . "mulle-tests/test-c-common.sh"
 . "mulle-tests/test-tools-common.sh"
