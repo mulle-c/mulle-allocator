@@ -52,38 +52,32 @@ ${OS_SPECIFIC_LIBRARIES}
 )
 endif()
 
+include( PostLibrary OPTIONAL)
 
-add_library( "mulle-test-allocator"
-${TEST_ALLOCATOR_SOURCES}
-${TEST_ALLOCATOR_PUBLIC_HEADERS}
+
+set( STANDALONE_BASE_NAME "mulle-allocator")
+set( STANDALONE_NAME "mulle-allocator-standalone")
+set( STANDALONE_DEFINITIONS ${MULLE_ALLOCATOR_DEFINITIONS})
+set( STANDALONE_DEPENDENCIES
+mulle-allocator
 )
 
-
-if( BUILD_SHARED_LIBS)
-   target_link_libraries( mulle-allocator
-${DEPENDENCIES_LIBRARIES}
+set( STANDALONE_ALL_LOAD_LIBRARIES
+$<TARGET_FILE:mulle-allocator>
+${C_DEPENDENCY_LIBRARIES}
 ${OS_SPECIFIC_LIBRARIES}
 )
-endif()
 
-include( PostLibrary OPTIONAL)
+include( Standalone)
 
 ### Install
 
 include( PreInstall OPTIONAL)
 
-install( TARGETS "mulle-allocator" DESTINATION "lib")
+install( TARGETS "mulle-allocator" "mulle-allocator-standalone" DESTINATION "lib")
 install( FILES ${PUBLIC_HEADERS}  DESTINATION "include/mulle-allocator")
 install( FILES ${PRIVATE_HEADERS} DESTINATION "include/mulle-allocator/private")
 
 install( FILES ${CMAKE_INCLUDES}  DESTINATION "include/mulle-allocator/cmake")
-
-#
-# the test allocator is not a "real" dependency
-# therefore it's left out of cmake, if that becomes a problem, we need to split
-# it off and give it it's own project
-#
-install( TARGETS "mulle-test-allocator" DESTINATION "lib")
-install( FILES ${TEST_ALLOCATOR_PUBLIC_HEADERS}  DESTINATION "include/mulle-test-allocator")
 
 include( PostInstall OPTIONAL)
