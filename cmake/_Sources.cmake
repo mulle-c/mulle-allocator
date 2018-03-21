@@ -8,6 +8,10 @@ set( SOURCES
 src/mulle-allocator.c
 )
 
+set( STANDALONE_SOURCES
+src/mulle-allocator-standalone.c
+)
+
 set( TEST_ALLOCATOR_SOURCES
 src/mulle-test-allocator.c
 )
