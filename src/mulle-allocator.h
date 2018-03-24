@@ -34,8 +34,9 @@
 #ifndef mulle_allocator_h__
 #define mulle_allocator_h__
 
-#include "mulle-allocator-struct.h"
 #include "dependencies.h"
+
+#include "mulle-allocator-struct.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

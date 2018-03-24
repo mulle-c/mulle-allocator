@@ -37,7 +37,7 @@
 #ifndef mulle_test_allocator_h__
 #define mulle_test_allocator_h__
 
-#include <mulle_allocator/mulle_allocator.h>
+#include <mulle-allocator/mulle-allocator.h>
 
 #include "mulle-test-allocator-struct.h"
 

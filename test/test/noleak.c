@@ -1,13 +1,10 @@
-#include <mulle_allocator/mulle_allocator.h>
-#include <mulle_test_allocator/mulle_test_allocator.h>
+#include <mulle-allocator/mulle-allocator.h>
+#include <mulle-test-allocator/mulle-test-allocator.h>
 
 
 static void  run_test( void)
 {
-   void  *p;
-
-   p = mulle_malloc( 1848);
-   mulle_free( p);
+   malloc( 1848);  // a leak we can't detect
 }
 
 
