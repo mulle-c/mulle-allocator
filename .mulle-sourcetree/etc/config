@@ -1,1 +1,1 @@
-mulle-thread;tar;;8d9ef69f-388c-4711-80d6-9cb7446ef898;${MULLE_THREAD_URL:-https://github.com/mulle-c/mulle-thread/archive/${MULLE_THREAD_BRANCH:-latest}.tar.gz};;;;
+mulle-thread;tar;no-all-load;8d9ef69f-388c-4711-80d6-9cb7446ef898;${MULLE_THREAD_URL:-https://github.com/mulle-c/mulle-thread/archive/${MULLE_THREAD_BRANCH:-latest}.tar.gz};;;;
