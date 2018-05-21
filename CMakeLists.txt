@@ -60,37 +60,54 @@ ${TEST_ALLOCATOR_SOURCES}
 ${TEST_ALLOCATOR_PUBLIC_HEADERS}
 )
 
+option( STANDALONE "Create standalone library for debugging" OFF)
 
-set( STANDALONE_BASE_NAME "mulle-allocator")
-set( STANDALONE_NAME "mulle-allocator-standalone")
-set( STANDALONE_DEFINITIONS ${MULLE_ALLOCATOR_DEFINITIONS})
-set( STANDALONE_DEPENDENCIES
-mulle-allocator
-mulle-test-allocator
+set( INSTALL_LIBRARY_TARGETS
+"mulle-allocator"
+"mulle-test-allocator"
 )
 
-set( STANDALONE_ALL_LOAD_LIBRARIES
-$<TARGET_FILE:mulle-allocator>
-$<TARGET_FILE:mulle-test-allocator>
-${DEPENDENCY_LIBRARIES}
-${OPTIONAL_DEPENDENCY_LIBRARIES}
-)
+if( STANDALONE)
 
-set( STANDALONE_NORMAL_LOAD_LIBRARIES
-${OS_SPECIFIC_LIBRARIES}
-)
-include( Standalone)
+   set( STANDALONE_BASE_NAME "mulle-allocator")
+   set( STANDALONE_NAME "mulle-allocator-standalone")
+   set( STANDALONE_DEFINITIONS ${MULLE_ALLOCATOR_DEFINITIONS})
+   set( STANDALONE_DEPENDENCIES
+   mulle-allocator
+   mulle-test-allocator
+   )
+
+   set( STANDALONE_ALL_LOAD_LIBRARIES
+   $<TARGET_FILE:mulle-allocator>
+   $<TARGET_FILE:mulle-test-allocator>
+   ${DEPENDENCY_LIBRARIES}
+   ${OPTIONAL_DEPENDENCY_LIBRARIES}
+   )
+
+   set( STANDALONE_NORMAL_LOAD_LIBRARIES
+   ${OS_SPECIFIC_LIBRARIES}
+   )
+   include( Standalone)
+
+   set( INSTALL_LIBRARY_TARGETS
+   ${INSTALL_LIBRARY_TARGETS}
+   "mulle-allocator-standalone"
+   )
+endif()
 
 ### Install
 
 include( PreInstall OPTIONAL)
 
-install( TARGETS "mulle-allocator"  "mulle-allocator-standalone" "mulle-test-allocator" DESTINATION "lib")
+install( TARGETS ${INSTALL_LIBRARY_TARGETS} DESTINATION "lib")
 install( FILES ${PUBLIC_HEADERS}  DESTINATION "include/mulle-allocator")
 install( FILES ${PRIVATE_HEADERS} DESTINATION "include/mulle-allocator/private")
 
 install( FILES ${TEST_ALLOCATOR_PUBLIC_HEADERS}  DESTINATION "include/mulle-test-allocator")
-
+# definitions from cmake/share/Environment.cmake
 install( FILES ${CMAKE_INCLUDES}  DESTINATION "include/mulle-allocator/cmake")
+
+# definitions from cmake/share/LinkManifest.cmake
+install( FILES ${LINK_MANIFEST_FILES}  DESTINATION "include/mulle-allocator/link")
 
 include( PostInstall OPTIONAL)

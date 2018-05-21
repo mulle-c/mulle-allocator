@@ -6,6 +6,6 @@
 #ifndef _mulle_allocator__dependencies_h__
 #define _mulle_allocator__dependencies_h__
 
-# include <mulle-thread/mulle-thread.h>
+# include <mulle-thread/mulle-thread.h>   // mulle-thread
 
 #endif
