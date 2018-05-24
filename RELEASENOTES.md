@@ -1,10 +1,7 @@
-### 2.2.13
+# 3.0.0
 
-* no more homebrew packages, use mulle-sde now
-
-### 2.2.12
-
-* fix travis
+* made headernames hyphenated
+* no longer distributed as a homebrew package
 * migrated to mulle-sde
 
 ### 2.2.11
