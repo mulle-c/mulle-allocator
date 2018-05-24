@@ -1,3 +1,8 @@
+### 2.2.12
+
+* fix travis
+* migrated to mulle-sde
+
 ### 2.2.11
 
 * add mulle_allocator_assert as a quick check to see if an allocator is valid
