@@ -1,3 +1,7 @@
+### 2.2.13
+
+* no more homebrew packages, use mulle-sde now
+
 ### 2.2.12
 
 * fix travis
