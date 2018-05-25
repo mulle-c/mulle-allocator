@@ -1,7 +1,7 @@
 
 inotifywait
 ssh
-ninja
 cc
 gcc
 ld
+ninja
