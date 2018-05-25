@@ -1,3 +1,7 @@
+### 3.0.1
+
+* upgraded mulle-sde extensions
+
 # 3.0.0
 
 * made headernames hyphenated
