@@ -1,3 +1,7 @@
+### 3.0.2
+
+* fix travis.yml
+
 ### 3.0.1
 
 * upgraded mulle-sde extensions
