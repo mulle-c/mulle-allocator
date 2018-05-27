@@ -1,3 +1,7 @@
+### 3.0.3
+
+* Various small improvements
+
 ### 3.0.2
 
 * fix travis.yml
