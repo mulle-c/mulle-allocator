@@ -104,6 +104,15 @@ set( INSTALL_LIBRARY_TARGETS
    "mulle-test-allocator"
 )
 
+#
+# for our tests to export, must be after Library but before PostLibrary
+# problem to fix: TARGET_FILE is the uninstalled library
+#
+set( OPTIONAL_DEPENDENCY_LIBRARIES
+   ${OPTIONAL_DEPENDENCY_LIBRARIES}
+   $<TARGET_FILE:mulle-test-allocator>
+)
+
 include( Library OPTIONAL)
 
 
@@ -124,13 +133,6 @@ if( BUILD_SHARED_LIBS)
    )
 endif()
 
-
-# for our tests to export, must be after Library but before PostLibrary
-
-set( OPTIONAL_DEPENDENCY_LIBRARIES
-   ${OPTIONAL_DEPENDENCY_LIBRARIES}
-   $<TARGET_FILE:mulle-test-allocator>
-)
 
 include( PostLibrary OPTIONAL)
 

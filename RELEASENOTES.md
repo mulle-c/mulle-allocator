@@ -1,3 +1,7 @@
+### 3.0.10
+
+* move `OPTIONAL_DEPENDENCY_LIBRARIES` back into Standalone
+
 ### 3.0.9
 
 * and fix..
