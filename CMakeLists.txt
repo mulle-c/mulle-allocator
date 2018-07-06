@@ -104,15 +104,7 @@ set( INSTALL_LIBRARY_TARGETS
    "mulle-test-allocator"
 )
 
-
-# for our tests to export
-set( OPTIONAL_DEPENDENCY_LIBRARIES
-   ${OPTIONAL_DEPENDENCY_LIBRARIES}
-   $<TARGET_FILE:mulle-test-allocator>
-)
-
-
-include( PostLibrary OPTIONAL)
+include( Library OPTIONAL)
 
 
 #
@@ -132,8 +124,14 @@ if( BUILD_SHARED_LIBS)
    )
 endif()
 
+include( PostLibrary OPTIONAL)
 
 
+# for our tests to export
+set( OPTIONAL_DEPENDENCY_LIBRARIES
+   ${OPTIONAL_DEPENDENCY_LIBRARIES}
+   $<TARGET_FILE:mulle-test-allocator>
+)
 
 ### Install
 
