@@ -124,14 +124,17 @@ if( BUILD_SHARED_LIBS)
    )
 endif()
 
-include( PostLibrary OPTIONAL)
 
+# for our tests to export, must be after Library but before PostLibrary
 
-# for our tests to export
 set( OPTIONAL_DEPENDENCY_LIBRARIES
    ${OPTIONAL_DEPENDENCY_LIBRARIES}
    $<TARGET_FILE:mulle-test-allocator>
 )
+
+include( PostLibrary OPTIONAL)
+
+
 
 ### Install
 
