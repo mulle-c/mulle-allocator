@@ -17,6 +17,7 @@ include( Environment)
 include( PreFiles OPTIONAL)
 
 set( MULLE_ALLOCATOR_LIBRARY ON)
+set( MULLE_TEST_ALLOCATOR_LIBRARY ON)
 
 #
 # Include all non underscored .cmake files in ./cmake

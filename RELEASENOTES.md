@@ -1,3 +1,7 @@
+### 3.0.5
+
+* fix travis
+
 ### 3.0.4
 
 * modernized mulle-sde
