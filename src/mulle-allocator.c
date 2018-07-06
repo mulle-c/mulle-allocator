@@ -31,7 +31,7 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "dependencies.h"
+#include "include-private.h"
 #include "mulle-allocator-struct.h"
 // #include "mulle_allocator.h"  // don't include for windows
 #include <errno.h>

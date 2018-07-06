@@ -3,8 +3,8 @@
    Edits will be lost.
 */
 
-#ifndef _mulle_allocator__dependencies_h__
-#define _mulle_allocator__dependencies_h__
+#ifndef _mulle_allocator_include_h__
+#define _mulle_allocator_include_h__
 
 # include <mulle-thread/mulle-thread.h>   // mulle-thread
 

@@ -33,7 +33,7 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "dependencies.h"
+#include "include-private.h"
 
 #include "mulle-allocator.h"
 #include "mulle-test-allocator-struct.h"

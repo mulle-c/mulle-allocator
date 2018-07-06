@@ -8,8 +8,12 @@ set( INCLUDE_DIRS
 src
 ) 
 
+set( PRIVATE_HEADERS
+src/include-private.h
+)
+
 set( PUBLIC_HEADERS
-src/dependencies.h
+src/include.h
 src/mulle-allocator.h
 src/mulle-allocator-struct.h
 src/pointerarray.h

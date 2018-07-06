@@ -1,3 +1,7 @@
+### 3.0.4
+
+* modernized mulle-sde
+
 ### 3.0.3
 
 * Various small improvements
