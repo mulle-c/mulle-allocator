@@ -22,13 +22,16 @@ if( NOT __STANDALONE_C_CMAKE__)
       # A standalone library has all symbols and nothing is optimized away
       # sorta like a big static library, just shared
       #
-      set( STANDALONE_ALL_LOAD_LIBRARIES
-         $<TARGET_FILE:mulle-allocator>
-         ${ALL_LOAD_DEPENDENCY_LIBRARIES}
-         ${DEPENDENCY_LIBRARIES}
-         ${OPTIONAL_DEPENDENCY_LIBRARIES}
-         ${OS_SPECIFIC_LIBRARIES}
-      )
+      if( NOT STANDALONE_ALL_LOAD_LIBRARIES)
+         set( STANDALONE_ALL_LOAD_LIBRARIES
+            ${STANDALONE_ALL_LOAD_LIBRARIES}
+            $<TARGET_FILE:mulle-allocator>
+            ${ALL_LOAD_DEPENDENCY_LIBRARIES}
+            ${DEPENDENCY_LIBRARIES}
+            ${OPTIONAL_DEPENDENCY_LIBRARIES}
+            ${OS_SPECIFIC_LIBRARIES}
+         )
+      endif()
 
       # STARTUP_LIBRARY is supposed to be a find_library definition
       if( NOT STANDALONE_STARTUP_LIBRARY)

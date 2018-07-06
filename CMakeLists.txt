@@ -94,6 +94,25 @@ add_library( "mulle-allocator"
 
 set( INSTALL_LIBRARY_TARGETS "mulle-allocator")
 
+add_library( "mulle-test-allocator"
+   ${TEST_ALLOCATOR_SOURCES}
+   ${TEST_ALLOCATOR_PUBLIC_HEADERS}
+)
+ 
+set( INSTALL_LIBRARY_TARGETS
+   ${INSTALL_LIBRARY_TARGETS}
+   "mulle-test-allocator"
+)
+
+set( STANDALONE_ALL_LOAD_LIBRARIES
+   $<TARGET_FILE:mulle-allocator>
+   $<TARGET_FILE:mulle-test-allocator>
+   ${ALL_LOAD_DEPENDENCY_LIBRARIES}
+   ${DEPENDENCY_LIBRARIES}
+   ${OPTIONAL_DEPENDENCY_LIBRARIES}
+   ${OS_SPECIFIC_LIBRARIES}
+)
+
 include( PostLibrary OPTIONAL)
 
 
@@ -115,15 +134,6 @@ if( BUILD_SHARED_LIBS)
 endif()
 
 
-add_library( "mulle-test-allocator"
-   ${TEST_ALLOCATOR_SOURCES}
-   ${TEST_ALLOCATOR_PUBLIC_HEADERS}
-)
- 
-set( INSTALL_LIBRARY_TARGETS
-   ${INSTALL_LIBRARY_TARGETS}
-   "mulle-test-allocator"
-)
 
 
 ### Install
