@@ -34,7 +34,7 @@
 #ifndef mulle_allocator_h__
 #define mulle_allocator_h__
 
-#include "dependencies.h"
+#include "include.h"
 
 #include "mulle-allocator-struct.h"
 #include <stddef.h>
@@ -50,7 +50,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 3)
+#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 4)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
