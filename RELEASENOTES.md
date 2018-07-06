@@ -1,3 +1,7 @@
+### 3.0.8
+
+* fix test build
+
 ### 3.0.7
 
 * fix travis once more
