@@ -1,3 +1,7 @@
+### 3.0.6
+
+* fix travis again
+
 ### 3.0.5
 
 * fix travis
