@@ -24,7 +24,6 @@ if( NOT __STANDALONE_C_CMAKE__)
       #
       if( NOT STANDALONE_ALL_LOAD_LIBRARIES)
          set( STANDALONE_ALL_LOAD_LIBRARIES
-            ${STANDALONE_ALL_LOAD_LIBRARIES}
             $<TARGET_FILE:mulle-allocator>
             ${ALL_LOAD_DEPENDENCY_LIBRARIES}
             ${DEPENDENCY_LIBRARIES}

@@ -98,20 +98,19 @@ add_library( "mulle-test-allocator"
    ${TEST_ALLOCATOR_SOURCES}
    ${TEST_ALLOCATOR_PUBLIC_HEADERS}
 )
- 
+
 set( INSTALL_LIBRARY_TARGETS
    ${INSTALL_LIBRARY_TARGETS}
    "mulle-test-allocator"
 )
 
-set( STANDALONE_ALL_LOAD_LIBRARIES
-   $<TARGET_FILE:mulle-allocator>
-   $<TARGET_FILE:mulle-test-allocator>
-   ${ALL_LOAD_DEPENDENCY_LIBRARIES}
-   ${DEPENDENCY_LIBRARIES}
+
+# for our tests to export
+set( OPTIONAL_DEPENDENCY_LIBRARIES
    ${OPTIONAL_DEPENDENCY_LIBRARIES}
-   ${OS_SPECIFIC_LIBRARIES}
+   $<TARGET_FILE:mulle-test-allocator>
 )
+
 
 include( PostLibrary OPTIONAL)
 
