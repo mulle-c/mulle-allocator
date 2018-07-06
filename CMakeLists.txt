@@ -115,6 +115,9 @@ set( OPTIONAL_DEPENDENCY_LIBRARIES
 
 include( Library OPTIONAL)
 
+if( STANDALONE)
+  add_dependencies( ${STANDALONE_NAME} mulle-test-allocator)
+endif()
 
 #
 # defined by cmake -DBUILD_SHARED_LIBS=ON

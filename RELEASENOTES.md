@@ -1,3 +1,7 @@
+### 3.0.11
+
+* fix standalone dependency
+
 ### 3.0.10
 
 * move `OPTIONAL_DEPENDENCY_LIBRARIES` back into Standalone
