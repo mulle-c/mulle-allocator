@@ -135,7 +135,7 @@ and everybody will be happy")
       )
       set_property( TARGET ${STANDALONE_NAME} PROPERTY CXX_STANDARD 11)
 
-      add_dependencies( ${STANDALONE_NAME} ${LIRARY_NAME})
+      add_dependencies( ${STANDALONE_NAME} ${LIBRARY_NAME})
       if( STARTUP_NAME)
          add_dependencies( ${STANDALONE_NAME} ${STARTUP_NAME})
       endif()
