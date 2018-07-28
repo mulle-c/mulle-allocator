@@ -1,10 +1,7 @@
-if( NOT __POST_EXECUTABLE__CMAKE__)
-   set( __POST_EXECUTABLE__CMAKE__ ON)
+# can be included multiple times
 
-   if( MULLE_TRACE_INCLUDE)
-      message( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
-   endif()
-
-   include( PostExecutableCAux OPTIONAL)
-
+if( MULLE_TRACE_INCLUDE)
+   message( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
+
+include( PostExecutableCAux OPTIONAL)
