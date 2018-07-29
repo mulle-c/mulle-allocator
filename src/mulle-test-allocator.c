@@ -460,7 +460,7 @@ void   _mulle_test_allocator_detect_leaks()
 //
 // TODO: MULLE_C_CONSTRUCTOR doesn't work with non-clang compilers
 //
-MULLE_C_CONSTRUCTOR
+MULLE_C_CONSTRUCTOR( mulle_test_allocator_initialize)
 void   mulle_test_allocator_initialize( void)
 {
    int    rval;

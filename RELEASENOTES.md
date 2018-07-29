@@ -1,3 +1,7 @@
+### 3.0.15
+
+* adapt to mulle-c11 3.0.0
+
 ### 3.0.14
 
 * fix a warning
