@@ -1,3 +1,11 @@
+### 3.0.13
+
+* fix misspelling
+
+### 3.0.12
+
+* remove old test cruft, fix for mingw
+
 ### 3.0.11
 
 * fix standalone dependency
