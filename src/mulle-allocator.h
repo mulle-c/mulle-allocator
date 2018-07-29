@@ -43,14 +43,14 @@
 #include <assert.h>
 
 
-#if MULLE_C11_VERSION < ((1 << 20) | (3 << 8) | 0)
+#if MULLE_C11_VERSION < ((3 << 20) | (0 << 8) | 0)
 # error "mulle_c11 is too old"
 #endif
 
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 14)
+#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 15)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
