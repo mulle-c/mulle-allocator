@@ -50,7 +50,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 15)
+#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 16)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
@@ -64,6 +64,9 @@ MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
 MULLE_C_NO_RETURN
 void   mulle_allocator_fail( void *block, size_t size);
 
+// NO_RETURN really but....
+int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block);
+
 
 # pragma mark -
 # pragma mark Petty Accessors
@@ -76,7 +79,7 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
       p = &mulle_default_allocator;
 
    p->aba     = aba;
-   p->abafree = f ? f : (int (*)( void *, int (*)( void *), void *)) abort;
+   p->abafree = f ? f : mulle_allocator_abort;
 }
 
 

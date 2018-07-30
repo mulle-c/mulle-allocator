@@ -47,6 +47,17 @@ void   mulle_allocator_fail( void *block, size_t size)
 }
 
 
+//
+// this function exists because gcc is paining me. But this is also "wrong"
+// because it's a supposedly int returning function that should be marked as
+// "no-return". It's a classical type tragedy.
+//
+// MULLE_C_NO_RETURN
+int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block)
+{
+   abort();
+}
+
 #pragma mark -
 #pragma mark _mulle_allocator
 
