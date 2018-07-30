@@ -1,3 +1,7 @@
+### 3.0.16
+
+* try to fix gcc warning with gratuitous C function
+
 ### 3.0.15
 
 * adapt to mulle-c11 3.0.0

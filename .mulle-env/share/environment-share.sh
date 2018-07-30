@@ -23,6 +23,9 @@ export MULLE_SDE_INSTALLED_VERSION="0.28.4"
 
 
 # By default assume a project has source and a sourcetree in that order.
+
+
+# By default assume a project has source and a sourcetree in that order.
 export MULLE_SDE_UPDATE_CALLBACKS="sourcetree:source"
 
 

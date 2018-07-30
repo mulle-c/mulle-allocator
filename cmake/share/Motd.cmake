@@ -21,6 +21,7 @@ if( NOT __MOTD__CMAKE__)
                         "${CMAKE_BINARY_DIR}"
                         "${PROJECT_NAME}"
          COMMENT "Creating a motd file for mulle-craft"
+         VERBATIM
       )
 
       add_dependencies( __motd__ ${PROJECT_NAME})
