@@ -50,7 +50,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 16)
+#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 17)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
@@ -65,7 +65,7 @@ MULLE_C_NO_RETURN
 void   mulle_allocator_fail( void *block, size_t size);
 
 // NO_RETURN really but....
-int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block);
+int   mulle_allocator_abort( void *aba, int (*free)( void *), void *block);
 
 
 # pragma mark -
