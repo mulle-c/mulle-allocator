@@ -1,3 +1,7 @@
+### 3.0.17
+
+* fix a warning
+
 ### 3.0.16
 
 * try to fix gcc warning with gratuitous C function

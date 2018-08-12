@@ -53,7 +53,7 @@ void   mulle_allocator_fail( void *block, size_t size)
 // "no-return". It's a classical type tragedy.
 //
 // MULLE_C_NO_RETURN
-int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block)
+int   mulle_allocator_abort( void *aba, int (*free)( void *), void *block)
 {
    abort();
 }
@@ -64,7 +64,7 @@ int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block)
 MULLE_C_GLOBAL
 struct mulle_allocator   mulle_stdlib_allocator =
 {
-   calloc, realloc, free, mulle_allocator_fail, (int (*)()) abort, NULL
+   calloc, realloc, free, mulle_allocator_fail, mulle_allocator_abort, NULL
 };
 
 
@@ -73,7 +73,7 @@ struct mulle_allocator   mulle_stdlib_allocator =
 MULLE_C_GLOBAL
 struct mulle_allocator   mulle_default_allocator =
 {
-   calloc, realloc, free, mulle_allocator_fail, (int (*)()) abort, NULL
+   calloc, realloc, free, mulle_allocator_fail, mulle_allocator_abort, NULL
 };
 
 
