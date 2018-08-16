@@ -1,3 +1,7 @@
+### 3.0.18
+
+* fix type warning for sure now
+
 ### 3.0.17
 
 * fix a warning
