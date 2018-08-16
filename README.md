@@ -18,12 +18,9 @@ Fork      |  Build Status | Release Version
 [Mulle kybernetiK](//github.com/mulle-nat/mulle-allocator) | [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-nat/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
 [Community](https://github.com/mulle-objc/mulle-allocator/tree/release) | [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg)](https://travis-ci.org/mulle-objc/mulle-allocator) | ![Community tag](https://img.shields.io/github/tag/mulle-objc/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-objc/mulle-allocator)
 
-
 ##  Use `mulle_test_allocator` for leak detection
 
-If you use `mulle_malloc` and friends instead of `malloc` in your code,
-you can easily check for leaks during tests using the `mulle_test_allocator`
-library.
+Use `mulle_malloc` and friends instead of `malloc` in your code.
 
 So instead of:
 
@@ -45,8 +42,14 @@ write
    mulle_free( s);
 ```
 
+Your code will run the same and a possible performance degradation
+because of the indirection will be hardly measurable.
 
-Then wrap your test code inside
+> Actually there is even a chance of improvement, due to inlining code.
+
+Now you can easily check for leaks using the `mulle_test_allocator` library.
+
+Wrap your code inside
 
 ```
 mulle_test_allocator_initialize();

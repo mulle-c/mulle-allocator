@@ -42,7 +42,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef __APPLE__
+#if defined( __APPLE__)
 # include <execinfo.h>
 # include <stdio.h>
 #endif
@@ -82,7 +82,7 @@ static int   may_alloc( size_t size)
 }
 
 
-#ifdef __APPLE__
+#if defined( __APPLE__)
 //
 // it gives 0   libMulleStandaloneObjC.dylib        0x000000010ab7e46d stacktrace + 61
 // move past the address
@@ -145,7 +145,7 @@ static int  boring( char *s, int size)
 
 static void   stacktrace( int offset)
 {
-#ifdef __APPLE__
+#if defined( __APPLE__)
    fprintf( stderr, " : [");
    {
       void   *callstack[256];
@@ -191,7 +191,7 @@ static void   stacktrace( int offset)
 
 static void   bail( void *p)
 {
-#ifdef __APPLE__
+#if defined( __APPLE__)
    if( getenv( "MULLE_TEST_ALLOCATOR_HISTORY"))
    {
       /* start malloc_history */
@@ -213,7 +213,7 @@ static void   bail( void *p)
 #endif
 
 /* abort is clumsy on WIN32 */
-#ifdef _WIN32
+#if defined( _WIN32)
    exit( 1);
 #endif
    abort();
