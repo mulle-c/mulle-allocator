@@ -1,3 +1,8 @@
+# 4.0.0
+
+* moved testallocator to mulle-core since its dependent on mulle-thread
+
+
 ### 3.0.18
 
 * fix type warning for sure now
@@ -153,7 +158,7 @@ README.md for background.
 1.8.0
 ===
 
-* to make it more painless on windows, let `mulle_test_allocator_reset` call
+* to make it more painless on windows, let `mulle_testallocator_reset` call
 `mulle_test_allocator_initialize` if needed.
 
 

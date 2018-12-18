@@ -50,7 +50,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((3 << 20) | (0 << 8) | 18)
+#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (0 << 8) | 0)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
@@ -233,6 +233,7 @@ static inline int   mulle_abafree( void *block)
 # pragma mark -
 # pragma mark strdup convenience
 
+MULLE_C_NON_NULL_RETURN
 static inline char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
 {
    size_t   len;
@@ -240,8 +241,7 @@ static inline char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *
 
    len = strlen( s) + 1;
    dup = _mulle_allocator_malloc( p, len);
-   if( dup)
-      memcpy( dup, s, len);
+   memcpy( dup, s, len);
    return( dup);
 }
 
