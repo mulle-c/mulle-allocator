@@ -1,7 +1,5 @@
 # mulle-allocator
 
-... is a leak and double free checker for tests (and at runtime)
-
 ... provides a way to pass around the memory scheme du jour
 
 ... has identical API to malloc, realloc, free
@@ -9,26 +7,40 @@
 ... frees your code from having to check for errors when allocating memory
 
 
-**mulle_allocator** comes as two libraries: `mulle_allocator` and
-`mulle_test_allocator`. `mulle_test_allocator` provides the error detection,
-which you may want to include or leave out.
+**mulle_allocator** has a companion project: `mulle_testallocator`.
+`mulle_testallocator` provides the error and leak detection.
 
 Fork      |  Build Status | Release Version
 ----------|---------------|-----------------------------------
-[Mulle kybernetiK](//github.com/mulle-nat/mulle-allocator) | [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-nat/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-nat/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-nat/mulle-allocator)
-[Community](https://github.com/mulle-objc/mulle-allocator/tree/release) | [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg)](https://travis-ci.org/mulle-objc/mulle-allocator) | ![Community tag](https://img.shields.io/github/tag/mulle-objc/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-objc/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-objc/mulle-allocator)
+[Mulle kybernetiK](//github.com/mulle-c/mulle-allocator) | [![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator)
 
-##  Use `mulle_test_allocator` for leak detection
 
-Use `mulle_malloc` and friends instead of `malloc` in your code.
+##  Use `mulle_malloc` instead of `malloc` to reduce code size
 
-So instead of:
+Instead of:
 
 ```
-   malloc( 1848);
-   calloc( 18, 48);
+   if( ! malloc( 1848))
+   {
+      perror( "malloc:");
+      exit( 1);
+   }
+   if( ! calloc( 18, 48))
+   {
+      perror( "calloc:");
+      exit( 1);
+   }
    s = strdup( "VfL Bochum 1848");
-   realloc( s, 18);
+   if( ! s)
+   {
+      perror( "strdup:");
+      exit( 1);
+   }
+   if( ! realloc( s, 18);
+   {
+      perror( "realloc:");
+      exit( 1);
+   }
    free( s);
 ```
 
@@ -42,27 +54,11 @@ write
    mulle_free( s);
 ```
 
-Your code will run the same and a possible performance degradation
-because of the indirection will be hardly measurable.
+You don't have to check for out of memory error conditions anymore.
+Otherwise (except) your code will run the same and a possible performance
+degradation because of the indirection will be hardly measurable.
 
 > Actually there is even a chance of improvement, due to inlining code.
-
-Now you can easily check for leaks using the `mulle_test_allocator` library.
-
-Wrap your code inside
-
-```
-mulle_test_allocator_initialize();
-mulle_default_allocator = mulle_test_allocator;
-{
-   // do stuff
-}
-mulle_test_allocator_reset();
-```
-
-and `mulle_test_allocator_reset` will tell you about your leaks.
-All `mulle_test_allocator` routines will check for erroneus frees and
-wrong pointers.
 
 
 ##  Use `mulle_allocator` to make your code more flexible
@@ -79,8 +75,8 @@ tests. This way, other, possibly benign, code leaks, do not obscure the test.
 
 ## What is an allocator ?
 
-The `mulle_allocator` struct is mostly a collection of function pointers and
-looks like this:
+The `mulle_allocator` struct is a collection of function pointers, with one
+added pointer for `aba` and looks like this:
 
 ```
 struct mulle_allocator
@@ -95,12 +91,13 @@ struct mulle_allocator
 ```
 
 > By default `.aba` and `.abafree` are not available.
-> If you need ABA safe freeing, it is recommended to use [mulle-aba](//www.mulle-kybernetik.com/software/git/mulle-aba/).
+> If you need ABA safe freeing, it is recommended to use [mulle-aba](//github.com/mulle-concurrent/mulle-aba).
 
 You should not jump through the vectors directly, but use
 supplied inline functions like `mulle_allocator_malloc` to allocate memory
 using the allocator, since they perform the necessary return value checks
 (see below: Dealing with memory shortage)
+
 
 #### Embedding the allocator in your data structure
 
@@ -173,7 +170,7 @@ The disadvantage is, that passing in different allocators opens is a new
 possible source of bugs.
 
 
-##  NEW in 2.0! Dealing with memory shortage
+##  How mulle-allocator deals with memory shortage
 
 By the C standard `malloc` returns **NULL** and sets `errno` to `ENOMEM`, if
 it can't satisfy the memory request. Here are the two most likely scenarios why
@@ -222,40 +219,40 @@ fail vector. This will print an error message and exit the program.
 
 ## Install
 
-On OS X and Linux you can use
-[homebrew](//brew.sh), respectively
-[linuxbrew](//linuxbrew.sh)
-to install the library:
+Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your
+dependencies `mulle-sde dependency add https://github.com/mulle-c/mulle-allocator.git`.
+
+
+## Manual Installation
+
+Install the requirements:
+
+
+Requirements                               | Description
+-------------------------------------------|-----------------------
+[mulle-c11](//github.com/mulle-c/mulle-c11)| Compiler glue, single header
+
+
+Install with
 
 ```
-brew install mulle-objc/software/mulle-allocator
+mkdir build
+cd build
+cmake
+make
+make install
 ```
-
-On other platforms you can use **mulle-install** from
-[mulle-build](//github.com/mulle-nat/mulle-build)
-to install the library:
-
-```
-mulle-install --prefix /usr/local --branch release https://github.com/mulle-objc/mulle-allocator
-```
-
-
-Otherwise read:
-
-* [How to Build](dox/BUILD.md)
 
 
 ## API
 
 * [Allocator](dox/API_ALLOCATOR.md)
-* [Test Allocator](dox/API_TEST_ALLOCATOR.md)
 
 
 ### Platforms and Compilers
 
 All platforms and compilers supported by
-[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/) and
-[mulle-thread](//www.mulle-kybernetik.com/software/git/mulle-thread/).
+[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
 
 
 ## Author

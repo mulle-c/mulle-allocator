@@ -1,0 +1,2 @@
+mulle-allocator;tar;no-all-load,no-import,only-standalone;A6EC993C-F5F4-4BF8-B223-6AE956824E30;${MULLE_ALLOCATOR_URL:-https://github.com/mulle-c/mulle-allocator/archive/${MULLE_ALLOCATOR_BRANCH:-latest}.tar.gz};;;;
+mulle-testallocator;tar;no-all-load,no-import;5920503D-C693-437D-B9E8-62D5C3586EF7;${MULLE_TESTALLOCATOR_URL:-https://github.com/mulle-core/mulle-testallocator/archive/${MULLE_TESTALLOCATOR_BRANCH:-latest}.tar.gz};;;;
