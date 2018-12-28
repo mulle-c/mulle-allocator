@@ -1,5 +1,7 @@
 # mulle-allocator
 
+🔄 Flexible C memory allocation scheme
+
 ... provides a way to pass around the memory scheme du jour
 
 ... has identical API to malloc, realloc, free
@@ -10,9 +12,9 @@
 **mulle_allocator** has a companion project: `mulle_testallocator`.
 `mulle_testallocator` provides the error and leak detection.
 
-Fork      |  Build Status | Release Version
-----------|---------------|-----------------------------------
-[Mulle kybernetiK](//github.com/mulle-c/mulle-allocator) | [![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator)
+Build Status | Release Version
+-------------|-----------------------------------
+[![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator)
 
 
 ##  Use `mulle_malloc` instead of `malloc` to reduce code size
