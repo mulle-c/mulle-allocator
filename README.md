@@ -10,7 +10,7 @@
 
 
 **mulle_allocator** has a companion project: `mulle_testallocator`.
-`mulle_testallocator` provides the error and leak detection.
+`mulle_testallocator` provides error and leak detection.
 
 Build Status | Release Version
 -------------|-----------------------------------
