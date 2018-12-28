@@ -17,6 +17,9 @@ project.xcworkspace/
 stacktrace/
 malloc-error/
 
+environment-user-*.sh
+environment-host-*.sh
+
 
 
 
