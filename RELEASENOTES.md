@@ -1,3 +1,7 @@
+### 4.0.2
+
+* modernized to mulle-sde with .mulle folder
+
 # 4.0.0
 
 * moved testallocator to mulle-core since its dependent on mulle-thread
