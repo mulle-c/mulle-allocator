@@ -1,6 +1,8 @@
 #include <mulle-allocator/mulle-allocator.h>
+#include <stdio.h>
 
 
+MULLE_C_NO_RETURN
 static void   fail( void *unused, size_t ignored)
 {
    printf( "OK\n");
