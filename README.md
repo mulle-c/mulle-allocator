@@ -60,7 +60,8 @@ You don't have to check for out of memory error conditions anymore.
 Otherwise (except) your code will run the same and a possible performance
 degradation because of the indirection will be hardly measurable.
 
-> Actually there is even a chance of improvement, due to inlining code.
+> Actually there is even a chance of improvement, due to resolved 
+> shared library calls and inlining code.
 
 
 ##  Use `mulle_allocator` to make your code more flexible
