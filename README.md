@@ -9,8 +9,8 @@
 ... frees your code from having to check for errors when allocating memory
 
 
-**mulle_allocator** has a companion project: `mulle_testallocator`.
-`mulle_testallocator` provides error and leak detection.
+**mulle_allocator** has a companion project: [mulle_testallocator](https://github.com/mulle-core/mulle-testallocator).
+*mulle_testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
 
 Build Status | Release Version
 -------------|-----------------------------------
