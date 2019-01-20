@@ -9,8 +9,8 @@
 ... frees your code from having to check for errors when allocating memory
 
 
-**mulle_allocator** has a companion project: `mulle_testallocator`.
-`mulle_testallocator` provides error and leak detection.
+**mulle-allocator** has a companion project: [mulle-testallocator](https://github.com/mulle-core/mulle-testallocator).
+*mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
 
 Build Status | Release Version
 -------------|-----------------------------------
@@ -57,16 +57,14 @@ write
 ```
 
 You don't have to check for out of memory error conditions anymore.
-Otherwise (except) your code will run the same and a possible performance
+Otherwise your code will run the same and a possible performance
 degradation because of the indirection will be hardly measurable.
-
-> Actually there is even a chance of improvement, due to inlining code.
 
 
 ##  Use `mulle_allocator` to make your code more flexible
 
 You can make your code, and especially your data structures, more flexible by
-using `mulle_allocator` as this decouples your data structure from **stdib**.
+using `mulle_allocator` as this decouples your data structure from **stdlib**.
 It enables your data structure to reside in shared or wired memory for example
 with no additional code. Your API consumers just have to pass their own
 allocators.
