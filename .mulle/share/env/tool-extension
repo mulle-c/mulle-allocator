@@ -4,6 +4,7 @@ mulle-create-build-motd;optional
 curl;optional
 git;optional
 gzip;optional
+id;optional
 inotifywait;optional
 ssh;optional
 tar;optional
