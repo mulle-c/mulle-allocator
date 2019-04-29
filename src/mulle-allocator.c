@@ -40,7 +40,7 @@
 
 
 MULLE_C_NO_RETURN
-void   mulle_allocator_fail( void *block, size_t size)
+void   mulle_allocation_fail( void *block, size_t size)
 {
    perror( "memory allocation:");
    exit( 1);
@@ -53,7 +53,7 @@ void   mulle_allocator_fail( void *block, size_t size)
 // "no-return". It's a classical type tragedy.
 //
 // MULLE_C_NO_RETURN
-int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block)
+int   mulle_aba_abort( void *aba, void (*free)( void *), void *block)
 {
    abort();
 }
@@ -63,7 +63,7 @@ int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block)
 
 MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 {
-   calloc, realloc, free, mulle_allocator_fail, mulle_allocator_abort, NULL
+   calloc, realloc, free, mulle_allocation_fail, mulle_aba_abort, NULL
 };
 
 
@@ -71,8 +71,17 @@ MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 
 MULLE_C_GLOBAL struct mulle_allocator   mulle_default_allocator =
 {
-   calloc, realloc, free, mulle_allocator_fail, mulle_allocator_abort, NULL
+   calloc, realloc, free, mulle_allocation_fail, mulle_aba_abort, NULL
 };
 
+
+static void   no_free( void *ignored)
+{
+}
+
+MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator =
+{
+   calloc, realloc, no_free, mulle_allocation_fail, mulle_aba_abort, NULL
+};
 
 
