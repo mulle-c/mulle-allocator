@@ -60,12 +60,13 @@
 
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_default_allocator;
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
+MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator;
 
 MULLE_C_NO_RETURN
-void   mulle_allocator_fail( void *block, size_t size);
+void   mulle_allocation_fail( void *block, size_t size);
 
 // NO_RETURN really but....
-int   mulle_allocator_abort( void *aba, void (*free)( void *), void *block);
+int   mulle_aba_abort( void *aba, void (*free)( void *), void *block);
 
 
 # pragma mark -
@@ -79,7 +80,7 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
       p = &mulle_default_allocator;
 
    p->aba     = aba;
-   p->abafree = f ? f : mulle_allocator_abort;
+   p->abafree = f ? f : mulle_aba_abort;
 }
 
 
@@ -89,7 +90,17 @@ static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
    if( ! p)
       p = &mulle_default_allocator;
 
-   p->fail = f ? f : mulle_allocator_fail;
+   p->fail = f ? f : mulle_allocation_fail;
+}
+
+
+MULLE_C_NO_RETURN
+static inline void   mulle_allocator_fail( struct mulle_allocator *p, void *block, size_t size)
+{
+   if( ! p)
+      p = &mulle_default_allocator;
+
+   (*p->fail)( block, size);
 }
 
 
