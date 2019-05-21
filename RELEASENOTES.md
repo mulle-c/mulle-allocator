@@ -1,3 +1,10 @@
+## 4.1.0
+
+* renamed `mulle_allocator_fail` to `mulle_allocation_fail,` because it has not allocator parameter
+* renamed `mulle_allocator_abort` to `mulle_aba_abort` for same reason
+* added `mulle_stdlib_nofree_allocator` for benefit of MulleObjCStandardFoundation
+
+
 ### 4.0.2
 
 * modernized to mulle-sde with .mulle folder

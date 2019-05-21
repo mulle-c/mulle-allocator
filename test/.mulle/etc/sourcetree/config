@@ -1,3 +1,1 @@
-mulle-testallocator;tar;no-all-load,no-descend,no-import,no-singlephase,no-static-link;35054094-2ba2-442d-89b8-81d2ff632420;${MULLE_TESTALLOCATOR_URL:-https://github.com/mulle-core/mulle-testallocator/archive/${MULLE_TESTALLOCATOR_BRANCH:-latest}.tar.gz};;;;
-mulle-allocator;tar;no-all-load,no-descend,no-import,only-standalone;e69c22ab-c841-419a-a670-34a26ce278ea;${MULLE_ALLOCATOR_URL:-https://github.com/mulle-c/mulle-allocator/archive/${MULLE_ALLOCATOR_BRANCH:-latest}.tar.gz};;;;
-mulle-stacktrace;tar;no-all-load,no-import,no-singlephase;431b590e-d5fd-451e-9eb0-cb246e6a21c6;${MULLE_STACKTRACE_URL:-https://github.com/mulle-core/mulle-stacktrace/archive/${MULLE_STACKTRACE_BRANCH:-latest}.tar.gz};;;;
+mulle-allocator;tar;no-all-load,no-import;69216e86-d007-45b9-aa94-7374bf6bfbe7;${MULLE_ALLOCATOR_URL:-https://github.com/mulle-c/mulle-allocator/archive/${MULLE_BRANCH}.tar.gz};${MULLE_ALLOCATOR_BRANCH:-latest};;;
