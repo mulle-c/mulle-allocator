@@ -20,4 +20,4 @@ before_install:
 
 script: |
    mulle-sde -v craft
-   [ -d test ] && mulle-sde -v test
+   [ -d test ] && mulle-sde -v test --no-memory-checker
