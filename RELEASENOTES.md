@@ -1,3 +1,7 @@
+### 4.1.1
+
+* Various small improvements
+
 ## 4.1.0
 
 * renamed `mulle_allocator_fail` to `mulle_allocation_fail,` because it has not allocator parameter
