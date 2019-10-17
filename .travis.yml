@@ -11,4 +11,4 @@ before_install:
 
 script: |
    mulle-sde -v craft
-   [ -d test ] && mulle-sde -v test --serial --no-memory-checker
+   [ -d test ] && mulle-sde -v test --no-memory-checker --serial
