@@ -84,4 +84,3 @@ MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator =
    calloc, realloc, no_free, mulle_allocation_fail, mulle_aba_abort, NULL
 };
 
-
