@@ -216,6 +216,12 @@ accordingly, never to return, if the allocation went bad. If the allocator
 function detects that an allocation can not be satisfied it jumps through it's
 fail vector. This will print an error message and exit the program.
 
+You can not pass a zero size to either `mulle_realloc` or `mulle_malloc`
+without getting a failure. If you want to free memory with realloc - by
+passing a zero block size - you need to use `mulle_realloc_strict`.
+If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
+will return NULL.
+
 
 ## Install
 

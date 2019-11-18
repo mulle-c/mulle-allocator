@@ -113,6 +113,8 @@ static inline void   *_mulle_allocator_malloc( struct mulle_allocator *p, size_t
 {
    void   *q;
 
+   assert( size);
+
    q = (*p->realloc)( NULL, size);
    if( ! q)
       (*p->fail)( NULL, size);
@@ -125,6 +127,8 @@ static inline void   *_mulle_allocator_calloc( struct mulle_allocator *p, size_t
 {
    void   *q;
 
+   assert( n && size);
+
    q = (*p->calloc)( n, size);
    if( ! q)
       (*p->fail)( NULL, n * size);
@@ -132,16 +136,48 @@ static inline void   *_mulle_allocator_calloc( struct mulle_allocator *p, size_t
 }
 
 
+//
+// this reallocs, but doesn't free. If you pass in size 0, you risk failing
+// you can pass in block 0 for malloc
+//
 MULLE_C_NON_NULL_RETURN
-static inline void   *_mulle_allocator_realloc( struct mulle_allocator *p, void *block, size_t size)
+static inline void *
+   _mulle_allocator_realloc( struct mulle_allocator *p, void *block, size_t size)
 {
    void   *q;
+
+   assert( size);
 
    q = (*p->realloc)( block, size);
    if( ! q)
       (*p->fail)( block, size);
    return( q);
 }
+
+
+static inline void *
+   _mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size)
+{
+   void   *q;
+
+   if( ! size)
+   {
+      (*p->free)( block);
+      return( NULL);
+   }
+
+   q = (*p->realloc)( block, size);
+   if( ! q)
+      (*p->fail)( block, size);
+   return( q);
+}
+
+
+//
+// this function is more like the real realloc, but it is guaranteed that
+// if you pass in block != 0 and size 0, that you free AND get NULL back
+//
+void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size);
 
 
 static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *block)
@@ -193,6 +229,13 @@ static inline void   *mulle_allocator_realloc( struct mulle_allocator *p, void *
 }
 
 
+static inline void   *mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size)
+{
+   return( _mulle_allocator_realloc_strict( p ? p : &mulle_default_allocator, block, size));
+}
+
+
+
 static inline void   mulle_allocator_free( struct mulle_allocator *p, void *block)
 {
    _mulle_allocator_free( p ? p : &mulle_default_allocator, block);
@@ -226,6 +269,12 @@ MULLE_C_NON_NULL_RETURN
 static inline void   *mulle_realloc( void *block, size_t size)
 {
    return( _mulle_allocator_realloc( &mulle_default_allocator, block, size));
+}
+
+
+static inline void   *mulle_realloc_strict( void *block, size_t size)
+{
+   return( _mulle_allocator_realloc_strict( &mulle_default_allocator, block, size));
 }
 
 
