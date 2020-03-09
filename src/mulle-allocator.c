@@ -43,7 +43,7 @@ MULLE_C_NO_RETURN
 void   mulle_allocation_fail( void *block, size_t size)
 {
    perror( "memory allocation:");
-   exit( 1);
+   abort();
 }
 
 

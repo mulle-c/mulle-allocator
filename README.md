@@ -166,8 +166,8 @@ static inline void   my_other_string_free( struct my_other_string *p,
 }
 ```
 
-The disadvantage is, that passing in different allocators opens is a new
-possible source of bugs.
+The disadvantage this opens the door for bugs, if you are passing in different
+allocators
 
 
 ##  How mulle-allocator deals with memory shortage
@@ -180,7 +180,7 @@ The caller specified a huge amount of memory, that the OS can't give you.
 Typically (size_t) -1 can never work. This is considered to be a bug on the
 callers part.
 
-Or the programm has exhausted all available memory space to the process. Here
+Or the program has exhausted all memory space available to the process. Here
 is what happens on various OS:
 
 OS                |  malloc fate
@@ -194,8 +194,8 @@ The gist is, that in portable programs it doesn't really make sense to rely
 on `malloc` returning **NULL** and doing something clever based on it.
 
 If we define the `mulle-allocator`'s `malloc` to always return a valid memory
-block, discounting erroneous parameters as programmers error to be caught
-during development, memory calling code simplifies from:
+block, discounting erroneous parameters as programmers error, to be caught
+during development, then memory calling code simplifies from:
 
 ```
 p = mulle_alloc( size);
