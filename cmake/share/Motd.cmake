@@ -1,3 +1,7 @@
+### If you want to edit this, copy it from cmake/share to cmake. It will be
+### picked up in preference over the one in cmake/share. And it will not get
+### clobbered with the next upgrade.
+
 if( NOT __MOTD__CMAKE__)
    set( __MOTD__CMAKE__ ON)
 
@@ -27,12 +31,12 @@ if( NOT __MOTD__CMAKE__)
          COMMAND "${CREATE_MOTD_EXE}" $ENV{CREATE_BUILD_MOTD_FLAGS}
                      "executable"
                         "${CMAKE_BINARY_DIR}"
-                        "${PROJECT_NAME}"
+                        "${EXECUTABLE_NAME}"
          COMMENT "Creating a motd file for mulle-craft"
          VERBATIM
       )
 
-      add_dependencies( __motd__ ${PROJECT_NAME})
+      add_dependencies( __motd__ ${EXECUTABLE_NAME})
    endif()
 
    include( MotdAux OPTIONAL)

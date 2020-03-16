@@ -13,10 +13,14 @@ add_mulle_kybernetik_to_apt_sources()
    local release
    local debname
 
+   release="`lsb_release -c -s`" || return 1
+
    #
-   # we can choose a different mulle-kybernetik repository, like
-   # say "prerelease" if the branch contains &debname=prerelease
-   # Yes you can use & in tags:
+   # we can choose a different mulle-kybernetik debian repository instead
+   # of "main" like say "prerelease", if the branch contains
+   # &debname=prerelease.
+   #
+   # Yes you can use & in git tags:
    # https://git-scm.com/docs/git-check-ref-format
    #
    debname="main"
@@ -28,11 +32,10 @@ add_mulle_kybernetik_to_apt_sources()
    esac
 
    #
-   # use DEBIAN_REPOSITORY preferably (set in travis-ci settings)
+   # use DEBIAN_REPOSITORY preferably (set it in travis-ci settings)
    #
    debname="${DEBIAN_REPOSITORY:-${debname}}"
 
-   release="`lsb_release -c -s`" || return 1
    echo "deb [arch=all] http://www.mulle-kybernetik.com ${release} ${debname}" | \
    sudo tee "/etc/apt/sources.list.d/mulle-kybernetik.com-${debname}.list" > /dev/null
 }
@@ -40,4 +43,4 @@ add_mulle_kybernetik_to_apt_sources()
 get_mulle_kybernetik_gpg_key && \
 add_mulle_kybernetik_to_apt_sources &&  \
 sudo apt-get update && \
-sudo apt-get -y install mulle-sde-developer ninja-build cmake
+sudo apt-get -y install mulle-sde mulle-test
