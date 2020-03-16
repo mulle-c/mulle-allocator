@@ -7,8 +7,5 @@ endif()
 
 set( SOURCES
 src/mulle-allocator.c
-)
-
-set( STANDALONE_SOURCES
 src/mulle-allocator-standalone.c
 )

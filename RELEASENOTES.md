@@ -1,3 +1,9 @@
+## 4.2.0
+
+* adapted to changes in mulle-c11
+* add `_mulle_allocator_realloc_strict` for a 100% realloc
+
+
 ### 4.1.2
 
 * fix travis ...
