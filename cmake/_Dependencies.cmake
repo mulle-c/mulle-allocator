@@ -15,7 +15,7 @@ if( NOT MULLE_C11_HEADER)
    message( STATUS "MULLE_C11_HEADER is ${MULLE_C11_HEADER}")
 
    #
-   # Add to list of header files.
+   # Add MULLE_C11_HEADER to HEADER_ONLY_LIBRARIES list.
    # Disable with: `mulle-sourcetree mark mulle-c11 no-cmakeadd`
    #
    set( HEADER_ONLY_LIBRARIES

@@ -1,11 +1,14 @@
 #! /bin/sh
 
-printf "%s\n" "Crafting..." >&2
-mulle-sde -v craft -V || exit 1
+# with serial its easier to read the logs
 
+echo "MULLE_HOSTNAME=\"${MULLE_HOSTNAME}\"" 2>&1
 
-if [ ! -d test ]
+mulle-sde -v craft --serial || exit 1
+
+if [ -d test ]
 then
-   printf "%s\n" "Testing..." >&2
-   mulle-env -c "mulle-sde -v test --no-memory-checker --serial"
+   # here verbose is more distracting and duplicates much of what we've seen
+   mulle-sde test craft &&
+   mulle-sde -v test run --serial
 fi
