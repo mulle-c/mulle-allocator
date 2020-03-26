@@ -1,11 +1,9 @@
 #! /bin/sh
 
-printf "%s\n" "Crafting..." >&2
-mulle-sde -v craft -V || exit 1
+# with serial its easier to read the logs
+mulle-sde -v craft --serial || exit 1
 
-
-if [ ! -d test ]
+if [ -d test ]
 then
-   printf "%s\n" "Testing..." >&2
-   mulle-env -c "mulle-sde -v test --no-memory-checker --serial"
+   mulle-sde -v test --serial
 fi

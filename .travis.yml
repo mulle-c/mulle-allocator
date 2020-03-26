@@ -1,6 +1,5 @@
 language: c
 
-# ignore -prerelease tags
 if: NOT tag =~ .*-prerelease$
 
 addons:
