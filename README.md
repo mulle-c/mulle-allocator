@@ -239,14 +239,17 @@ Requirements                               | Description
 [mulle-c11](//github.com/mulle-c/mulle-c11)| Compiler glue, single header
 
 
-Install with
+Install into /usr/local:
 
 ```
-mkdir build
-cd build
-cmake
-make
-make install
+mkdir build 2> /dev/null
+(
+   cd build ;
+   cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+         -DCMAKE_PREFIX_PATH=/usr/local \
+         -DCMAKE_BUILD_TYPE=Release .. ;
+   make install
+)
 ```
 
 
