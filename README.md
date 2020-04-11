@@ -166,8 +166,8 @@ static inline void   my_other_string_free( struct my_other_string *p,
 }
 ```
 
-The disadvantage this opens the door for bugs, if you are passing in different
-allocators
+The disadvantage pf this is, that this opens the door for bugs, if you are passing in different
+allocators.
 
 
 ##  How mulle-allocator deals with memory shortage
