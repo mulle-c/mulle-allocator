@@ -222,24 +222,47 @@ passing a zero block size - you need to use `mulle_realloc_strict`.
 If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
 
+## API
+
+* [Allocator](dox/API_ALLOCATOR.md)
+
+
+### Platforms and Compilers
+
+All platforms and compilers supported by
+[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
+
+
+## Add 
+
+Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your project:
+
+```
+mulle-sde dependency add --c --github mulle-c mulle-allocator
+```
 
 ## Install
 
-Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your
-dependencies `mulle-sde dependency add https://github.com/mulle-c/mulle-allocator.git`.
+### mulle-sde
 
+Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-allocator and all dependencies:
 
-## Manual Installation
+```
+mulle-sde install --prefix /usr/local \
+   https://github.com/mulle-c/mulle-allocator/archive/latest.tar.gz
+```
+
+### Manual Installation
+
 
 Install the requirements:
 
+Requirements                                 | Description
+---------------------------------------------|-----------------------
+[mulle-c11](//github.com/mulle-c/mulle-c11)  | Compiler glue
 
-Requirements                               | Description
--------------------------------------------|-----------------------
-[mulle-c11](//github.com/mulle-c/mulle-c11)| Compiler glue, single header
 
-
-Install into /usr/local:
+Install into `/usr/local`:
 
 ```
 mkdir build 2> /dev/null
@@ -252,16 +275,6 @@ mkdir build 2> /dev/null
 )
 ```
 
-
-## API
-
-* [Allocator](dox/API_ALLOCATOR.md)
-
-
-### Platforms and Compilers
-
-All platforms and compilers supported by
-[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
 
 
 ## Author
