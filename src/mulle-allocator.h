@@ -38,8 +38,6 @@
 
 #include "mulle-allocator-struct.h"
 #include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 
 
@@ -50,7 +48,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 1)
+#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 2)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
@@ -94,18 +92,16 @@ static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
 }
 
 
-MULLE_C_NO_RETURN
-static inline void   mulle_allocator_fail( struct mulle_allocator *p, void *block, size_t size)
-{
-   if( ! p)
-      p = &mulle_default_allocator;
-
-   (*p->fail)( block, size);
-}
-
 
 # pragma mark -
 # pragma mark Vectoring
+
+
+MULLE_C_NO_RETURN
+static inline void   _mulle_allocator_fail( struct mulle_allocator *p, void *block, size_t size)
+{
+   (*p->fail)( block, size);
+}
 
 
 MULLE_C_NONNULL_RETURN
@@ -155,29 +151,12 @@ static inline void *
 }
 
 
-static inline void *
-   _mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size)
-{
-   void   *q;
-
-   if( ! size)
-   {
-      (*p->free)( block);
-      return( NULL);
-   }
-
-   q = (*p->realloc)( block, size);
-   if( ! q)
-      (*p->fail)( block, size);
-   return( q);
-}
-
-
 //
 // this function is more like the real realloc, but it is guaranteed that
 // if you pass in block != 0 and size 0, that you free AND get NULL back
 //
 void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size);
+
 
 
 static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *block)
@@ -248,6 +227,14 @@ static inline int   mulle_allocator_abafree( struct mulle_allocator *p, void *bl
 }
 
 
+MULLE_C_NO_RETURN
+static inline void   mulle_allocator_fail( struct mulle_allocator *p, void *block, size_t size)
+{
+   _mulle_allocator_fail( p ? p : &mulle_default_allocator, block, size);
+}
+
+
+
 # pragma mark -
 # pragma mark Convenience API
 
@@ -294,16 +281,7 @@ static inline int   mulle_abafree( void *block)
 # pragma mark strdup convenience
 
 MULLE_C_NONNULL_RETURN
-static inline char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
-{
-   size_t   len;
-   char     *dup;
-
-   len = strlen( s) + 1;
-   dup = _mulle_allocator_malloc( p, len);
-   memcpy( dup, s, len);
-   return( dup);
-}
+char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s);
 
 
 # pragma mark -
