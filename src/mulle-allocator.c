@@ -36,6 +36,7 @@
 // #include "mulle_allocator.h"  // don't include for windows
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 
@@ -44,6 +45,43 @@ void   mulle_allocation_fail( void *block, size_t size)
 {
    perror( "memory allocation:");
    abort();
+}
+
+
+MULLE_C_NONNULL_RETURN
+char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
+{
+   size_t   size;
+   char     *dup;
+
+   size = strlen( s) + 1;
+   dup  = (*p->realloc)( NULL, size);
+   if( ! dup)
+      (*p->fail)( NULL, size);
+
+   memcpy( dup, s, size);
+   return( dup);
+}
+
+
+
+void *
+   _mulle_allocator_realloc_strict( struct mulle_allocator *p,
+                                    void *block,
+                                    size_t size)
+{
+   void   *q;
+
+   if( ! size)
+   {
+      (*p->free)( block);
+      return( NULL);
+   }
+
+   q = (*p->realloc)( block, size);
+   if( ! q)
+      (*p->fail)( block, size);
+   return( q);
 }
 
 
@@ -58,8 +96,7 @@ int   mulle_aba_abort( void *aba, void (*free)( void *), void *block)
    abort();
 }
 
-#pragma mark -
-#pragma mark _mulle_allocator
+#pragma mark - _mulle_allocator
 
 MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 {

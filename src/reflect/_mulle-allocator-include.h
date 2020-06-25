@@ -14,7 +14,7 @@
 
 // How to tweak the following mulle-c11 #include
 //    remove:          `mulle-sourcetree mark mulle-c11 no-header`
-//    rename:          `mulle-sourcetree mark mulle-c11 set include whatever.h`
+//    rename:          `mulle-sde dependency|library set mulle-c11 include whatever.h`
 //    toggle #import:  `mulle-sourcetree mark mulle-c11 [no-]import`
 //    toggle public:   `mulle-sourcetree mark mulle-c11 [no-]public`
 //    toggle optional: `mulle-sourcetree mark mulle-c11 [no-]require`
