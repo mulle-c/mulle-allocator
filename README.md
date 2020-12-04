@@ -1,6 +1,6 @@
 # mulle-allocator
 
-🔄 Flexible C memory allocation scheme
+#### 🔄 Flexible C memory allocation scheme
 
 ... provides a way to pass around the memory scheme du jour
 
@@ -137,7 +137,7 @@ static inline void   my_string_free( struct my_string *p)
 #### Not embedding the allocator in your data structure
 
 But if you don't want to store the allocator inside the data structure, you
-could of course also just let it get passed in again:
+can pass in again:
 
 ```
 struct my_other_string
@@ -166,7 +166,7 @@ static inline void   my_other_string_free( struct my_other_string *p,
 }
 ```
 
-The disadvantage pf this is, that this opens the door for bugs, if you are passing in different
+The disadvantage is, that this opens the door for bugs, if you are passing in different
 allocators.
 
 
@@ -233,7 +233,7 @@ All platforms and compilers supported by
 [mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
 
 
-## Add 
+## Add
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your project:
 

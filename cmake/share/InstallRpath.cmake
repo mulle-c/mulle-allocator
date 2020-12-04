@@ -30,5 +30,3 @@ if( NOT MULLE_NO_CMAKE_INSTALL_RPATH)
       set( CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
    endif()
 endif()
-
-message( STATUS "CMAKE_INSTALL_RPATH=\"${CMAKE_INSTALL_RPATH}\"" )
