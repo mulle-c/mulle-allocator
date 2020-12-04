@@ -1,0 +1,38 @@
+name: MulleCI
+
+on: [push]
+
+env:
+  BUILD_TYPE: release
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Mulle-SDE with mulle-test
+      run: ${{ github.workspace }}/.github/workflows/install-mulle-sde.sh
+
+    - name: Add ~/bin to PATH
+      run:  echo "$HOME/bin" >> $GITHUB_PATH
+
+    - name: Dump Environment
+      run:  |
+            env | sort
+
+    - name: Mulle-SDE Fetch
+      shell: bash
+      run: mulle-sde fetch 
+      
+    - name: Mulle-SDE Craft
+      shell: bash
+      run: mulle-sde craft --${BUILD_TYPE}
+
+    - name: Mulle-SDE Test
+      shell: bash
+      run: mulle-sde test

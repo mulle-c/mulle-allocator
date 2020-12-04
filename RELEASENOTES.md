@@ -1,3 +1,7 @@
+### 4.2.2
+
+* added `mulle_allocator_fail` fo consistency and to let outside code partake in out of memory handling
+
 ### 4.2.1
 
 * new mulle-sde project structure

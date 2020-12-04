@@ -67,8 +67,7 @@ void   mulle_allocation_fail( void *block, size_t size);
 int   mulle_aba_abort( void *aba, void (*free)( void *), void *block);
 
 
-# pragma mark -
-# pragma mark Petty Accessors
+# pragma mark - Petty Accessors
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
                                               void *aba,
@@ -93,8 +92,7 @@ static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
 
 
 
-# pragma mark -
-# pragma mark Vectoring
+# pragma mark - Vectoring
 
 
 MULLE_C_NO_RETURN
@@ -133,7 +131,7 @@ static inline void   *_mulle_allocator_calloc( struct mulle_allocator *p, size_t
 
 
 //
-// this reallocs, but doesn't free. If you pass in size 0, you risk failing
+// this reallocs, but doesn't free. If you pass in size 0, you risk failing.
 // you can pass in block 0 for malloc
 //
 MULLE_C_NONNULL_RETURN
