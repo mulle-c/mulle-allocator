@@ -12,9 +12,9 @@
 **mulle-allocator** has a companion project: [mulle-testallocator](https://github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
 
-Build Status | Release Version
--------------|-----------------------------------
-[![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator) | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg) [![Build Status](https://travis-ci.org/mulle-c/mulle-allocator.svg?branch=release)](https://travis-ci.org/mulle-c/mulle-allocator)
+| Release Version
+|-----------------------------------
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-c/mulle-allocator/actions)
 
 
 ##  Use `mulle_malloc` instead of `malloc` to reduce code size
