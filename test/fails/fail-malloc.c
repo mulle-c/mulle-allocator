@@ -1,5 +1,6 @@
 #include <mulle-allocator/mulle-allocator.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 MULLE_C_NO_RETURN

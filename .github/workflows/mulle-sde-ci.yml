@@ -4,7 +4,6 @@ on: [push]
 
 env:
   BUILD_TYPE: release
-  OTHER_PROJECTS: mulle-c/mulle-c-developer;
 
 jobs:
   build:
@@ -14,6 +13,9 @@ jobs:
         os: [ macos-latest, ubuntu-latest]
 
     steps:
+    - name: Set MULLE_HOSTNAME
+      run: echo "MULLE_HOSTNAME=ci-${GITHUB_REF##*/}" >> $GITHUB_ENV
+
     - uses: actions/checkout@v2
 
     - uses: mulle-sde/github-ci@v1
@@ -21,8 +23,8 @@ jobs:
     - name: Add to path
       run:  echo "$HOME/bin" >> $GITHUB_PATH
 
-    - name: Dump Build Environment
-      run:  env
+    - name: Dump Environment
+      run:  env | sort
 
     - name: Mulle-SDE Fetch
       run: mulle-sde fetch
@@ -31,4 +33,5 @@ jobs:
       run: mulle-sde craft --${BUILD_TYPE:-release}
 
     - name: Mulle-SDE Test
-      run: mulle-sde test
+      run: |
+        [ ! -d test ] || mulle-sde test

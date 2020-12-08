@@ -3,6 +3,7 @@
 
 # .inc is generally C
 
+*.h         linguist-language=C
 *.inc       linguist-language=C
 
 # remove boring files
