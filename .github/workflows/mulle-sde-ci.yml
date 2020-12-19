@@ -14,7 +14,9 @@ jobs:
 
     steps:
     - name: Set MULLE_HOSTNAME
-      run: echo "MULLE_HOSTNAME=ci-${GITHUB_REF##*/}" >> $GITHUB_ENV
+      run: |
+        name="${GITHUB_REF##*/}"
+        echo "MULLE_HOSTNAME=ci-${name##*-}" >> $GITHUB_ENV
 
     - uses: actions/checkout@v2
 
