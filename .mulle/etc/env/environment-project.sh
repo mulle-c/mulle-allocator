@@ -37,18 +37,18 @@ export PROJECT_EXTENSIONS="c"
 #
 #
 #
-export PROJECT_IDENTIFIER="mulle_allocator"
 
-
-#
-#
-#
-export PROJECT_DOWNCASE_IDENTIFIER="mulle_allocator"
 
 
 #
 #
 #
-export PROJECT_UPCASE_IDENTIFIER="MULLE_ALLOCATOR"
+
+
+
+#
+#
+#
+
 
 

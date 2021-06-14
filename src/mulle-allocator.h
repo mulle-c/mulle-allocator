@@ -48,7 +48,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 2)
+#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 3)
 
 
 #ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
@@ -68,10 +68,11 @@ int   mulle_aba_abort( void *aba, void (*free)( void *), void *block);
 
 
 # pragma mark - Petty Accessors
+typedef   int (*mulle_allocator_aba_t)( void *, void (*f)( void *), void *);
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
                                               void *aba,
-                                              int (*f)( void *aba, void (*free)( void *), void *block))
+                                              mulle_allocator_aba_t f)
 {
    if( ! p)
       p = &mulle_default_allocator;
@@ -81,8 +82,10 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
 }
 
 
+typedef void (*mulle_allocator_fail_t)( void *, size_t) _MULLE_C_NO_RETURN;
+
 static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
-                                               void (*f)( void *block, size_t size) _MULLE_C_NO_RETURN)
+                                               mulle_allocator_fail_t f)
 {
    if( ! p)
       p = &mulle_default_allocator;
