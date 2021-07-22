@@ -1,4 +1,3 @@
-# Fill it with mulle-env envirionment --scope  set <key> <value>
 #
 # mulle-c11 nodetype: ${MULLE_C11_NODETYPE:-tar}
 #
