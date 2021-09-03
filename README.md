@@ -198,7 +198,7 @@ block, discounting erroneous parameters as programmers error, to be caught
 during development, then memory calling code simplifies from:
 
 ```
-p = mulle_alloc( size);
+p = mulle_malloc( size);
 if( ! p)
    return( -1);
 memcpy( p, q, size);
@@ -207,14 +207,14 @@ memcpy( p, q, size);
 to
 
 ```
-p = mulle_alloc( size);
+p = mulle_malloc( size);
 memcpy( p, q, size);
 ```
 
-So the `mulle_default_allocator` and `mulle_stdlib_allocator` have been written
-accordingly, never to return, if the allocation went bad. If the allocator
-function detects that an allocation can not be satisfied it jumps through it's
-fail vector. This will print an error message and exit the program.
+The `mulle_default_allocator` and `mulle_stdlib_allocator` never return, if the 
+allocation went bad. If an allocator function detects, that an allocation can 
+not be satisfied, it jumps through its fail vector. This will print an error 
+message and exit the program.
 
 You can not pass a zero size to either `mulle_realloc` or `mulle_malloc`
 without getting a failure. If you want to free memory with realloc - by
