@@ -16,14 +16,14 @@
 
 // You can tweak the following #include with these commands.
 // (Use 4F638AE4-A8F3-49F0-BC69-EFBBE1376CBB instead of mulle-c11 if there are duplicate entries)
-//    remove:             `mulle-sourcetree mark mulle-c11 no-header`
+//    remove:             `mulle-sde dependency mark mulle-c11 no-header`
 //    rename:             `mulle-sde dependency|library set mulle-c11 include whatever.h`
-//    reorder:            `mulle-sourcetree move mulle-c11 <up|down>`
-//    toggle #include:    `mulle-sourcetree mark mulle-c11 [no-]import`
-//    toggle public:      `mulle-sourcetree mark mulle-c11 [no-]public`
-//    toggle optional:    `mulle-sourcetree mark mulle-c11 [no-]require`
-//    remove for platform:`mulle-sourcetree mark mulle-c11 no-platform-<uname>`
-//        (use mulle-sourcetree-to-c --unames for known values)
+//    reorder:            `mulle-sde dependency move mulle-c11 <up|down>`
+//    toggle #include:    `mulle-sde dependency mark mulle-c11 [no-]import`
+//    toggle public:      `mulle-sde dependency mark mulle-c11 [no-]public`
+//    toggle optional:    `mulle-sde dependency mark mulle-c11 [no-]require`
+//    remove for platform:`mulle-sde dependency mark mulle-c11 no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
 #include <mulle-c11/mulle-c11.h>   // mulle-c11
 
 #endif
