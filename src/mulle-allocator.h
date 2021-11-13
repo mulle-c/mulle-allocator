@@ -48,12 +48,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 3)
-
-
-#ifndef MULLE_ALLOCATOR_EXTERN_GLOBAL
-# define MULLE_ALLOCATOR_EXTERN_GLOBAL    MULLE_C_EXTERN_GLOBAL
-#endif
+#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 4)
 
 
 MULLE_ALLOCATOR_EXTERN_GLOBAL struct mulle_allocator   mulle_default_allocator;
@@ -156,6 +151,7 @@ static inline void *
 // this function is more like the real realloc, but it is guaranteed that
 // if you pass in block != 0 and size 0, that you free AND get NULL back
 //
+MULLE_ALLOCATOR_EXTERN_GLOBAL
 void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size);
 
 
@@ -185,8 +181,7 @@ static inline void   mulle_allocator_assert( struct mulle_allocator *p)
 }
 
 
-# pragma mark -
-# pragma mark API
+# pragma mark - API
 
 MULLE_C_NONNULL_RETURN
 static inline void   *mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
@@ -236,8 +231,7 @@ static inline void   mulle_allocator_fail( struct mulle_allocator *p, void *bloc
 
 
 
-# pragma mark -
-# pragma mark Convenience API
+# pragma mark - Convenience API
 
 MULLE_C_NONNULL_RETURN
 static inline void   *mulle_malloc( size_t size)
@@ -278,15 +272,14 @@ static inline int   mulle_abafree( void *block)
 }
 
 
-# pragma mark -
-# pragma mark strdup convenience
+# pragma mark - strdup convenience
 
+MULLE_ALLOCATOR_EXTERN_GLOBAL
 MULLE_C_NONNULL_RETURN
 char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s);
 
 
-# pragma mark -
-# pragma mark strdup API
+# pragma mark - strdup API
 
 static inline char   *mulle_allocator_strdup( struct mulle_allocator *p, char *s)
 {
