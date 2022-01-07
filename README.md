@@ -227,10 +227,11 @@ will return NULL.
 * [Allocator](dox/API_ALLOCATOR.md)
 
 
-### Platforms and Compilers
 
-All platforms and compilers supported by
-[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
+### You are here
+
+![Overview](overview.dot.svg)
+
 
 
 ## Add
@@ -282,3 +283,9 @@ mkdir build 2> /dev/null
 [Nat!](//www.mulle-kybernetik.com/weblog) for
 [Mulle kybernetiK](//www.mulle-kybernetik.com) and
 [Codeon GmbH](//www.codeon.de)
+
+### Platforms and Compilers
+
+All platforms and compilers supported by
+[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
+
