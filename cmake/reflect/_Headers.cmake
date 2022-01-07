@@ -34,6 +34,7 @@ src/include-private.h
 #
 set( PUBLIC_GENERATED_HEADERS
 src/reflect/_mulle-allocator-include.h
+src/reflect/_mulle-allocator-versioncheck.h
 )
 
 #

@@ -294,4 +294,11 @@ static inline char   *mulle_strdup( char *s)
    return( mulle_allocator_strdup( &mulle_default_allocator, s));
 }
 
+
+#ifdef __has_include
+# if __has_include( "_mulle-allocator-versioncheck.h")
+#  include "_mulle-allocator-versioncheck.h"
+# endif
+#endif
+
 #endif

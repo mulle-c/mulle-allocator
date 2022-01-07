@@ -1,3 +1,7 @@
+### 4.2.4
+
+* Various small improvements
+
 ### 4.2.3
 
 * added some typedefs for callback functions
