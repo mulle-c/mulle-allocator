@@ -17,7 +17,7 @@
 | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-c/mulle-allocator/actions)
 
 
-##  Use `mulle_malloc` instead of `malloc` to reduce code size
+## Use `mulle_malloc` instead of `malloc` to reduce code size
 
 Instead of:
 
@@ -60,12 +60,52 @@ You don't have to check for out of memory error conditions anymore.
 Otherwise your code will run the same and a possible performance
 degradation because of the indirection will be hardly measurable.
 
+### How mulle-allocator deals with memory shortage
+
+By the C standard `malloc` returns **NULL** and sets `errno` to `ENOMEM`, if
+it can't satisfy the memory request. Here are the two most likely scenarios why
+this happens:
+
+The caller specified a huge amount of memory, that the OS can't give you.
+Typically (size_t) -1 can never work. This is considered to be a bug on the
+callers part.
+
+Or the program has exhausted all memory space available to the process. Here
+is what happens on various OS:
+
+OS       |  malloc fate
+---------|-------------------------------------------
+FreeBSD  | `malloc` hangs, probably waiting for memory to become available
+MacOS X  | `malloc` slowly brings the system to a crawl, no error observed
+Linux    | `malloc` returns an error
+Windows  | unknown
+
+The gist is, that in portable programs it doesn't really make sense to rely
+on `malloc` returning **NULL** and doing something clever based on it.
+
+If we define the mulle-allocator malloc to always return a valid memory
+block - discounting erroneous parameters as programmers error, to be caught
+during development - then memory calling code simplifies from:
+
+```
+p = malloc( size);
+if( ! p)
+   return( -1);
+memcpy( p, q, size);
+```
+
+to
+
+```
+p = mulle_malloc( size);
+memcpy( p, q, size);
+```
 
 ##  Use `mulle_allocator` to make your code more flexible
 
 You can make your code, and especially your data structures, more flexible by
-using `mulle_allocator` as this decouples your data structure from **stdlib**.
-It enables your data structure to reside in shared or wired memory for example
+using a `mulle_allocator`. This decouples your data structure from **stdlib**.
+It enables your data structure to reside in shared or wired memory
 with no additional code. Your API consumers just have to pass their own
 allocators.
 
@@ -73,7 +113,7 @@ Also it can be helpful to isolate your data structure memory allocation during
 tests. This way, other, possibly benign, code leaks, do not obscure the test.
 
 
-## What is an allocator ?
+### What is an allocator ?
 
 The `mulle_allocator` struct is a collection of function pointers, with one
 added pointer for `aba` and looks like this:
@@ -94,16 +134,20 @@ struct mulle_allocator
 > If you need ABA safe freeing, it is recommended to use [mulle-aba](//github.com/mulle-concurrent/mulle-aba).
 
 You should not jump through the vectors directly, but use
-supplied inline functions like `mulle_allocator_malloc` to allocate memory
-using the allocator, since they perform the necessary return value checks
-(see below: Dealing with memory shortage)
+supplied inline functions like `mulle_allocator_malloc`, as they perform the
+necessary return value checks (see below: Dealing with memory shortage).
+
+The shortcut functions `mulle_malloc` use the `mulle_default_allocator`
+by default and save you some typework. You can also use `NULL` as the
+allocator for `mulle_allocator_malloc` with the same effect of choosing
+the `mulle_default_allocator`.
 
 
 #### Embedding the allocator in your data structure
 
 A pointer to the allocator could be kept in your data structure. This
 simplifies your API, as the allocator is only needed during creation. Here is
-an example how you could use the allocator in this fashion:
+an example how to use the allocator in this fashion:
 
 ```
 struct my_string
@@ -137,7 +181,7 @@ static inline void   my_string_free( struct my_string *p)
 #### Not embedding the allocator in your data structure
 
 But if you don't want to store the allocator inside the data structure, you
-can pass in again:
+can pass it in again:
 
 ```
 struct my_other_string
@@ -166,54 +210,15 @@ static inline void   my_other_string_free( struct my_other_string *p,
 }
 ```
 
-The disadvantage is, that this opens the door for bugs, if you are passing in different
-allocators.
+The disadvantage is, that this opens the door for bugs, as you may be using
+different allocators accidentally.
 
 
-##  How mulle-allocator deals with memory shortage
+## Caveats
 
-By the C standard `malloc` returns **NULL** and sets `errno` to `ENOMEM`, if
-it can't satisfy the memory request. Here are the two most likely scenarios why
-this happens:
-
-The caller specified a huge amount of memory, that the OS can't give you.
-Typically (size_t) -1 can never work. This is considered to be a bug on the
-callers part.
-
-Or the program has exhausted all memory space available to the process. Here
-is what happens on various OS:
-
-OS                |  malloc fate
-------------------|-------------------------------------------
-FreeBSD           | `malloc` hangs, probably waiting for memory to be freed by other threads
-MacOS X           | `malloc` slowly brings the system to a crawl, no error observed
-Linux             | `malloc` returns an error
-Windows           | unknown
-
-The gist is, that in portable programs it doesn't really make sense to rely
-on `malloc` returning **NULL** and doing something clever based on it.
-
-If we define the `mulle-allocator`'s `malloc` to always return a valid memory
-block, discounting erroneous parameters as programmers error, to be caught
-during development, then memory calling code simplifies from:
-
-```
-p = mulle_malloc( size);
-if( ! p)
-   return( -1);
-memcpy( p, q, size);
-```
-
-to
-
-```
-p = mulle_malloc( size);
-memcpy( p, q, size);
-```
-
-The `mulle_default_allocator` and `mulle_stdlib_allocator` never return, if the 
-allocation went bad. If an allocator function detects, that an allocation can 
-not be satisfied, it jumps through its fail vector. This will print an error 
+The `mulle_default_allocator` and `mulle_stdlib_allocator` never return, if the
+allocation went bad. If an allocator function detects, that an allocation can
+not be satisfied, it jumps through its fail vector. This will print an error
 message and exit the program.
 
 You can not pass a zero size to either `mulle_realloc` or `mulle_malloc`
@@ -221,6 +226,9 @@ without getting a failure. If you want to free memory with realloc - by
 passing a zero block size - you need to use `mulle_realloc_strict`.
 If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
+
+
+
 
 ## API
 

@@ -98,7 +98,7 @@ int   mulle_aba_abort( void *aba, void (*free)( void *), void *block)
 
 #pragma mark - _mulle_allocator
 
-MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
+struct mulle_allocator   mulle_stdlib_allocator =
 {
    calloc, realloc, free, mulle_allocation_fail, mulle_aba_abort, NULL
 };
@@ -106,7 +106,7 @@ MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_allocator =
 
 // this will be patched by the foundation
 
-MULLE_C_GLOBAL struct mulle_allocator   mulle_default_allocator =
+struct mulle_allocator   mulle_default_allocator =
 {
    calloc, realloc, free, mulle_allocation_fail, mulle_aba_abort, NULL
 };
@@ -116,7 +116,8 @@ static void   no_free( void *ignored)
 {
 }
 
-MULLE_C_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator =
+
+struct mulle_allocator   mulle_stdlib_nofree_allocator =
 {
    calloc, realloc, no_free, mulle_allocation_fail, mulle_aba_abort, NULL
 };

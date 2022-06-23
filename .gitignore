@@ -51,3 +51,7 @@ addiction/
 
 *.sublime-workspace
 .mulle/etc/project/publisher-info.sh
+.mulle-make-build-dir
+version.old
+.idea/
+.gdb_history
