@@ -1,8 +1,7 @@
-cmake_minimum_required( VERSION 3.1)
+cmake_minimum_required( VERSION 3.15)
 
 project( mulle-allocator C)
 
-add_definitions( -DMULLE_ALLOCATOR_EXTERN_GLOBAL=extern)
 
 ### mulle-sde environment
 

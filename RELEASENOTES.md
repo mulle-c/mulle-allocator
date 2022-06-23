@@ -1,3 +1,7 @@
+### 4.2.5
+
+* change GLOBAL declarations for Windows
+
 ### 4.2.4
 
 * Various small improvements
