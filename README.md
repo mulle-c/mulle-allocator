@@ -9,12 +9,12 @@
 ... frees your code from having to check for errors when allocating memory
 
 
-**mulle-allocator** has a companion project: [mulle-testallocator](https://github.com/mulle-core/mulle-testallocator).
+**mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
 
 | Release Version
 |-----------------------------------
-| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](https://github.com/mulle-c/mulle-allocator/actions)
+| ![Mulle kybernetiK tag](//img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](//github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-c/mulle-allocator/actions)
 
 
 ## Use `mulle_malloc` instead of `malloc` to reduce code size
@@ -258,7 +258,7 @@ Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-allocator and
 
 ```
 mulle-sde install --prefix /usr/local \
-   https://github.com/mulle-c/mulle-allocator/archive/latest.tar.gz
+   //github.com/mulle-c/mulle-allocator/archive/latest.tar.gz
 ```
 
 ### Manual Installation
@@ -295,5 +295,5 @@ mkdir build 2> /dev/null
 ### Platforms and Compilers
 
 All platforms and compilers supported by
-[mulle-c11](//www.mulle-kybernetik.com/software/git/mulle-c11/).
+[mulle-c11](//github.com/mulle-c/mulle-c11).
 
