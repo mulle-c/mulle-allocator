@@ -14,7 +14,7 @@
 
 | Release Version
 |-----------------------------------
-| ![Mulle kybernetiK tag](//img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](//github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-c/mulle-allocator/actions)
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-c/mulle-allocator/actions)
 
 
 ## Use `mulle_malloc` instead of `malloc` to reduce code size
