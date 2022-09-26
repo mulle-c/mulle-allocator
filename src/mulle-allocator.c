@@ -41,7 +41,7 @@
 
 
 MULLE_C_NO_RETURN
-void   mulle_allocation_fail( void *block, size_t size)
+void   mulle_allocation_fail( struct mulle_allocator *p, void *block, size_t size)
 {
    perror( "memory allocation:");
    abort();
@@ -55,9 +55,9 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
    char     *dup;
 
    size = strlen( s) + 1;
-   dup  = (*p->realloc)( NULL, size);
+   dup  = (*p->realloc)( NULL, size, p);
    if( ! dup)
-      (*p->fail)( NULL, size);
+      (*p->fail)( p, NULL, size);
 
    memcpy( dup, s, size);
    return( dup);
@@ -74,13 +74,13 @@ void *
 
    if( ! size)
    {
-      (*p->free)( block);
+      (*p->free)( block, p);
       return( NULL);
    }
 
-   q = (*p->realloc)( block, size);
+   q = (*p->realloc)( block, size, p);
    if( ! q)
-      (*p->fail)( block, size);
+      (*p->fail)( p, block, size);
    return( q);
 }
 
@@ -91,34 +91,119 @@ void *
 // "no-return". It's a classical type tragedy.
 //
 // MULLE_C_NO_RETURN
-int   mulle_aba_abort( void *aba, void (*free)( void *), void *block)
+int   mulle_aba_abort( void *aba, void (*free)( void *, void *), void *block, void *owner)
 {
    abort();
 }
 
+
 #pragma mark - _mulle_allocator
 
-struct mulle_allocator   mulle_stdlib_allocator =
+void   _mulle_allocator_invalidate( struct mulle_allocator *p)
 {
-   calloc, realloc, free, mulle_allocation_fail, mulle_aba_abort, NULL
-};
+   p->calloc  = (void *(*)( size_t, size_t, struct mulle_allocator *)) abort;
+   p->realloc = (void *(*)( void *, size_t, struct mulle_allocator *)) abort;
+   p->free    = (void (*)( void *, struct mulle_allocator *)) abort;
+   p->abafree = mulle_aba_abort;
+}
 
 
-// this will be patched by the foundation
-
-struct mulle_allocator   mulle_default_allocator =
-{
-   calloc, realloc, free, mulle_allocation_fail, mulle_aba_abort, NULL
-};
-
+#ifdef NO_STDLIB_TRAMPOLINE_NEEDED
 
 static void   no_free( void *ignored)
 {
 }
 
 
-struct mulle_allocator   mulle_stdlib_nofree_allocator =
+struct mulle_allocator   mulle_stdlib_allocator =
 {
-   calloc, realloc, no_free, mulle_allocation_fail, mulle_aba_abort, NULL
+   calloc,
+   realloc,
+   free,
+   mulle_allocation_fail,
+   mulle_aba_abort,
+   NULL
 };
 
+
+// this will be patched by the foundation
+struct mulle_allocator   mulle_default_allocator =
+{
+   calloc,
+   realloc,
+   free,
+   mulle_allocation_fail,
+   mulle_aba_abort,
+   NULL
+};
+
+
+struct mulle_allocator   mulle_stdlib_nofree_allocator =
+{
+   calloc,
+   realloc,
+   no_free,
+   mulle_allocation_fail,
+   mulle_aba_abort,
+   NULL
+};
+
+#else
+
+static void   *v_calloc( size_t n, size_t size, struct mulle_allocator *allocator)
+{
+   return( calloc( n, size));
+}
+
+
+static void   *v_realloc( void *block, size_t size, struct mulle_allocator *allocator)
+{
+   return( realloc( block, size));
+}
+
+
+static void   v_free( void *block, struct mulle_allocator *allocator)
+{
+   free( block);
+}
+
+
+static void   v_no_free( void *ignored, struct mulle_allocator *allocator)
+{
+}
+
+
+struct mulle_allocator   mulle_stdlib_allocator =
+{
+   v_calloc,
+   v_realloc,
+   v_free,
+   mulle_allocation_fail,
+   mulle_aba_abort,
+   NULL
+};
+
+
+// this will be patched by the foundation
+struct mulle_allocator   mulle_default_allocator =
+{
+   v_calloc,
+   v_realloc,
+   v_free,
+   mulle_allocation_fail,
+   mulle_aba_abort,
+   NULL
+};
+
+
+struct mulle_allocator   mulle_stdlib_nofree_allocator =
+{
+   v_calloc,
+   v_realloc,
+   v_no_free,
+   mulle_allocation_fail,
+   mulle_aba_abort,
+   NULL
+};
+
+#endif
