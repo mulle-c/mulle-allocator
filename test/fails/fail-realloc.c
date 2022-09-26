@@ -4,7 +4,7 @@
 
 
 MULLE_C_NO_RETURN
-static void   fail( void *unused, size_t ignored)
+static void   fail( struct mulle_allocator *allocaor, void *unused, size_t ignored)
 {
    printf( "OK\n");
    exit( 0);

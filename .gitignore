@@ -55,3 +55,4 @@ addiction/
 version.old
 .idea/
 .gdb_history
+cmake-build-debug/

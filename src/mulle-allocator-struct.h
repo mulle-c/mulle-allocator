@@ -39,17 +39,30 @@
 
 
 //
+// put the allocator in the back. It's assumed that the actual call of the
+// vector will be inline, and that calloc will be called most often and
+// that the compiler doesn't then need to reshuffle arguments registers.
+// On many ABIs we should be able to get away with just casting "calloc",
+// but that's not easy to test...
+//
+// abafree uses aba as context and not
+//
+#define MULLE_ALLOCATOR_BASE                                                                         \
+   void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                     \
+   void   *(*realloc)( void *block, size_t size, struct mulle_allocator *allocator);                 \
+   void   (*free)( void *block, struct mulle_allocator *allocator);                                  \
+   void   (*fail)( struct mulle_allocator *allocator, void *block, size_t size) _MULLE_C_NO_RETURN;  \
+   int    (*abafree)( void *aba, void (*free)( void *, void *), void *block, void *owner);           \
+   void   *aba
+
+
+//
 // mulle_allocator: a way to pass around the memory scheme du jour
 //                  you can usually leave aba/abafree uninitialized
 //
 struct mulle_allocator
 {
-   void   *(*calloc)( size_t n, size_t size);
-   void   *(*realloc)( void *block, size_t size);
-   void   (*free)( void *block);
-   void   (*fail)( void *block, size_t size) _MULLE_C_NO_RETURN;
-   int    (*abafree)( void *aba, void (*free)( void *), void *block);
-   void   *aba;
+   MULLE_ALLOCATOR_BASE;
 };
 
 #endif

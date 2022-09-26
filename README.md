@@ -21,7 +21,7 @@
 
 Instead of:
 
-```
+``` c
    if( ! malloc( 1848))
    {
       perror( "malloc:");
@@ -48,7 +48,7 @@ Instead of:
 
 write
 
-```
+``` c
    mulle_malloc( 1848);
    mulle_calloc( 18, 48);
    s = mulle_strdup( "VfL Bochum 1848");
@@ -87,7 +87,7 @@ If we define the mulle-allocator malloc to always return a valid memory
 block - discounting erroneous parameters as programmers error, to be caught
 during development - then memory calling code simplifies from:
 
-```
+``` c
 p = malloc( size);
 if( ! p)
    return( -1);
@@ -96,7 +96,7 @@ memcpy( p, q, size);
 
 to
 
-```
+``` c
 p = mulle_malloc( size);
 memcpy( p, q, size);
 ```
@@ -118,13 +118,13 @@ tests. This way, other, possibly benign, code leaks, do not obscure the test.
 The `mulle_allocator` struct is a collection of function pointers, with one
 added pointer for `aba` and looks like this:
 
-```
+``` c
 struct mulle_allocator
 {
-   void   *(*calloc)( size_t n, size_t size);
-   void   *(*realloc)( void *block, size_t size);
-   void   (*free)( void *block);
-   void   (*fail)( void *block, size_t size) MULLE_C_NO_RETURN;
+   void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *p);
+   void   *(*realloc)( void *block, size_t size, struct mulle_allocator *p);
+   void   (*free)( void *block, struct mulle_allocator *p);
+   void   (*fail)( struct mulle_allocator *p, void *block, size_t size) MULLE_C_NO_RETURN;
    int    (*abafree)( void *aba, void (*free)( void *), void *block);
    void   *aba;
 };
@@ -149,7 +149,7 @@ A pointer to the allocator could be kept in your data structure. This
 simplifies your API, as the allocator is only needed during creation. Here is
 an example how to use the allocator in this fashion:
 
-```
+``` c
 struct my_string
 {
    struct mulle_allocator   *allocator;
@@ -183,7 +183,7 @@ static inline void   my_string_free( struct my_string *p)
 But if you don't want to store the allocator inside the data structure, you
 can pass it in again:
 
-```
+``` c
 struct my_other_string
 {
    char   s[ 1];
@@ -228,8 +228,6 @@ If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
 
 
-
-
 ## API
 
 * [Allocator](dox/API_ALLOCATOR.md)
@@ -246,7 +244,7 @@ will return NULL.
 
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your project:
 
-```
+``` sh
 mulle-sde dependency add --c --github mulle-c mulle-allocator
 ```
 
@@ -256,9 +254,9 @@ mulle-sde dependency add --c --github mulle-c mulle-allocator
 
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-allocator and all dependencies:
 
-```
+``` sh
 mulle-sde install --prefix /usr/local \
-   //github.com/mulle-c/mulle-allocator/archive/latest.tar.gz
+   https://github.com/mulle-c/mulle-allocator/archive/latest.tar.gz
 ```
 
 ### Manual Installation
@@ -273,15 +271,13 @@ Requirements                                 | Description
 
 Install into `/usr/local`:
 
-```
-mkdir build 2> /dev/null
-(
-   cd build ;
-   cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
-         -DCMAKE_PREFIX_PATH=/usr/local \
-         -DCMAKE_BUILD_TYPE=Release .. ;
-   make install
-)
+``` sh
+cmake -B build \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+      -DCMAKE_PREFIX_PATH=/usr/local \
+      -DCMAKE_BUILD_TYPE=Release &&
+cmake --build build --config Release &&
+cmake --install build --config Release
 ```
 
 

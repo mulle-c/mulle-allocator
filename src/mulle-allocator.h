@@ -56,14 +56,15 @@ MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
 MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator;
 
 MULLE_C_NO_RETURN
-void   mulle_allocation_fail( void *block, size_t size);
+void   mulle_allocation_fail( struct mulle_allocator *allocator, void *block, size_t size);
 
 // NO_RETURN really but....
-int   mulle_aba_abort( void *aba, void (*free)( void *), void *block);
+int   mulle_aba_abort( void *aba, void (*free)( void *, void *), void *block, void *owner);
 
 
 # pragma mark - Petty Accessors
-typedef   int (*mulle_allocator_aba_t)( void *, void (*f)( void *), void *);
+typedef   int (*mulle_allocator_aba_t)( void *, void (*f)( void *, void *), void *, void *);
+
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
                                               void *aba,
@@ -77,7 +78,9 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
 }
 
 
-typedef void (*mulle_allocator_fail_t)( void *, size_t) _MULLE_C_NO_RETURN;
+typedef void (*mulle_allocator_fail_t)( struct mulle_allocator *allocator,
+                                        void *,
+                                        size_t) _MULLE_C_NO_RETURN;
 
 static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
                                                mulle_allocator_fail_t f)
@@ -93,13 +96,6 @@ static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
 # pragma mark - Vectoring
 
 
-MULLE_C_NO_RETURN
-static inline void   _mulle_allocator_fail( struct mulle_allocator *p, void *block, size_t size)
-{
-   (*p->fail)( block, size);
-}
-
-
 MULLE_C_NONNULL_RETURN
 static inline void   *_mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
 {
@@ -107,9 +103,9 @@ static inline void   *_mulle_allocator_malloc( struct mulle_allocator *p, size_t
 
    assert( size);
 
-   q = (*p->realloc)( NULL, size);
+   q = (*p->realloc)( NULL, size, p);
    if( ! q)
-      (*p->fail)( NULL, size);
+      (*p->fail)( p, NULL, size);
    return( q);
 }
 
@@ -121,9 +117,9 @@ static inline void   *_mulle_allocator_calloc( struct mulle_allocator *p, size_t
 
    assert( n && size);
 
-   q = (*p->calloc)( n, size);
+   q = (*p->calloc)( n, size, p);
    if( ! q)
-      (*p->fail)( NULL, n * size);
+      (*p->fail)( p, NULL, n * size);
    return( q);
 }
 
@@ -140,10 +136,33 @@ static inline void *
 
    assert( size);
 
-   q = (*p->realloc)( block, size);
+   q = (*p->realloc)( block, size, p);
    if( ! q)
-      (*p->fail)( block, size);
+      (*p->fail)( p, block, size);
    return( q);
+}
+
+
+static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *block)
+{
+   if( block)
+      (*p->free)( block, p);
+}
+
+
+
+MULLE_C_NO_RETURN
+static inline void   _mulle_allocator_fail( struct mulle_allocator *p, void *block, size_t size)
+{
+   (*p->fail)( p, block, size);
+}
+
+
+static inline int   _mulle_allocator_abafree( struct mulle_allocator *p, void *block)
+{
+   if( ! block)
+      return( 0);
+   return( (*p->abafree)( p->aba, (void (*)( void *, void *)) p->free, block, p));
 }
 
 
@@ -155,20 +174,9 @@ MULLE_ALLOCATOR_GLOBAL
 void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size);
 
 
-
-static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *block)
-{
-   if( block)
-      (*p->free)( block);
-}
-
-
-static inline int   _mulle_allocator_abafree( struct mulle_allocator *p, void *block)
-{
-   if( ! block)
-      return( 0);
-   return( (*p->abafree)( p->aba, p->free, block));
-}
+// trash the allocator, all allocation and free routines will abort
+MULLE_ALLOCATOR_GLOBAL
+void   _mulle_allocator_invalidate( struct mulle_allocator *p);
 
 
 static inline void   mulle_allocator_assert( struct mulle_allocator *p)
