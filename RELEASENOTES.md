@@ -1,3 +1,9 @@
+# 5.0.0
+
+* added `mulle_allocator_is_stdlib_allocator` function
+* revision to properly support allocators that need 'self' in the allocation
+
+
 ### 4.2.5
 
 * change GLOBAL declarations for Windows
