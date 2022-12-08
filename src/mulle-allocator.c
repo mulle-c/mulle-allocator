@@ -148,6 +148,12 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
    NULL
 };
 
+
+int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
+{
+   return( p->calloc == calloc);
+}
+
 #else
 
 static void   *v_calloc( size_t n, size_t size, struct mulle_allocator *allocator)
@@ -205,5 +211,11 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
    mulle_aba_abort,
    NULL
 };
+
+
+int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
+{
+   return( p->calloc == v_calloc);
+}
 
 #endif

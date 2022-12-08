@@ -48,7 +48,7 @@
 //
 // community version is always even
 //
-#define MULLE_ALLOCATOR_VERSION  ((4 << 20) | (2 << 8) | 5)
+#define MULLE_ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 0)
 
 
 MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;
@@ -64,6 +64,10 @@ int   mulle_aba_abort( void *aba, void (*free)( void *, void *), void *block, vo
 
 # pragma mark - Petty Accessors
 typedef   int (*mulle_allocator_aba_t)( void *, void (*f)( void *, void *), void *, void *);
+
+
+int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p);
+
 
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
