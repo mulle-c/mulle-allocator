@@ -1,0 +1,17 @@
+{
+   "name" : "mulle-allocator",
+   "version" : "5.0.0",
+   "description" : "Flexible C memory allocation scheme",
+   "keywords" : [],
+   "license" : "BSD-3-Clause",
+   "repo" : "mulle-c/mulle-allocator",
+   "src" : [
+      "src/mulle-allocator-struct.h",
+      "src/mulle-allocator.c",
+      "src/mulle-allocator.h",
+      "src/reflect/_mulle-allocator-versioncheck.h"
+   ],
+   "dependencies" : {
+      "mulle-c/mulle-c11": "*"
+   }
+}

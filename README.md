@@ -12,9 +12,17 @@
 **mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
 
-| Release Version
-|-----------------------------------
-| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-c/mulle-allocator/actions)
+| Release Version                                       | Release Notes
+|-------------------------------------------------------|--------------
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-c/mulle-allocator/actions)| [RELEASENOTES](RELEASENOTES.md) |
+
+
+## API
+
+* [Allocator](dox/API_ALLOCATOR.md)
+
+
+
 
 
 ## Use `mulle_malloc` instead of `malloc` to reduce code size
@@ -228,15 +236,12 @@ If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
 
 
-## API
-
-* [Allocator](dox/API_ALLOCATOR.md)
-
-
 
 ### You are here
 
 ![Overview](overview.dot.svg)
+
+
 
 
 
@@ -245,12 +250,23 @@ will return NULL.
 Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your project:
 
 ``` sh
-mulle-sde dependency add --c --github mulle-c mulle-allocator
+mulle-sde add github:mulle-c/mulle-allocator
 ```
+
+To only add the sources of mulle-allocator with dependency
+sources use [clib](https://github.com/clibs/clib):
+
+
+``` sh
+clib install --out src/mulle-c mulle-c/mulle-allocator
+```
+
+Add `-isystem src/mulle-c` to your `CFLAGS` and compile all the sources that were downloaded with your project.
+
 
 ## Install
 
-### mulle-sde
+### Install with mulle-sde
 
 Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-allocator and all dependencies:
 
@@ -261,15 +277,13 @@ mulle-sde install --prefix /usr/local \
 
 ### Manual Installation
 
-
 Install the requirements:
 
-Requirements                                 | Description
----------------------------------------------|-----------------------
-[mulle-c11](//github.com/mulle-c/mulle-c11)  | Compiler glue
+| Requirements                                 | Description
+|----------------------------------------------|-----------------------
+| [mulle-c11](https://github.com/mulle-c/mulle-c11)             | 🔀 Cross-platform C compiler glue (and some cpp conveniences)
 
-
-Install into `/usr/local`:
+Install **mulle-allocator** into `/usr/local` with [cmake](https://cmake.org):
 
 ``` sh
 cmake -B build \
@@ -281,15 +295,8 @@ cmake --install build --config Release
 ```
 
 
-
 ## Author
 
-[Nat!](//www.mulle-kybernetik.com/weblog) for
-[Mulle kybernetiK](//www.mulle-kybernetik.com) and
-[Codeon GmbH](//www.codeon.de)
+[Nat!](https://mulle-kybernetik.com/weblog) for Mulle kybernetiK
 
-### Platforms and Compilers
-
-All platforms and compilers supported by
-[mulle-c11](//github.com/mulle-c/mulle-c11).
 

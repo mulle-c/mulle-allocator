@@ -1,4 +1,4 @@
-//  mulle-container
+//  mulle-allocator
 //
 //  Created by Nat! on 02/11/15.
 //  Copyright (c) 2015 Nat! - Mulle kybernetiK.
@@ -31,7 +31,6 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "include-private.h"
 #include "mulle-allocator-struct.h"
 // #include "mulle_allocator.h"  // don't include for windows
 #include <errno.h>

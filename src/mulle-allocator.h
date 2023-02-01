@@ -1,4 +1,4 @@
-//  mulle-container
+//  mulle-allocator
 //
 //  Created by Nat! on 02/11/15.
 //  Copyright (c) 2015 Nat! - Mulle kybernetiK.
@@ -34,7 +34,18 @@
 #ifndef mulle_allocator_h__
 #define mulle_allocator_h__
 
-#include "include.h"
+#include <mulle-c11/mulle-c11.h>
+
+#ifdef MULLE_ALLOCATOR_BUILD
+# define MULLE_ALLOCATOR_GLOBAL    MULLE_C_GLOBAL
+#else
+# if defined( MULLE_ALLOCATOR_INCLUDE_DYNAMIC) ||  \
+     (defined( MULLE_INCLUDE_DYNAMIC) && ! defined( MULLE_ALLOCATOR_INCLUDE_STATIC))
+#  define MULLE_ALLOCATOR_GLOBAL   MULLE_C_EXTERN_GLOBAL
+# else
+#  define MULLE_ALLOCATOR_GLOBAL   extern
+# endif
+#endif
 
 #include "mulle-allocator-struct.h"
 #include <stddef.h>
@@ -45,10 +56,8 @@
 # error "mulle_c11 is too old"
 #endif
 
-//
-// community version is always even
-//
-#define MULLE_ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 0)
+
+#define MULLE_ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 1)
 
 
 MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;

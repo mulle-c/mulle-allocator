@@ -12,37 +12,14 @@ endif()
 
 set( INCLUDE_DIRS
 src
-src/generic
 src/reflect
-)
-
-#
-# contents selected with patternfile ??-header--private-generated-headers
-#
-set( PRIVATE_GENERATED_HEADERS
-src/reflect/_mulle-allocator-include-private.h
-)
-
-#
-# contents selected with patternfile ??-header--private-generic-headers
-#
-set( PRIVATE_GENERIC_HEADERS
-src/generic/include-private.h
 )
 
 #
 # contents selected with patternfile ??-header--public-generated-headers
 #
 set( PUBLIC_GENERATED_HEADERS
-src/reflect/_mulle-allocator-include.h
 src/reflect/_mulle-allocator-versioncheck.h
-)
-
-#
-# contents selected with patternfile ??-header--public-generic-headers
-#
-set( PUBLIC_GENERIC_HEADERS
-src/generic/include.h
 )
 
 #
@@ -51,6 +28,5 @@ src/generic/include.h
 set( PUBLIC_HEADERS
 src/mulle-allocator.h
 src/mulle-allocator-struct.h
-src/version.h
 )
 
