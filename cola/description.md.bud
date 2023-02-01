@@ -1,0 +1,9 @@
+... provides a way to pass around the memory scheme du jour
+
+... has identical API to malloc, realloc, free
+
+... frees your code from having to check for errors when allocating memory
+
+
+**mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
+*mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..

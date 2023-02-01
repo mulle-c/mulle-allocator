@@ -28,7 +28,6 @@ if( NOT MULLE_C11_HEADER)
    set( HEADER_ONLY_LIBRARIES
       ${MULLE_C11_HEADER}
       ${HEADER_ONLY_LIBRARIES}
-      CACHE INTERNAL "need to cache this"
    )
    if( MULLE_C11_HEADER)
       # intentionally left blank

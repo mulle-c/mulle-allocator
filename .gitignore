@@ -57,3 +57,7 @@ version.old
 .gdb_history
 cmake-build-debug/
 .ackrc
+wilted/
+mulle-template-composer-*
+mulle-markdown-preview-*.html
+save/
