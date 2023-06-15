@@ -36,14 +36,14 @@
 
 #include <mulle-c11/mulle-c11.h>
 
-#ifdef MULLE_ALLOCATOR_BUILD
-# define MULLE_ALLOCATOR_GLOBAL    MULLE_C_GLOBAL
+#ifdef MULLE__ALLOCATOR_BUILD
+# define MULLE__ALLOCATOR_GLOBAL    MULLE_C_GLOBAL
 #else
 # if defined( MULLE_ALLOCATOR_INCLUDE_DYNAMIC) ||  \
      (defined( MULLE_INCLUDE_DYNAMIC) && ! defined( MULLE_ALLOCATOR_INCLUDE_STATIC))
-#  define MULLE_ALLOCATOR_GLOBAL   MULLE_C_EXTERN_GLOBAL
+#  define MULLE__ALLOCATOR_GLOBAL   MULLE_C_EXTERN_GLOBAL
 # else
-#  define MULLE_ALLOCATOR_GLOBAL   extern
+#  define MULLE__ALLOCATOR_GLOBAL   extern
 # endif
 #endif
 
@@ -52,17 +52,17 @@
 #include <assert.h>
 
 
-#if MULLE_C11_VERSION < ((3 << 20) | (0 << 8) | 0)
+#if MULLE__C11_VERSION < ((3 << 20) | (0 << 8) | 0)
 # error "mulle_c11 is too old"
 #endif
 
 
-#define MULLE_ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 1)
+#define MULLE__ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 1)
 
 
-MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;
-MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
-MULLE_ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator;
+MULLE__ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;
+MULLE__ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_allocator;
+MULLE__ALLOCATOR_GLOBAL struct mulle_allocator   mulle_stdlib_nofree_allocator;
 
 MULLE_C_NO_RETURN
 void   mulle_allocation_fail( struct mulle_allocator *allocator, void *block, size_t size);
@@ -110,28 +110,30 @@ static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
 
 
 MULLE_C_NONNULL_RETURN
-static inline void   *_mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
+static inline void   *
+   _mulle_allocator_malloc( struct mulle_allocator *p, size_t size)
 {
    void   *q;
 
    assert( size);
 
    q = (*p->realloc)( NULL, size, p);
-   if( ! q)
+   if( MULLE_C_UNLIKELY( ! q))
       (*p->fail)( p, NULL, size);
    return( q);
 }
 
 
 MULLE_C_NONNULL_RETURN
-static inline void   *_mulle_allocator_calloc( struct mulle_allocator *p, size_t n, size_t size)
+static inline void   *
+   _mulle_allocator_calloc( struct mulle_allocator *p, size_t n, size_t size)
 {
    void   *q;
 
    assert( n && size);
 
    q = (*p->calloc)( n, size, p);
-   if( ! q)
+   if( MULLE_C_UNLIKELY( ! q))
       (*p->fail)( p, NULL, n * size);
    return( q);
 }
@@ -150,7 +152,7 @@ static inline void *
    assert( size);
 
    q = (*p->realloc)( block, size, p);
-   if( ! q)
+   if( MULLE_C_UNLIKELY( ! q))
       (*p->fail)( p, block, size);
    return( q);
 }
@@ -158,7 +160,7 @@ static inline void *
 
 static inline void   _mulle_allocator_free( struct mulle_allocator *p, void *block)
 {
-   if( block)
+   if( MULLE_C_LIKELY( block != NULL))
       (*p->free)( block, p);
 }
 
@@ -173,7 +175,7 @@ static inline void   _mulle_allocator_fail( struct mulle_allocator *p, void *blo
 
 static inline int   _mulle_allocator_abafree( struct mulle_allocator *p, void *block)
 {
-   if( ! block)
+   if( MULLE_C_UNLIKELY( block == NULL))
       return( 0);
    return( (*p->abafree)( p->aba, (void (*)( void *, void *)) p->free, block, p));
 }
@@ -183,12 +185,12 @@ static inline int   _mulle_allocator_abafree( struct mulle_allocator *p, void *b
 // this function is more like the real realloc, but it is guaranteed that
 // if you pass in block != 0 and size 0, that you free AND get NULL back
 //
-MULLE_ALLOCATOR_GLOBAL
+MULLE__ALLOCATOR_GLOBAL
 void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p, void *block, size_t size);
 
 
 // trash the allocator, all allocation and free routines will abort
-MULLE_ALLOCATOR_GLOBAL
+MULLE__ALLOCATOR_GLOBAL
 void   _mulle_allocator_invalidate( struct mulle_allocator *p);
 
 
@@ -295,7 +297,7 @@ static inline int   mulle_abafree( void *block)
 
 # pragma mark - strdup convenience
 
-MULLE_ALLOCATOR_GLOBAL
+MULLE__ALLOCATOR_GLOBAL
 MULLE_C_NONNULL_RETURN
 char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s);
 

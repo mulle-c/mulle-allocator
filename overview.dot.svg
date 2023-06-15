@@ -18,8 +18,11 @@
 <!-- mulle&#45;c11 -->
 <g id="node2" class="node">
 <title>mulle&#45;c11</title>
+<g id="a_node2"><a xlink:href="https://github.com/mulle-c/mulle-c11" xlink:title="mulle&#45;c11">
 <polygon fill="lightgrey" stroke="black" points="104.5,-36 18.5,-36 18.5,0 104.5,0 104.5,-36"/>
 <text text-anchor="middle" x="61.5" y="-14.3" font-family="Times,serif" font-size="14.00">mulle&#45;c11</text>
+</a>
+</g>
 </g>
 <!-- mulle&#45;allocator&#45;&gt;mulle&#45;c11 -->
 <g id="edge1" class="edge">
