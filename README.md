@@ -13,6 +13,7 @@
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
 
 
+
 | Release Version                                       | Release Notes
 |-------------------------------------------------------|--------------
 | ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg?branch=release) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg?branch=release)](//github.com/mulle-c/mulle-allocator/actions)| [RELEASENOTES](RELEASENOTES.md) |
@@ -291,6 +292,8 @@ Install the requirements:
 | Requirements                                 | Description
 |----------------------------------------------|-----------------------
 | [mulle-c11](https://github.com/mulle-c/mulle-c11)             | 🔀 Cross-platform C compiler glue (and some cpp conveniences)
+
+Download the latest [tar](https://github.com/mulle-c/mulle-allocator/archive/refs/tags/latest.tar.gz) or [zip](https://github.com/mulle-c/mulle-allocator/archive/refs/tags/latest.zip) archive and unpack it.
 
 Install **mulle-allocator** into `/usr/local` with [cmake](https://cmake.org):
 

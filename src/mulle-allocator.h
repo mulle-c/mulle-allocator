@@ -57,7 +57,7 @@
 #endif
 
 
-#define MULLE__ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 1)
+#define MULLE__ALLOCATOR_VERSION  ((5 << 20) | (0 << 8) | 2)
 
 
 MULLE__ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;
