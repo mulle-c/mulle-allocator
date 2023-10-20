@@ -31,6 +31,18 @@ if( NOT __COMPILER_FLAGS_C_CMAKE__)
    if( BUILD_SHARED_LIBS)
       set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMULLE_INCLUDE_DYNAMIC=1")
    endif()
+
+   #
+   # MEMO: mulle-clang is currently too old for "mold", it doesn't know about
+   #       that linker yet.
+   #
+   # if( "${CMAKE_C_COMPILER_ID}" MATCHES "^(Clang|MulleClang)$")
+   #    find_program( MOLD_LINKER "mold")
+   #    if( MOLD_LINKER)
+   #       set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=mold")
+   #    endif()
+   # endif()
+
    # load in flags defined by other plugins, presumably Objective-C
    include( CompilerFlagsAuxC OPTIONAL)
 
