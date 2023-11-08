@@ -72,7 +72,7 @@ int   mulle_aba_abort( void *aba, void (*free)( void *, void *), void *block, vo
 
 
 # pragma mark - Petty Accessors
-typedef   int (*mulle_allocator_aba_t)( void *, void (*f)( void *, void *), void *, void *);
+typedef int   mulle_allocator_aba_t( void *, void (*f)( void *, void *), void *, void *);
 
 
 int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p);
@@ -81,7 +81,7 @@ int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p);
 
 static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
                                               void *aba,
-                                              mulle_allocator_aba_t f)
+                                              mulle_allocator_aba_t *f)
 {
    if( ! p)
       p = &mulle_default_allocator;
@@ -91,12 +91,12 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
 }
 
 
-typedef void (*mulle_allocator_fail_t)( struct mulle_allocator *allocator,
-                                        void *,
-                                        size_t) _MULLE_C_NO_RETURN;
+typedef void  mulle_allocator_fail_t( struct mulle_allocator *allocator,
+                                      void *,
+                                      size_t) ;
 
 static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
-                                               mulle_allocator_fail_t f)
+                                               mulle_allocator_fail_t *f _MULLE_C_NO_RETURN)
 {
    if( ! p)
       p = &mulle_default_allocator;

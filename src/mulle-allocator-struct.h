@@ -45,7 +45,7 @@
 // On many ABIs we should be able to get away with just casting "calloc",
 // but that's not easy to test...
 //
-// abafree uses aba as context and not
+// abafree uses aba as context
 //
 #define MULLE_ALLOCATOR_BASE                                                                         \
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                     \

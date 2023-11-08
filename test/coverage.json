@@ -1,0 +1,21 @@
+{
+    "branch_covered": 8,
+    "branch_percent": 100.0,
+    "branch_total": 8,
+    "files": [
+        {
+            "branch_covered": 8,
+            "branch_percent": 1.0,
+            "branch_total": 8,
+            "filename": "mulle-allocator.c",
+            "line_covered": 39,
+            "line_percent": 1.0,
+            "line_total": 39
+        }
+    ],
+    "gcovr/summary_format_version": "0.2",
+    "line_covered": 39,
+    "line_percent": 100.0,
+    "line_total": 39,
+    "root": "../../src"
+}

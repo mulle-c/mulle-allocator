@@ -1,4 +1,10 @@
 {
+   config =
+   {
+      showButtons = YES;
+      showCoverage = YES;
+      showCodacy = NO;
+   };
    project =
    {
       description="🔄 Flexible C memory allocation scheme";
