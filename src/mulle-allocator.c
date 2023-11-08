@@ -55,10 +55,11 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
 
    size = strlen( s) + 1;
    dup  = (*p->realloc)( NULL, size, p);
-   if( ! dup)
+   if( dup)
+      memcpy( dup, s, size);
+   else
+   // keep like this for benefit of tests
       (*p->fail)( p, NULL, size);
-
-   memcpy( dup, s, size);
    return( dup);
 }
 
@@ -150,6 +151,8 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
 
 int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
 {
+   if( ! p)
+      p = &mulle_default_allocator;
    return( p->calloc == calloc);
 }
 
@@ -214,6 +217,8 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
 
 int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
 {
+   if( ! p)
+      p = &mulle_default_allocator;
    return( p->calloc == v_calloc);
 }
 
