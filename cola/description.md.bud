@@ -4,6 +4,7 @@
 
 ... frees your code from having to check for errors when allocating memory
 
+... contains a safer and portable alloca
 
 **mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..

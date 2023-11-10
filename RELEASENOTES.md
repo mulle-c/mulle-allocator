@@ -1,3 +1,9 @@
+# 6.0.0
+
+* new feature mulle-alloca, sort of obviates some of the flex data structures
+* **BREAKING CHANGE** `mulle_allocator_aba_t` and `mulle_allocator_fail_t` are now not fnction pointer typedefs but just functions, done for consistency across all libraries
+
+
 ### 5.0.1
 
 * remove package.json as it conflicts with clib.json
