@@ -31,6 +31,7 @@ MULLE_C_NO_RETURN
 void   fail_fail( struct mulle_allocator *p, void *block, size_t size)
 {
    printf( "failed for %zd bytes\n", size);
+   // returns intentionally
 }
 
 

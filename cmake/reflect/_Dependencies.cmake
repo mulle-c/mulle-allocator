@@ -17,22 +17,22 @@ endif()
 # Disable for this platform: `mulle-sourcetree mark mulle-c11 no-cmake-platform-${MULLE_UNAME}`
 # Disable for a sdk: `mulle-sourcetree mark mulle-c11 no-cmake-sdk-<name>`
 #
-if( NOT MULLE_C11_HEADER)
-   find_file( MULLE_C11_HEADER NAMES mulle-c11.h mulle-c11/mulle-c11.h)
-   message( STATUS "MULLE_C11_HEADER is ${MULLE_C11_HEADER}")
+if( NOT MULLE__C11_HEADER)
+   find_file( MULLE__C11_HEADER NAMES mulle-c11.h mulle-c11/mulle-c11.h)
+   message( STATUS "MULLE__C11_HEADER is ${MULLE__C11_HEADER}")
 
    #
-   # Add MULLE_C11_HEADER to HEADER_ONLY_LIBRARIES list.
+   # Add MULLE__C11_HEADER to HEADER_ONLY_LIBRARIES list.
    # Disable with: `mulle-sourcetree mark mulle-c11 no-cmake-add`
    #
    set( HEADER_ONLY_LIBRARIES
-      ${MULLE_C11_HEADER}
+      ${MULLE__C11_HEADER}
       ${HEADER_ONLY_LIBRARIES}
    )
-   if( MULLE_C11_HEADER)
+   if( MULLE__C11_HEADER)
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark mulle-c11 no-require`
-      message( FATAL_ERROR "MULLE_C11_HEADER was not found")
+      message( FATAL_ERROR "MULLE__C11_HEADER was not found")
    endif()
 endif()

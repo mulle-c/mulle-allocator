@@ -26,6 +26,7 @@ src/reflect/_mulle-allocator-versioncheck.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
+src/mulle-alloca.h
 src/mulle-allocator.h
 src/mulle-allocator-struct.h
 )
