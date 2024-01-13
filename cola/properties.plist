@@ -1,10 +1,4 @@
 {
-   config =
-   {
-      showButtons = YES;
-      showCoverage = YES;
-      showCodacy = NO;
-   };
    project =
    {
       description="🔄 Flexible C memory allocation scheme";
@@ -13,14 +7,17 @@
       user="mulle-c";
       repo="mulle-allocator";
       homepage="https://github.com/mulle-c/mulle-allocator";
-      license="BSD-3-Clause"
+      license="BSD-3-Clause";
    };
    dependencies =
    (
       {
-         name="mulle-c11";
-         url="https://github.com/mulle-c/mulle-c11";
          description="🔀 Cross-platform C compiler glue (and some cpp conveniences)";
+         domain="github";
+         name="mulle-c11";
+         repo="mulle-c11";
+         url="https://github.com/mulle-c/mulle-c11";
+         user="mulle-c";
       }
-   )
+   );
 }
