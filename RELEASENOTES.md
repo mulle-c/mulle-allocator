@@ -1,3 +1,7 @@
+### 6.0.1
+
+* also define `mulle_malloc_do` for consistency
+
 # 6.0.0
 
 * new feature mulle-alloca, sort of obviates some of the flex data structures
