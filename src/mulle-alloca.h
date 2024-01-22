@@ -1,6 +1,6 @@
 //
 //  mulle-alloca.c
-//  mulle-buffer
+//  mulle-allocator
 //
 //  Copyright (c) 2023 Nat! - Mulle kybernetiK.
 //  All rights reserved.
@@ -253,6 +253,33 @@ while( 0)
       for( int  name ## __j = 0;    /* break protection */                                     \
            name ## __j < 1;                                                                    \
            name ## __j++)
+
+
+//
+// complements mulle_alloca_do
+//         
+#define mulle_malloc_do( name, type, count)                                 \
+   for( type *name ## __count = (type *) (uintptr_t) (count),               \
+        *name = mulle_malloc( sizeof( type) * (uintptr_t) name ## __count); \
+        name;                                                               \
+        name = (mulle_free( name), NULL)                                    \
+      )                                                                     \
+                                                                            \
+      for( int  name ## __j = 0;    /* break protection */                  \
+           name ## __j < 1;                                                 \
+           name ## __j++)
+
+#define mulle_calloc_do( name, type, count)                                 \
+   for( type *name ## __count = (type *) (uintptr_t) (count),               \
+        *name = mulle_calloc( sizeof( type), (uintptr_t) name ## __count);  \
+        name;                                                               \
+        name = (mulle_free( name), NULL)                                    \
+      )                                                                     \
+                                                                            \
+      for( int  name ## __j = 0;    /* break protection */                  \
+           name ## __j < 1;                                                 \
+           name ## __j++)
+
 
 
 // This macro works outside of mulle_alloca_do, you have to give it

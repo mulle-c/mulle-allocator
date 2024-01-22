@@ -1,3 +1,5 @@
+//
+//  mulle-allocator.c
 //  mulle-allocator
 //
 //  Created by Nat! on 02/11/15.
@@ -57,7 +59,7 @@
 #endif
 
 
-#define MULLE__ALLOCATOR_VERSION  ((6UL << 20) | (0 << 8) | 0)
+#define MULLE__ALLOCATOR_VERSION  ((6UL << 20) | (0 << 8) | 1)
 
 
 MULLE__ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;
