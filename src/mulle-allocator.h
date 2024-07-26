@@ -59,7 +59,7 @@
 #endif
 
 
-#define MULLE__ALLOCATOR_VERSION  ((6UL << 20) | (0 << 8) | 1)
+#define MULLE__ALLOCATOR_VERSION  ((7UL << 20) | (0 << 8) | 0)
 
 
 MULLE__ALLOCATOR_GLOBAL struct mulle_allocator   mulle_default_allocator;
@@ -72,7 +72,7 @@ void   mulle_allocation_fail( struct mulle_allocator *allocator,
                               size_t size);
 
 // NO_RETURN really but....
-int   mulle_aba_abort( void *aba,
+int   mulle_allocator_no_aba_abort( void *aba,
                        void (*free)( void *, void *),
                        void *block,
                        void *owner);
@@ -97,7 +97,7 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
       p = &mulle_default_allocator;
 
    p->aba     = aba;
-   p->abafree = f ? f : mulle_aba_abort;
+   p->abafree = f ? f : mulle_allocator_no_aba_abort;
 }
 
 
