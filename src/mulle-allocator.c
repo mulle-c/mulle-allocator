@@ -94,7 +94,7 @@ void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p,
 // "no-return". It's a classical type tragedy.
 //
 // MULLE_C_NO_RETURN
-int   mulle_aba_abort( void *aba,
+int   mulle_allocator_no_aba_abort( void *aba,
                        void (*free)( void *, void *),
                        void *block,
                        void *owner)
@@ -110,7 +110,7 @@ void   _mulle_allocator_invalidate( struct mulle_allocator *p)
    p->calloc  = (void *(*)( size_t, size_t, struct mulle_allocator *)) abort;
    p->realloc = (void *(*)( void *, size_t, struct mulle_allocator *)) abort;
    p->free    = (void (*)( void *, struct mulle_allocator *)) abort;
-   p->abafree = mulle_aba_abort;
+   p->abafree = mulle_allocator_no_aba_abort;
 }
 
 
@@ -127,7 +127,7 @@ struct mulle_allocator   mulle_stdlib_allocator =
    realloc,
    free,
    mulle_allocation_fail,
-   mulle_aba_abort,
+   mulle_allocator_no_aba_abort,
    NULL
 };
 
@@ -139,7 +139,7 @@ struct mulle_allocator   mulle_default_allocator =
    realloc,
    free,
    mulle_allocation_fail,
-   mulle_aba_abort,
+   mulle_allocator_no_aba_abort,
    NULL
 };
 
@@ -150,7 +150,7 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
    realloc,
    no_free,
    mulle_allocation_fail,
-   mulle_aba_abort,
+   mulle_allocator_no_aba_abort,
    NULL
 };
 
@@ -197,7 +197,7 @@ struct mulle_allocator   mulle_stdlib_allocator =
    v_realloc,
    v_free,
    mulle_allocation_fail,
-   mulle_aba_abort,
+   mulle_allocator_no_aba_abort,
    NULL
 };
 
@@ -209,7 +209,7 @@ struct mulle_allocator   mulle_default_allocator =
    v_realloc,
    v_free,
    mulle_allocation_fail,
-   mulle_aba_abort,
+   mulle_allocator_no_aba_abort,
    NULL
 };
 
@@ -220,7 +220,7 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
    v_realloc,
    v_no_free,
    mulle_allocation_fail,
-   mulle_aba_abort,
+   mulle_allocator_no_aba_abort,
    NULL
 };
 
