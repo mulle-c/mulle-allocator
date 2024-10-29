@@ -33,6 +33,6 @@ if( NOT MULLE__C11_HEADER)
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark mulle-c11 no-require`
-      message( FATAL_ERROR "MULLE__C11_HEADER was not found")
+      message( SEND_ERROR "MULLE__C11_HEADER was not found")
    endif()
 endif()
