@@ -37,7 +37,7 @@ endif()
 include( PreExecutable OPTIONAL)
 
 if( NOT EXECUTABLE_SOURCES)
-   message( FATAL_ERROR "There are no sources to compile for executable ${EXECUTABLE_NAME}. Did `mulle-sde reflect` run yet ?")
+   message( SEND_ERROR "There are no sources to compile for executable ${EXECUTABLE_NAME}. Did `mulle-sde reflect` run yet ?")
 endif()
 
 

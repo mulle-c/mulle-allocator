@@ -66,3 +66,6 @@ coverage*.html
 *.gcno
 cola/wilted/
 cola/coverage.json
+cmake-build-*/
+research/
+test/mulle-allocator.sublime-project
