@@ -124,6 +124,10 @@
     ? _mulle_alloca_stackitems( size, type)                       \
     : 1)
 
+#define _mulle_alloca_do_get_size_as_length( name)                \
+   (sizeof( name ## __storage) / sizeof( name ## __storage[ 0]))
+
+
 // returns 1 for loop convenience
 #define _mulle_alloca_do_free( name)                              \
   ((name != name ## __storage)                                    \
@@ -155,9 +159,6 @@ do                                                                \
    return;                                                        \
 }                                                                 \
 while( 0)
-
-#define _mulle_alloca_do_get_size_as_length( name)                \
-   (sizeof( name ## __storage) / sizeof( name ## __storage[ 0]))
 
 
 /* API */
@@ -271,21 +272,26 @@ while( 0)
 // "name__count" is useful for realloc and also to have only one expansion
 // point for the macro parameter. Generally all macros in this header have
 // only one expansion point, unless noted.
+// We need the triple for, because unfortunately when you pass a pointer as
+// the type (like struct foo *), the '*' is only applied to the first variable
+// of the for variables.
 //
-#define mulle_alloca_do( name, type, count)                                                    \
-   for( type name ## __storage[ _mulle_alloca_stackitems_1( MULLE_ALLOCA_STACKSIZE, type)],    \
-   	    *name ## __count = (type *) (uintptr_t) (count),                                     \
-   	    *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
-   	            ? name ## __storage                                                          \
-   	            : mulle_malloc( sizeof( type) * (uintptr_t) name ## __count),                \
-        *name ## __i = NULL;                                                                   \
-        ! name ## __i;                                                                         \
-        name ## __i = _mulle_alloca_do_free( name)                                             \
-      )                                                                                        \
-                                                                                               \
-      for( int  name ## __j = 0;    /* break protection */                                     \
-           name ## __j < 1;                                                                    \
-           name ## __j++)
+#define mulle_alloca_do( name, type, count)                                                          \
+   for( type name ## __storage[ _mulle_alloca_stackitems_1( MULLE_ALLOCA_STACKSIZE, type)],          \
+        *name ## __count = (void *) (uintptr_t) (count),                                             \
+        *name ## __k = NULL;                                                                         \
+        ! name ## __k;                                                                               \
+        name ## __k++)                                                                               \
+      for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
+                     ? name ## __storage                                                             \
+                     : mulle_malloc( sizeof( type) * (uintptr_t) (void *) name ## __count),          \
+           *name ## __j = NULL;                                                                      \
+           ! name ## __j;                                                                            \
+           name ## __j = _mulle_alloca_do_free( name)                                                \
+         )                                                                                           \
+         for( int  name ## __i = 0;    /* break protection */                                        \
+              name ## __i < 1;                                                                       \
+              name ## __i++)
 
 /**
  * This macro defines a flexible block of memory that can be allocated either on
@@ -306,20 +312,24 @@ while( 0)
 //
 // As above, but you can set the initial size in bytes
 //
-#define mulle_alloca_do_flexible( name, type, stacksize, count)                                \
-   for( type name ## __storage[ _mulle_alloca_stackitems_1( stacksize, type)],                 \
-          *name ## __count = (type *) (uintptr_t) (count),                                     \
-          *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
-                  ? name ## __storage                                                          \
-                  : mulle_malloc( sizeof( type) * (uintptr_t) name ## __count),                \
-        *name ## __i = NULL;                                                                   \
-        ! name ## __i;                                                                         \
-        name ## __i = _mulle_alloca_do_free( name)                                             \
-      )                                                                                        \
-                                                                                               \
-      for( int  name ## __j = 0;    /* break protection */                                     \
-           name ## __j < 1;                                                                    \
-           name ## __j++)
+#define mulle_alloca_do_flexible( name, type, stacksize, count)                                      \
+   for( type name ## __storage[ _mulle_alloca_stackitems_1( stacksize, type)],                       \
+        *name ## __count = (void *) (uintptr_t) (count),                                             \
+        *name ## __k = NULL;                                                                         \
+        ! name ## __k;                                                                               \
+        name ## __k++)                                                                               \
+                                                                                                     \
+      for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
+                     ? name ## __storage                                                             \
+                     : mulle_malloc( sizeof( type) * (uintptr_t) (void *) name ## __count),          \
+           *name ## __j = NULL;                                                                      \
+           ! name ## __j;                                                                            \
+           name ## __j = _mulle_alloca_do_free( name)                                                \
+                                                                                                     \
+         )                                                                                           \
+         for( int  name ## __i = 0;    /* break protection */                                        \
+              name ## __i < 1;                                                                       \
+              name ## __i++)
 
 
 /**
@@ -336,6 +346,7 @@ while( 0)
  * automatically frees it at the end of the loop. The memory block can be
  * accessed using the `name` variable within the loop.
  */
+
 //
 // complements mulle_alloca_do
 //         
@@ -353,15 +364,14 @@ while( 0)
  * accessed using the `name` variable within the loop.
  */
 #define mulle_malloc_do( name, type, count)                                 \
-   for( type *name ## __count = (type *) (uintptr_t) (count),               \
-        *name = mulle_malloc( sizeof( type) * (uintptr_t) name ## __count); \
+   for( type *name = mulle_malloc( sizeof( type) * (count));                \
         name;                                                               \
         name = (mulle_free( name), NULL)                                    \
       )                                                                     \
                                                                             \
-      for( int  name ## __j = 0;    /* break protection */                  \
-           name ## __j < 1;                                                 \
-           name ## __j++)
+      for( int  name ## __i = 0;    /* break protection */                  \
+           name ## __i < 1;                                                 \
+           name ## __i++)
 
 /**
  * This macro defines a zeroed block of memory that is allocated on the heap using `mulle_calloc`.
@@ -376,16 +386,15 @@ while( 0)
  * automatically frees it at the end of the loop. The memory block can be
  * accessed using the `name` variable within the loop.
  */
- #define mulle_calloc_do( name, type, count)                                 \
-   for( type *name ## __count = (type *) (uintptr_t) (count),               \
-        *name = mulle_calloc( sizeof( type), (uintptr_t) name ## __count);  \
+ #define mulle_calloc_do( name, type, count)                                \
+   for( type *name = mulle_calloc( (count), sizeof( type));                 \
         name;                                                               \
         name = (mulle_free( name), NULL)                                    \
       )                                                                     \
                                                                             \
-      for( int  name ## __j = 0;    /* break protection */                  \
-           name ## __j < 1;                                                 \
-           name ## __j++)
+      for( int  name ## __i = 0;    /* break protection */                  \
+           name ## __i < 1;                                                 \
+           name ## __i++)
 
 
 
@@ -507,20 +516,23 @@ while( 0)
  * @param type The type of the elements in the buffer.
  * @param count The initial size (in elements) of the buffer.
  */
-#define mulle_calloca_do( name, type, count)                                                        \
-   for( type name ## __storage[ _mulle_alloca_stackitems_1( MULLE_ALLOCA_STACKSIZE, type)] = { 0 }, \
-          *name ## __count = (type *) (uintptr_t) (count),                                          \
-          *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)       \
-                  ? name ## __storage                                                               \
-                  : mulle_calloc( sizeof( type), (uintptr_t) name ## __count),                      \
-        *name ## __i = NULL;                                                                        \
-        ! name ## __i;                                                                              \
-        name ## __i = _mulle_alloca_do_free( name)                                                  \
-      )                                                                                             \
-                                                                                                    \
-      for( int  name ## __j = 0;    /* break protection */                                          \
-           name ## __j < 1;                                                                         \
-           name ## __j++)
+#define mulle_calloca_do( name, type, count)                                                         \
+   for( type name ## __storage[ _mulle_alloca_stackitems_1( MULLE_ALLOCA_STACKSIZE, type)] = { 0 },  \
+        *name ## __count = (void *) (uintptr_t) (count),                                             \
+        *name ## __k = NULL;                                                                         \
+        ! name ## __k;                                                                               \
+        name ## __k++)                                                                               \
+      for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
+                     ? name ## __storage                                                             \
+                     : mulle_calloc( (size_t) (void *) name ## __count, sizeof( type)),              \
+           *name ## __j = NULL;                                                                      \
+           ! name ## __j;                                                                            \
+           name ## __j = _mulle_alloca_do_free( name)                                                \
+         )                                                                                           \
+         for( int  name ## __i = 0;    /* break protection */                                        \
+              name ## __i < 1;                                                                       \
+              name ## __i++)
+
 
 /**
  * Allocates a dynamically sized zeroed buffer on the stack or heap, depending on the
@@ -543,20 +555,22 @@ while( 0)
 //
 // as above, but you can set the initial size
 //
-#define mulle_calloca_do_flexible( name, type, stacksize, count)                              \
-   for( type name ## __storage[ _mulle_alloca_stackitems_1( stacksize, type)] = { 0 },        \
-          *name ## __count = (type *) (uintptr_t) (count),                                    \
-          *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name) \
-                  ? name ## __storage                                                         \
-                  : mulle_calloc( sizeof( type), (uintptr_t) name ## __count),                \
-        *name ## __i = NULL;                                                                  \
-        ! name ## __i;                                                                        \
-        name ## __i = _mulle_alloca_do_free( name)                                            \
-      )                                                                                       \
-                                                                                              \
-      for( int  name ## __j = 0;    /* break protection */                                    \
-           name ## __j < 1;                                                                   \
-           name ## __j++)
+#define mulle_calloca_do_flexible( name, type, stacksize, count)                                     \
+   for( type name ## __storage[ _mulle_alloca_stackitems_1( stacksize, type)] = { 0 },               \
+        *name ## __count = (void *) (uintptr_t) (count),                                             \
+        *name ## __k = NULL;                                                                         \
+        ! name ## __k;                                                                               \
+        name ## __k++)                                                                               \
+      for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
+                     ? name ## __storage                                                             \
+                     : mulle_calloc( (size_t) (void *) name ## __count, sizeof( type)),              \
+           *name ## __j = NULL;                                                                      \
+           ! name ## __j;                                                                            \
+           name ## __j = _mulle_alloca_do_free( name)                                                \
+         )                                                                                           \
+         for( int  name ## __i = 0;    /* break protection */                                        \
+              name ## __i < 1;                                                                       \
+              name ## __i++)
 
 
 /**

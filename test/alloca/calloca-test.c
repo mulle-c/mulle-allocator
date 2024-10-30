@@ -14,7 +14,10 @@ static int  test( unsigned int amount)
    {
       for( j = 0; j < amount; j++)
          if( values[ j] != 0)
+         {
+            fprintf( stderr, "1. %u of %u\n", j, amount);
             return( 1);
+         }
 
       for( i = 0; i < amount; i++)
          values[ i] = i;
@@ -24,7 +27,10 @@ static int  test( unsigned int amount)
       mulle_calloca_do_realloc( values, amount);
       for( j = old_amount; j < amount; j++)
          if( values[ j] != 0)
+         {
+            fprintf( stderr, "2. %u of %u\n", j, amount);
             return( 1);
+         }
 
       for( ; i < amount; i++)
          values[ i] = i;
@@ -33,7 +39,10 @@ static int  test( unsigned int amount)
       mulle_calloca_do_realloc( values, amount);
       for( i = 0; i < amount; i++)
          if( values[ i] != i)
+         {
+            fprintf( stderr, "3. %u of %u\n", j, amount);
             return( 1);
+         }
    }
    return( 0);
 }
@@ -79,7 +88,10 @@ static int  test_extract( unsigned int amount)
    mulle_calloc_for( buf, amount, p)
    {
       if( *p++ != amount)
-         return( -1);
+      {
+         fprintf( stderr, "4. %u of %u\n", (unsigned int) (p - buf), amount);
+         return( 1);
+      }
    }
 
    mulle_free( buf);
