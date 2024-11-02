@@ -182,7 +182,7 @@ while( 0)
  */
 //
 // Usable only inside of a `mulle_alloca_do` code block.
-// If you `mulle_alloca_do_realloc` to zero, you really get one.
+// If you call `mulle_alloca_do_realloc` with zero, you really get one.
 //
 #define mulle_alloca_do_realloc( name, count)                     \
 do                                                                \
@@ -620,5 +620,11 @@ while( 0)
 #define mulle_calloca_do_for( name, p)   \
    mulle_alloca_do_for( name, p)
 
+
+// backwards compatibility
+#define mulle_flexarray_do( a, b, c, d)    mulle_alloca_do( a, b, d)
+#define mulle_flexarray_realloc( a, b)     mulle_alloca_do_realloc( a, b)
+#define _mulle_flexarray_return( a, b)     _mulle_alloca_do_return( a, b)
+#define _mulle_flexarray_return_void( a)   _mulle_alloca_do_return_void( a)
 
 #endif

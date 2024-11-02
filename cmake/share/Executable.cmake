@@ -190,6 +190,13 @@ Frameworks aren't force loaded.")
       )
    endif()
 
+   # MEMO: its probably better to not have a big EXECUTABLE_LIBRARY_LIST but
+   #       instead break it up into multiple target_link_libraries calls, 
+   #       where we can set the WHOLEARCHIVE property separately
+   #
+   #       foreach( library ${ALL_LOAD_DEPENDENCY_LIBRARIES})
+   #          target_link_libraries( "${EXECUTABLE_NAME}" "$<LINK_LIBRARY:WHOLE_ARCHIVE,${library}>")
+   #       endforeach()   
    target_link_libraries( "${EXECUTABLE_NAME}"
       ${EXECUTABLE_LIBRARY_LIST}
    )
