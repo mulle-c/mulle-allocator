@@ -1,3 +1,15 @@
+# 7.0.0
+
+
+
+* add `mulle_flexarray_do` defines for backward compatibility
+
+* `mulle_alloca_do` now works properly with non-typedeffed pointer types as elements
+
+
+* renamed `mulle_aba_abort` to the more telling and properly named `mulle_allocator_no_aba_abort`
+
+
 ### 6.0.1
 
 * also define `mulle_malloc_do` for consistency
