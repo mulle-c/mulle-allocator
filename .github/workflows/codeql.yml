@@ -88,7 +88,7 @@ jobs:
       run:  echo "$HOME/bin" >> $GITHUB_PATH
 
     - name: Get mulle-sde
-      uses: mulle-sde/github-ci@v1
+      uses: mulle-sde/github-ci@v2
 
     - if: matrix.build-mode == 'manual'
       run: |
