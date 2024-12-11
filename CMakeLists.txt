@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.14)
 
-project( mulle-allocator VERSION 7.0.0 LANGUAGES C)
+project( mulle-allocator VERSION 7.0.1 LANGUAGES C)
 
 
 ### mulle-sde environment
@@ -86,6 +86,3 @@ if( LINK_PHASE)
 endif()
 
 include( FinalOutput OPTIONAL)
-
-
-

@@ -7,7 +7,7 @@
 
 #if defined( MULLE__C11_VERSION)
 # ifndef MULLE__C11_VERSION_MIN
-#  define MULLE__C11_VERSION_MIN  ((4UL << 20) | (5 << 8) | 0)
+#  define MULLE__C11_VERSION_MIN  ((4UL << 20) | (6 << 8) | 0)
 # endif
 # ifndef MULLE__C11_VERSION_MAX
 #  define MULLE__C11_VERSION_MAX  ((5UL << 20) | (0 << 8) | 0)
