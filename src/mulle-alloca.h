@@ -268,7 +268,9 @@ while( 0)
  * automatically frees it at the end of the loop. The memory block can be
  * accessed using the `name` variable within the loop.
  */
-// The "type" is needed for proper stack alignment.
+// The "type" is needed for proper stack alignment. Unfortunately something
+// array types won't work, you have to use pointers there.
+//
 // "name__count" is useful for realloc and also to have only one expansion
 // point for the macro parameter. Generally all macros in this header have
 // only one expansion point, unless noted.
