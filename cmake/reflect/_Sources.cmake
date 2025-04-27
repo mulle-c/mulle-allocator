@@ -12,4 +12,5 @@ endif()
 #
 set( SOURCES
 src/mulle-allocator.c
+src/mulle-memset.c
 )

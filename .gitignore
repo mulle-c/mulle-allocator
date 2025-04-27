@@ -69,3 +69,5 @@ cola/coverage.json
 cmake-build-*/
 research/
 test/mulle-allocator.sublime-project
+.mulle/etc/make/build-dir
+vgcore.*

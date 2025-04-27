@@ -10,6 +10,8 @@
       "src/mulle-allocator-struct.h",
       "src/mulle-allocator.c",
       "src/mulle-allocator.h",
+      "src/mulle-memset.c",
+      "src/mulle-memset.h",
       "src/reflect/_mulle-allocator-versioncheck.h"
    ],
    "dependencies" : {
