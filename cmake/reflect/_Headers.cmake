@@ -29,5 +29,6 @@ set( PUBLIC_HEADERS
 src/mulle-alloca.h
 src/mulle-allocator.h
 src/mulle-allocator-struct.h
+src/mulle-memset.h
 )
 
