@@ -1,3 +1,8 @@
+## 7.1.0
+
+* moved mulle-memtest.c from mulle-data to here for convenience. might move to mulle-c11 eventually
+
+
 ### 7.0.1
 
 Various small improvements
