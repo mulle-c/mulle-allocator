@@ -291,6 +291,8 @@ static inline void   mulle_allocator_assert( struct mulle_allocator *p)
    assert( (p ? p : &mulle_default_allocator)->realloc);
    assert( (p ? p : &mulle_default_allocator)->free);
    assert( (p ? p : &mulle_default_allocator)->fail);
+
+   MULLE_C_UNUSED( p);
 }
 
 
