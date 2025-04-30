@@ -48,6 +48,10 @@ void   mulle_allocation_fail( struct mulle_allocator *p,
 {
    perror( "memory allocation:");
    abort();
+
+   MULLE_C_UNUSED( p);
+   MULLE_C_UNUSED( block);
+   MULLE_C_UNUSED( size);
 }
 
 
@@ -95,11 +99,16 @@ void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p,
 //
 // MULLE_C_NO_RETURN
 int   mulle_allocator_no_aba_abort( void *aba,
-                       void (*free)( void *, void *),
-                       void *block,
-                       void *owner)
+                                    void (*free)( void *, void *),
+                                    void *block,
+                                    void *owner)
 {
    abort();
+
+   MULLE_C_UNUSED( aba);
+   MULLE_C_UNUSED( free);
+   MULLE_C_UNUSED( block);
+   MULLE_C_UNUSED( owner);
 }
 
 
@@ -118,6 +127,7 @@ void   _mulle_allocator_invalidate( struct mulle_allocator *p)
 
 static void   no_free( void *ignored)
 {
+   MULLE_C_UNUSED( ignored);
 }
 
 
@@ -168,6 +178,8 @@ static void   *v_calloc( size_t n,
                          size_t size,
                          struct mulle_allocator *allocator)
 {
+   MULLE_C_UNUSED( allocator);
+
    return( calloc( n, size));
 }
 
@@ -176,18 +188,24 @@ static void   *v_realloc( void *block,
                           size_t size,
                           struct mulle_allocator *allocator)
 {
+   MULLE_C_UNUSED( allocator);
+
    return( realloc( block, size));
 }
 
 
 static void   v_free( void *block, struct mulle_allocator *allocator)
 {
+   MULLE_C_UNUSED( allocator);
+
    free( block);
 }
 
 
 static void   v_no_free( void *ignored, struct mulle_allocator *allocator)
 {
+   MULLE_C_UNUSED( ignored);
+   MULLE_C_UNUSED( allocator);
 }
 
 
