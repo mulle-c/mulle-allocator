@@ -3,6 +3,7 @@
    {
       description="🔄 Flexible C memory allocation scheme";
       domain="github";
+      language="c";
       name="mulle-allocator";
       user="mulle-c";
       repo="mulle-allocator";

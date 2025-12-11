@@ -18,7 +18,15 @@ endif()
 # Disable for a sdk: `mulle-sourcetree mark mulle-c11 no-cmake-sdk-<name>`
 #
 if( NOT MULLE__C11_HEADER)
-   find_file( MULLE__C11_HEADER NAMES mulle-c11.h mulle-c11/mulle-c11.h)
+   find_file( MULLE__C11_HEADER NAMES
+      mulle-c11.h mulle-c11/mulle-c11.h
+      NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH
+   )
+   if( NOT MULLE__C11_HEADER AND NOT DEPENDENCY_IGNORE_SYSTEM_HEADERS)
+      find_file( MULLE__C11_HEADER NAMES
+         mulle-c11.h mulle-c11/mulle-c11.h
+      )
+   endif()
    message( STATUS "MULLE__C11_HEADER is ${MULLE__C11_HEADER}")
 
    #
@@ -33,6 +41,6 @@ if( NOT MULLE__C11_HEADER)
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark mulle-c11 no-require`
-      message( SEND_ERROR "MULLE__C11_HEADER was not found")
+      message( SEND_ERROR "MULLE__C11_HEADER was not found in mulle-c11.h mulle-c11/mulle-c11.h")
    endif()
 endif()

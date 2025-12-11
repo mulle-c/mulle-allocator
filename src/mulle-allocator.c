@@ -33,8 +33,8 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#include "mulle-allocator-struct.h"
-// #include "mulle_allocator.h"  // don't include for windows
+#include "mulle-allocator.h"
+
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,7 +131,7 @@ static void   no_free( void *ignored)
 }
 
 
-struct mulle_allocator   mulle_stdlib_allocator =
+struct mulle_allocator   mulle_allocator_stdlib =
 {
    calloc,
    realloc,
@@ -143,7 +143,7 @@ struct mulle_allocator   mulle_stdlib_allocator =
 
 
 // this will be patched by the foundation
-struct mulle_allocator   mulle_default_allocator =
+struct mulle_allocator   mulle_allocator_default =
 {
    calloc,
    realloc,
@@ -154,7 +154,7 @@ struct mulle_allocator   mulle_default_allocator =
 };
 
 
-struct mulle_allocator   mulle_stdlib_nofree_allocator =
+struct mulle_allocator   mulle_allocator_stdlib_nofree =
 {
    calloc,
    realloc,
@@ -209,7 +209,7 @@ static void   v_no_free( void *ignored, struct mulle_allocator *allocator)
 }
 
 
-struct mulle_allocator   mulle_stdlib_allocator =
+struct mulle_allocator   mulle_allocator_stdlib =
 {
    v_calloc,
    v_realloc,
@@ -221,7 +221,7 @@ struct mulle_allocator   mulle_stdlib_allocator =
 
 
 // this will be patched by the foundation
-struct mulle_allocator   mulle_default_allocator =
+struct mulle_allocator   mulle_allocator_default =
 {
    v_calloc,
    v_realloc,
@@ -232,7 +232,7 @@ struct mulle_allocator   mulle_default_allocator =
 };
 
 
-struct mulle_allocator   mulle_stdlib_nofree_allocator =
+struct mulle_allocator   mulle_allocator_stdlib_nofree =
 {
    v_calloc,
    v_realloc,
@@ -246,7 +246,7 @@ struct mulle_allocator   mulle_stdlib_nofree_allocator =
 int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
 {
    if( ! p)
-      p = &mulle_default_allocator;
+      p = &mulle_allocator_default;
    return( p->calloc == v_calloc);
 }
 
