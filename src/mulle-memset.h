@@ -30,6 +30,8 @@
 #ifndef mulle_memset_h__
 #define mulle_memset_h__
 
+#include "mulle-allocator.h"
+
 #include <stdint.h>
 
 
@@ -38,6 +40,7 @@
 // 8 bit quantity like memset. Chief use is for writing 0xdead into memory
 // regions.
 //
+MULLE__ALLOCATOR_GLOBAL
 void   *mulle_memset_uint32( void *dest, uint32_t value, size_t count);
 
 #endif

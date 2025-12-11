@@ -261,7 +261,6 @@ while( 0)
  * The macro takes the following parameters:
  * @param name: The name of the variable that will hold the memory block.
  * @param type: The type of the elements in the memory block.
- * @param stacksize: The initial size of the stack-allocated memory block in bytes.
  * @param count: The number of elements to allocate in the memory block.
  *
  * The macro creates a `for` loop that initializes the memory block and
@@ -333,21 +332,6 @@ while( 0)
               name ## __i < 1;                                                                       \
               name ## __i++)
 
-
-/**
- * This macro defines a block of memory that is allocated on the. The
- * memory block is allocated using `mulle_malloc` and automatically freed at the
- * end of the loop.
- *
- * The macro takes the following parameters:
- * @param name: The name of the variable that will hold the memory block.
- * @param type: The type of the elements in the memory block.
- * @param count: The number of elements to allocate in the memory block.
- *
- * The macro creates a `for` loop that initializes the memory block and
- * automatically frees it at the end of the loop. The memory block can be
- * accessed using the `name` variable within the loop.
- */
 
 //
 // complements mulle_alloca_do
