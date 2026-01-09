@@ -354,14 +354,18 @@ then:
 ``` sh
 mulle-sde init -d my-project -m mulle-core/c-developer executable
 cd my-project
+mulle-sde vibecoding on
 mulle-sde run
 ```
 
+You are done, skip the following "Add" step.
+
+
 ## Add
 
-**This project is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library. As such you usually will *not* add or install it
-individually, unless you specifically do not want to link against
-`mulle-core`.**
+**This project is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library.
+As such you usually will *not* add or install it individually, unless you
+specifically do not want to link against `mulle-core`.**
 
 
 ### Add as an individual component
