@@ -60,7 +60,7 @@
 #endif
 
 
-#define MULLE__ALLOCATOR_VERSION  ((7UL << 20) | (1 << 8) | 0)
+#define MULLE__ALLOCATOR_VERSION  ((7UL << 20) | (1 << 8) | 1)
 
 
 /**
