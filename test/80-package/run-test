@@ -1,7 +1,0 @@
-#! /bin/sh
-
-rm -rf kitchen \
-&& cmake -G Ninja -S . -B kitchen \
-&& cmake --build kitchen \
-&& ./kitchen/package.exe
-

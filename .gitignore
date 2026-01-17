@@ -76,3 +76,4 @@ test*/**/*.test.*
 !/AGENTS.md
 !/README.md
 build-*/
+test/80-package/
