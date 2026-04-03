@@ -144,9 +144,10 @@
 #define _mulle_alloca_do_return( name, value)                     \
 do                                                                \
 {                                                                 \
-   __typeof__( value) name ## __tmp = (value);                    \
+   MULLE_C_TYPE_OF( value) name ## __tmp = (value);               \
                                                                   \
    (void) _mulle_alloca_do_free( name);                           \
+   MULLE_C_CONFINED_RETURN                                        \
    return( name ## __tmp);                                        \
 }                                                                 \
 while( 0)
@@ -156,6 +157,7 @@ while( 0)
 do                                                                \
 {                                                                 \
    (void) _mulle_alloca_do_free( name);                           \
+   MULLE_C_CONFINED_RETURN                                        \
    return;                                                        \
 }                                                                 \
 while( 0)
@@ -290,10 +292,10 @@ while( 0)
            ! name ## __j;                                                                            \
            name ## __j = _mulle_alloca_do_free( name)                                                \
          )                                                                                           \
+        MULLE_C_CONFINED_LOOP                                                                        \
          for( int  name ## __i = 0;    /* break protection */                                        \
               name ## __i < 1;                                                                       \
-              name ## __i++)
-
+              name ## __i++)                                                                         \
 /**
  * This macro defines a flexible block of memory that can be allocated either on
  * the stack or dynamically on the heap, depending on the size required. The
@@ -328,6 +330,7 @@ while( 0)
            name ## __j = _mulle_alloca_do_free( name)                                                \
                                                                                                      \
          )                                                                                           \
+         MULLE_C_CONFINED_LOOP                                                                       \
          for( int  name ## __i = 0;    /* break protection */                                        \
               name ## __i < 1;                                                                       \
               name ## __i++)
@@ -355,6 +358,7 @@ while( 0)
         name = (mulle_free( name), NULL)                                    \
       )                                                                     \
                                                                             \
+      MULLE_C_CONFINED_LOOP                                                 \
       for( int  name ## __i = 0;    /* break protection */                  \
            name ## __i < 1;                                                 \
            name ## __i++)
@@ -378,6 +382,7 @@ while( 0)
         name = (mulle_free( name), NULL)                                    \
       )                                                                     \
                                                                             \
+      MULLE_C_CONFINED_LOOP                                                 \
       for( int  name ## __i = 0;    /* break protection */                  \
            name ## __i < 1;                                                 \
            name ## __i++)
@@ -429,16 +434,15 @@ while( 0)
 #define mulle_alloca_do_for( name, p)                           \
    mulle_malloc_for( name, (uintptr_t) name ## __count, p)
 
-// not API and dangerous (s.a.)
-#define _mulle_calloca_do_return( name, value)                  \
-   _mulle_alloca_do_return( name, value)
-
-#define _mulle_calloca_do_return_void( name)                    \
-   _mulle_alloca_do_return_void( name)
-
 #define mulle_calloca_do_extract( name, receiver)               \
    mulle_alloca_do_extract( name, receiver)
 
+// not API and dangerous (s.a.)
+# define _mulle_calloca_do_return( name, value)                  \
+   _mulle_alloca_do_return( name, value)
+
+# define _mulle_calloca_do_return_void( name)                    \
+   _mulle_alloca_do_return_void( name)
 
 /**
  * Reallocates a dynamically allocated buffer created by `mulle_alloca_do`.
@@ -515,6 +519,7 @@ while( 0)
            ! name ## __j;                                                                            \
            name ## __j = _mulle_alloca_do_free( name)                                                \
          )                                                                                           \
+         MULLE_C_CONFINED_LOOP                                                                       \
          for( int  name ## __i = 0;    /* break protection */                                        \
               name ## __i < 1;                                                                       \
               name ## __i++)
@@ -554,6 +559,7 @@ while( 0)
            ! name ## __j;                                                                            \
            name ## __j = _mulle_alloca_do_free( name)                                                \
          )                                                                                           \
+         MULLE_C_CONFINED_LOOP                                                                       \
          for( int  name ## __i = 0;    /* break protection */                                        \
               name ## __i < 1;                                                                       \
               name ## __i++)

@@ -1,4 +1,5 @@
 # mulle-allocator Library Documentation for AI
+<!-- Keywords: memory, allocator -->
 
 ## 1. Introduction & Purpose
 

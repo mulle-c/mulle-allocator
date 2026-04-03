@@ -38,7 +38,7 @@
 
 #include <mulle-c11/mulle-c11.h>
 
-#ifdef MULLE__ALLOCATOR_BUILD
+#if defined( MULLE__ALLOCATOR_BUILD) || defined( MULLE__CORE_BUILD)
 # define MULLE__ALLOCATOR_GLOBAL    MULLE_C_GLOBAL
 #else
 # if defined( MULLE_ALLOCATOR_INCLUDE_DYNAMIC) ||  \
@@ -145,6 +145,7 @@ typedef int   mulle_allocator_aba_t( void *,
  * @param p The `mulle_allocator` instance to check.
  * @return 1 if the allocator is the `mulle_stdlib_nofree_allocator` instance, 0 otherwise.
  */
+MULLE__ALLOCATOR_GLOBAL
 int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p);
 
 

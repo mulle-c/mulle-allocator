@@ -77,3 +77,6 @@ test*/**/*.test.*
 !/README.md
 build-*/
 test/80-package/
+.roam.json
+.roam
+.graveyard
