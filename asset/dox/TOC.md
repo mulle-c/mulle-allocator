@@ -1,500 +1,222 @@
 # mulle-allocator Library Documentation for AI
-<!-- Keywords: memory, allocator -->
+<!-- Keywords: memory, allocator, failfast, stack, fallback, macros, c11 -->
 
 ## 1. Introduction & Purpose
 
-`mulle-allocator` provides a flexible, indirectly-dispatched memory allocation scheme for C that decouples code from specific memory backends. Its primary purpose is to enable data structures and algorithms to operate with different allocators—such as standard `malloc`, pool allocators, shared memory, or garbage-collected memory—through a common interface defined by the `struct mulle_allocator`.
+`mulle-allocator` is a C memory utility library that provides allocator indirection (`struct mulle_allocator`), fail-fast allocation wrappers, and scoped stack/heap-fallback temporary buffers (`mulle_alloca_do` family). It solves three common problems: hard-wired `malloc` usage in reusable code, repetitive allocation error checks, and unsafe raw `alloca` usage.
 
-A distinguishing feature is its philosophy of **fail-fast memory failure handling**. When allocation fails, the allocator's failure callback is invoked rather than returning NULL. By default, this terminates the program with a clear error message. This eliminates pervasive NULL-check boilerplate after every allocation, leading to cleaner, more maintainable code while making memory errors immediately visible during development.
-
-The library also provides `mulle_alloca_do`, a safe, portable stack allocation macro that automatically falls back to heap allocation for requests exceeding a threshold, preventing stack overflow while maintaining efficiency for typical cases.
+At project level, this is a foundational low-level component in the mulle-c ecosystem. It depends directly on `mulle-c11` for portability/compiler macros and exposes a compact public API in headers (`mulle-allocator.h`, `mulle-alloca.h`, `mulle-memset.h`).
 
 ## 2. Key Concepts & Design Philosophy
 
-**Allocator Indirection**: The `struct mulle_allocator` is a table of function pointers (`malloc`, `realloc`, `free`, `fail` handler) that dispatch all memory operations. By passing an allocator pointer to data structures and functions, code becomes agnostic to the underlying memory scheme.
-
-**Fail-Fast Over Error Checking**: The design assumes that out-of-memory is unrecoverable and fatal in most portable applications. Rather than forcing cascading NULL checks, allocation failures invoke the `fail` callback which terminates immediately with context. This is pragmatic for systems software where allocation failure is catastrophic.
-
-**Default & Custom Allocators**: When `NULL` is passed as the allocator, the global `mulle_allocator_default` is used. Applications can install custom defaults via module initialization or pass per-instance allocators for flexibility. Supported allocators include:
-- `mulle_allocator_default`: Wraps standard C library (malloc/free)
-- `mulle_allocator_stdlib`: Explicit standard library allocator
-- `mulle_allocator_stdlib_nofree`: Allocates but never frees (for static/arena patterns)
-
-**ABA-Safe Reclamation**: The allocator optionally integrates with `mulle-aba` for safe memory reclamation in lock-free concurrent data structures through `abafree` and `aba` fields.
-
-**Allocator Mobility**: Data structures that embed an allocator pointer become movable across memory schemes without recompilation. A vector created with pool allocation can be used identically to one using standard malloc.
+- **Allocator indirection:** `struct mulle_allocator` carries function pointers (`calloc`, `realloc`, `free`, `fail`, `abafree`) plus opaque `aba` context.
+- **Fail-fast by default:** allocation wrappers call `fail` callback on failure (default implementation aborts); callers usually do not NULL-check successful paths.
+- **Explicit strict realloc variant:** `*_realloc_strict` provides "free-and-NULL" semantics for `size == 0`.
+- **Scoped temporary storage macros:** `mulle_alloca_do`/`mulle_calloca_do` use stack for small buffers and heap fallback for larger ones, with automatic cleanup at scope exit.
+- **Portable C API surface:** mostly inline wrappers/macros around allocator vectors; no runtime object model.
 
 ## 3. Core API & Data Structures
 
 ### 3.1. `mulle-allocator-struct.h`
 
 #### `struct mulle_allocator`
-- **Purpose**: Defines a pluggable memory allocation interface via function pointers
-- **Key Fields**:
-  - `void *(*calloc)(struct mulle_allocator *, size_t count, size_t size)`: Allocates and zero-initializes memory
-  - `void *(*realloc)(struct mulle_allocator *, void *ptr, size_t size)`: Resizes or moves allocation
-  - `void (*free)(struct mulle_allocator *, void *ptr)`: Deallocates memory
-  - `void (*fail)(struct mulle_allocator *, void *block, size_t size)`: Called on allocation failure (marked NO_RETURN)
-  - `void (*abafree)(void *aba, void (*f)(void *, void *), void *block, void *owner)`: Optional ABA-safe deallocation callback
-  - `void *aba`: Opaque data for ABA-safe reclamation system
-  
-**Semantics**:
-- All function pointers are never NULL; missing capabilities are implemented as no-ops
-- The `fail` callback never returns; it terminates the program
-- The `abafree` callback is only used if integrating with `mulle-aba` for lock-free data structures
+- **Purpose:** pluggable allocation vector passed through APIs.
+- **Key fields:**
+  - `calloc( n, size, allocator)` — allocate zeroed memory.
+  - `realloc( block, size, allocator)` — allocate/resize.
+  - `free( block, allocator)` — deallocate.
+  - `fail( allocator, block, size)` — failure handler (intended no-return).
+  - `abafree( aba, free_fn, block, owner)` — optional ABA-aware release.
+  - `aba` — opaque ABA context pointer.
 
-### 3.2. `mulle-allocator.h` - Global Instances & Operations
+### 3.2. `mulle-allocator.h`
 
-#### Global Allocator Instances
-- `mulle_allocator_default`: The default global allocator; used when NULL allocator is passed
-- `mulle_allocator_stdlib`: Standard C library allocator (`malloc`/`realloc`/`free`)
-- `mulle_allocator_stdlib_nofree`: Like `stdlib` but `free()` is a no-op; useful for one-shot allocations or when deallocation isn't needed
+#### Global allocators
+| Symbol | Short description |
+|---|---|
+| `mulle_allocator_default` | Default global allocator used by convenience wrappers. |
+| `mulle_allocator_stdlib` | Stdlib-backed allocator (`calloc`/`realloc`/`free`). |
+| `mulle_allocator_stdlib_nofree` | Stdlib allocation but no-op free function. |
+| `mulle_default_allocator` | Legacy macro alias to `mulle_allocator_default`. |
+| `mulle_stdlib_allocator` | Legacy macro alias to `mulle_allocator_stdlib`. |
+| `mulle_stdlib_nofree_allocator` | Legacy macro alias to `mulle_allocator_stdlib_nofree`. |
 
-#### Core Allocator-Dispatch Functions
-These take an explicit `struct mulle_allocator *` parameter (first arg) and dispatch through the allocator:
+#### Standalone functions / declarations
+| Symbol | Short description |
+|---|---|
+| `mulle_allocation_fail` | Default fail callback; reports error then aborts. |
+| `mulle_allocator_no_aba_abort` | Default ABA callback; aborts when ABA free is used unconfigured. |
+| `mulle_allocator_is_stdlib_allocator` | Checks whether allocator is stdlib-backed (implementation test by function pointer). |
+| `_mulle_allocator_realloc_strict` | Core strict realloc helper (`size==0` frees and returns `NULL`). |
+| `_mulle_allocator_invalidate` | Overwrites allocator callbacks with abort handlers (test/debug helper). |
+| `_mulle_allocator_strdup` | Allocator-based string duplication primitive. |
 
-- `void *mulle_allocator_malloc(struct mulle_allocator *allocator, size_t size)`
-  - Allocates uninitialized memory
-  - On failure, calls `allocator->fail()` (never returns)
-  
-- `void *mulle_allocator_calloc(struct mulle_allocator *allocator, size_t count, size_t size)`
-  - Allocates and zero-initializes `count * size` bytes
-  - Checks for integer overflow (`count * size`)
-  - On failure, calls `allocator->fail()`
-  
-- `void *mulle_allocator_realloc(struct mulle_allocator *allocator, void *ptr, size_t size)`
-  - Resizes existing allocation or allocates new block if `ptr` is NULL
-  - On failure, calls `allocator->fail()`; original block untouched
-  
-- `void *mulle_allocator_realloc_strict(struct mulle_allocator *allocator, void *ptr, size_t size)`
-  - Like `realloc` but returns NULL on failure instead of calling `fail`
-  - Use when you need explicit error handling
-  
-- `void mulle_allocator_free(struct mulle_allocator *allocator, void *ptr)`
-  - Deallocates memory allocated by this allocator
-  - Safe to call with NULL (no-op)
-  
-- `char *mulle_allocator_strdup(struct mulle_allocator *allocator, const char *s)`
-  - Duplicates string using allocator
-  - Returns allocated copy of `s` (or empty string if `s` is NULL)
-  
-- `char *mulle_allocator_strndup(struct mulle_allocator *allocator, const char *s, size_t n)`
-  - Duplicates up to `n` bytes of string
-  - Automatically null-terminates result
+#### Inline configuration and checks
+| Symbol | Short description |
+|---|---|
+| `mulle_allocator_set_aba` | Sets `aba` context and ABA free callback (or abort default). |
+| `mulle_allocator_set_fail` | Sets fail callback (or default fail callback). |
+| `mulle_allocator_assert` | Asserts allocator function pointers are present. |
 
-#### Convenience Default-Allocator Functions
-These use `mulle_allocator_default` automatically; equivalent to allocator-specific versions with NULL:
+#### Inline allocator API (allocator parameter, `NULL` => default allocator)
+| Symbol | Short description |
+|---|---|
+| `mulle_allocator_malloc` | Allocate bytes; fail callback on allocation failure. |
+| `mulle_allocator_calloc` | Allocate zeroed `n * size`; fail callback on failure. |
+| `mulle_allocator_realloc` | Resize/allocate; fail callback on failure. |
+| `mulle_allocator_realloc_strict` | Strict realloc semantics (`size==0` frees and returns `NULL`). |
+| `mulle_allocator_free` | Free block if non-NULL. |
+| `mulle_allocator_abafree` | ABA-aware free dispatch; returns status from callback. |
+| `mulle_allocator_fail` | Force allocator fail path. |
+| `mulle_allocator_strdup` | Duplicate string with selected allocator (`NULL` input => `NULL`). |
 
-- `void *mulle_malloc(size_t size)`
-- `void *mulle_calloc(size_t count, size_t size)`
-- `void *mulle_realloc(void *ptr, size_t size)`
-- `void *mulle_realloc_strict(void *ptr, size_t size)`
-- `void mulle_free(void *ptr)`
-- `char *mulle_strdup(const char *s)`
-- `char *mulle_strndup(const char *s, size_t n)`
+#### Inline convenience API (always default allocator)
+| Symbol | Short description |
+|---|---|
+| `mulle_malloc` | Default allocator malloc wrapper. |
+| `mulle_calloc` | Default allocator calloc wrapper. |
+| `mulle_realloc` | Default allocator realloc wrapper. |
+| `mulle_realloc_strict` | Default allocator strict realloc wrapper. |
+| `mulle_free` | Default allocator free wrapper. |
+| `mulle_abafree` | Default allocator ABA-free wrapper. |
+| `mulle_strdup` | Default allocator string duplicate wrapper. |
 
-#### Allocator Query & Management
-- `int mulle_allocator_is_stdlib_allocator(struct mulle_allocator *p)`
-  - Returns 1 if allocator is the `stdlib_nofree` singleton
-  
-- `void mulle_allocation_fail(struct mulle_allocator *allocator, void *block, size_t size)`
-  - Default failure callback; prints error message and exits with status 1
-  - Called by all allocation functions on OOM
-  
-- `int mulle_allocator_no_aba_abort(void *aba, void (*f)(void *, void *), void *block, void *owner)`
-  - Default ABA callback; aborts if ABA system used without proper initialization
-  - Indicates programming error (ABA system not configured)
+### 3.3. `mulle-alloca.h`
 
-### 3.3. `mulle-alloca.h` - Safe Stack/Heap Fallback Allocation
+#### Constants and scoped allocation macros
+| Symbol | Short description |
+|---|---|
+| `MULLE_ALLOCA_STACKSIZE` | Stack/heap threshold in bytes (default `128`). |
+| `mulle_alloca_do( name, type, count)` | Scoped temporary buffer; stack first, heap fallback, auto cleanup. |
+| `mulle_alloca_do_flexible( name, type, stacksize, count)` | Same as above with per-use stack threshold. |
+| `mulle_alloca_do_realloc( name, count)` | Reallocates active `mulle_alloca_do` buffer (inside scope only). |
+| `mulle_alloca_do_extract( name, receiver)` | Moves/copies active buffer out of scope ownership. |
+| `mulle_alloca_do_for( name, p)` | Iterator helper over active alloca buffer. |
+| `mulle_malloc_do( name, type, count)` | Scoped heap allocation wrapper with auto free. |
+| `mulle_calloc_do( name, type, count)` | Scoped zeroed heap allocation wrapper with auto free. |
+| `mulle_malloc_for( name, len, p)` | Pointer iteration helper for heap buffers. |
+| `mulle_calloca_do( name, type, count)` | Zeroed variant of `mulle_alloca_do`. |
+| `mulle_calloca_do_flexible( name, type, stacksize, count)` | Flexible zeroed variant. |
+| `mulle_calloca_do_realloc( name, count)` | Realloc for `mulle_calloca_do`, zero-fills newly grown tail. |
+| `mulle_calloca_do_extract( name, receiver)` | Alias of extract helper. |
+| `mulle_calloca_do_for( name, p)` | Alias of iterator helper for `mulle_calloca_do` scope. |
+| `mulle_calloc_for( name, len, p)` | Alias to `mulle_malloc_for`. |
 
-#### `mulle_alloca_do` Macro
-```c
-mulle_alloca_do(var_name, type, size)
-{
-    // var_name is available here as type *
-    // Automatically freed on scope exit
-}
-```
+#### Compatibility aliases (legacy names)
+| Symbol | Short description |
+|---|---|
+| `mulle_flexarray_do` | Alias to `mulle_alloca_do`. |
+| `mulle_flexarray_realloc` | Alias to `mulle_alloca_do_realloc`. |
+| `_mulle_flexarray_return` | Alias to `_mulle_alloca_do_return` (advanced/internal). |
+| `_mulle_flexarray_return_void` | Alias to `_mulle_alloca_do_return_void` (advanced/internal). |
 
-**Behavior**:
-- If `size <= MULLE_ALLOCA_STACKSIZE` (default 128 bytes): allocates on stack via `alloca()`
-- If `size > MULLE_ALLOCA_STACKSIZE`: allocates on heap via `mulle_malloc()`
-- Memory is automatically freed on scope exit (stack: naturally; heap: via cleanup macro)
-- `var_name` is typed as `type *` and usable throughout the block
+### 3.4. `mulle-memset.h`
 
-**Key Advantages Over Raw `alloca()`**:
-- **Stack-overflow safe**: Large allocations automatically fall back to heap
-- **Cross-platform portable**: Works on Windows, Linux, macOS
-- **RAII-like cleanup**: No manual free required
-- **Type-safe**: Allocates `size` bytes but variable is correctly typed
-
-#### `mulle_calloca_do` Macro
-```c
-mulle_calloca_do(var_name, type, size)
-```
-
-Same as `mulle_alloca_do` but zero-initializes the allocated memory.
-
-#### Configuration
-- `MULLE_ALLOCA_STACKSIZE`: Threshold (in bytes) for stack vs heap (default 128)
-- Set via compiler flag: `-DMULLE_ALLOCA_STACKSIZE=256` before including header
+| Symbol | Short description |
+|---|---|
+| `mulle_memset_uint32( dest, value, count)` | Byte-count fill using repeated 32-bit pattern, including unaligned starts. |
 
 ## 4. Performance Characteristics
 
-**Runtime Overhead**:
-- Allocator indirection: Single function pointer dereference per allocation (negligible ~1-2 CPU cycles)
-- `mulle_alloca_do` for small allocations: Stack allocation speed (sub-nanosecond)
-- `mulle_alloca_do` for large allocations: Identical to `mulle_malloc()` performance
-
-**Memory Footprint**:
-- `struct mulle_allocator`: ~48-64 bytes (5-6 function pointers + data)
-- Embedding allocator in structure: Minimal overhead (one pointer = 8 bytes on 64-bit)
-- Stack: No persistent overhead from `mulle_alloca_do`
-
-**Complexity Analysis**:
-- `malloc(n)`: O(1) amortized (same as stdlib)
-- `realloc(ptr, n)`: O(n) worst case (may copy data); O(1) if in-place resize succeeds
-- `free(ptr)`: O(1) amortized
-- `mulle_alloca_do`: O(1) for stack; O(n) for heap fallback
-
-**Thread-Safety**:
-- `mulle_allocator_stdlib`: Thread-safe if underlying C library malloc is (typically yes on modern systems)
-- Custom allocators: Responsible for own thread safety
-- Global `mulle_allocator_default`: Can be replaced but not thread-safe during replacement
-
-**CPU Cache Efficiency**:
-- Stack allocation (small): L1 cache hit likely
-- Heap allocation: Depends on underlying allocator (malloc typically uses fastbins for small blocks)
+- **Allocator wrappers (`mulle_*`, `mulle_allocator_*`):** underlying allocator complexity dominates (typically `malloc`/`realloc`/`free` behavior of libc).
+- **Wrapper overhead:** O(1) dispatch via function pointer and branch for failure handling.
+- **`mulle_alloca_do`/`mulle_calloca_do`:**
+  - setup/cleanup O(1),
+  - `*_realloc` O(n) when copying from stack storage to heap or when heap realloc moves.
+- **`mulle_memset_uint32`:** O(count) byte coverage; unrolled aligned 32-bit writes for larger regions.
+- **Thread-safety:**
+  - allocation calls are as thread-safe as chosen backend allocator,
+  - mutating global allocator vectors (e.g., assigning callbacks on `mulle_allocator_default`) is not synchronized and requires external coordination.
 
 ## 5. AI Usage Recommendations & Patterns
 
-### Best Practices
+### Best practices
+1. In reusable libraries, take `struct mulle_allocator *allocator` arguments and route all allocations through `mulle_allocator_*`.
+2. Normalize allocator input with `allocator ? allocator : &mulle_allocator_default` only when storing allocator pointers; otherwise wrapper functions already do this.
+3. Use `mulle_alloca_do`/`mulle_calloca_do` for temporary buffers whose size may vary significantly.
+4. Use `mulle_allocator_realloc_strict` when you need explicit `size==0` free-to-`NULL` semantics.
+5. Use `mulle_allocator_set_fail` and `mulle_allocator_set_aba` in tests/specialized runtimes to install custom behavior.
 
-1. **Embed allocator in reusable data structures**:
-   ```c
-   struct my_array {
-       struct mulle_allocator *allocator;
-       void **elements;
-       size_t count, capacity;
-   };
-   ```
-   Enables same code to work with multiple memory schemes
+### Common pitfalls
+1. Do not describe `mulle_allocator_realloc_strict` as "returns NULL on allocation failure"; failure still routes to fail callback. `NULL` is the defined result for `size==0` (after free).
+2. Do not use pointers obtained inside `mulle_alloca_do` outside scope unless extracted with `mulle_alloca_do_extract`.
+3. Do not assume `mulle_allocator_stdlib_nofree` frees memory; it intentionally does not.
+4. Do not call `mulle_abafree` unless ABA callback/context is configured, or default abort behavior will trigger.
 
-2. **Use allocator-specific functions in libraries**:
-   ```c
-   // In library/data structure code:
-   void *p = mulle_allocator_malloc(allocator, size);  // Respects caller's allocator
-   
-   // In application code:
-   int *x = mulle_malloc(1000);  // Uses default allocator
-   ```
-
-3. **Never NULL-check allocation results**:
-   ```c
-   // ❌ Wrong - unnecessary:
-   void *p = mulle_malloc(100);
-   if (!p) { error(); }
-   
-   // ✅ Correct:
-   void *p = mulle_malloc(100);  // Fail-fast on OOM; code below always executes
-   ```
-   Only use `mulle_allocator_realloc_strict()` if explicit error handling needed
-
-4. **Prefer `mulle_alloca_do` over system `alloca()`**:
-   ```c
-   // ✅ Safe and portable:
-   mulle_alloca_do(buffer, char, len) {
-       process_buffer(buffer);
-   }
-   
-   // ❌ Risky - stack overflow possible:
-   char *buffer = alloca(len);  // If len is large, stack overflow!
-   ```
-
-5. **Use `stdlib_nofree` for static/arena patterns**:
-   ```c
-   struct mulle_allocator *alloc = &mulle_allocator_stdlib_nofree;
-   // All allocations use malloc, but no free() calls issued
-   // Useful for: bootstrap code, static pools, arena allocators
-   ```
-
-### Common Pitfalls
-
-1. **Using wrong allocator to free**:
-   ```c
-   // ❌ Memory corruption:
-   void *p = mulle_allocator_malloc(custom_alloc, 100);
-   mulle_free(p);  // Using default allocator!
-   
-   // ✅ Correct:
-   mulle_allocator_free(custom_alloc, p);  // Or store allocator in struct
-   ```
-
-2. **Scope confusion with `mulle_alloca_do`**:
-   ```c
-   // ❌ Dangling pointer:
-   char *buffer;
-   mulle_alloca_do(tmp, char, 100) {
-       buffer = tmp;  // Pointer will be invalid outside block!
-   }
-   use_buffer(buffer);  // Undefined behavior
-   
-   // ✅ Correct:
-   mulle_alloca_do(buffer, char, 100) {
-       use_buffer(buffer);  // Only use inside scope
-   }
-   ```
-
-3. **Forgetting to free custom allocations**:
-   ```c
-   // Memory leak:
-   void *p = mulle_allocator_malloc(custom_alloc, 100);
-   // Forgot to call mulle_allocator_free(custom_alloc, p);
-   
-   // Easy pattern for self-contained structures:
-   struct my_object *obj = create_with_allocator(custom_alloc);
-   // obj stores allocator, so cleanup knows which allocator to use
-   ```
-
-4. **Mixing NULL and non-NULL allocators inconsistently**:
-   ```c
-   // Confusing - uses different allocators:
-   struct my_vector *v1 = create_vector(NULL);        // Uses default
-   struct my_vector *v2 = create_vector(custom);      // Uses custom
-   // v1 and v2 now use different memory schemes; hard to debug
-   ```
-
-### Idiomatic Patterns
-
-**Pattern 1: Self-Managed Data Structure**
-```c
-struct string_builder {
-    struct mulle_allocator *allocator;
-    char *buffer;
-    size_t size, capacity;
-};
-
-struct string_builder *sb_create(struct mulle_allocator *alloc) {
-    alloc = alloc ? alloc : &mulle_allocator_default;
-    struct string_builder *sb = mulle_allocator_malloc(alloc, sizeof(*sb));
-    sb->allocator = alloc;
-    sb->buffer = mulle_allocator_malloc(alloc, 64);
-    sb->capacity = 64;
-    sb->size = 0;
-    return sb;
-}
-
-void sb_free(struct string_builder *sb) {
-    if (!sb) return;
-    mulle_allocator_free(sb->allocator, sb->buffer);
-    mulle_allocator_free(sb->allocator, sb);
-}
-```
-
-**Pattern 2: Temporary Large Buffer with Automatic Cleanup**
-```c
-void process_large_file(const char *path) {
-    FILE *fp = fopen(path, "rb");
-    fseek(fp, 0, SEEK_END);
-    size_t file_size = ftell(fp);
-    rewind(fp);
-    
-    // Safe even if file_size is huge - falls back to heap
-    mulle_alloca_do(buffer, char, file_size) {
-        fread(buffer, 1, file_size, fp);
-        process_data(buffer, file_size);
-    }  // buffer automatically freed here
-    
-    fclose(fp);
-}
-```
-
-**Pattern 3: Custom Allocator for Arena/Pool Pattern**
-```c
-struct my_allocator {
-    struct mulle_allocator base;
-    void *arena;
-    size_t offset, capacity;
-};
-
-// User provides custom allocator callbacks to base.malloc, base.realloc, etc.
-struct my_allocator pool = { ... };
-
-// Now all data structures using pool.base work with arena allocation:
-struct my_vector *v = create_vector(&pool.base);  // Uses arena, not malloc
-```
+### Idiomatic usage
+- Keep allocator pointer in long-lived structs if caller-chosen memory domains must be preserved for destroy/deinit.
+- For local scratch memory, prefer scoped macros over manual `malloc/free` pairs.
 
 ## 6. Integration Examples
 
-### Example 1: Self-Contained String Structure
-
-Demonstrates embedding allocator to maintain allocation context.
-
-*Source: `README.md`*
+### Example 1: Allocator-parametric lifecycle
 
 ```c
 #include <mulle-allocator/mulle-allocator.h>
 #include <string.h>
-#include <stdio.h>
 
-typedef struct {
-    struct mulle_allocator *allocator;
-    char *data;
-    size_t length;
-} mulle_string;
-
-mulle_string *mulle_string_create(const char *cstr, 
-                                   struct mulle_allocator *allocator)
+struct message
 {
-    allocator = allocator ? allocator : &mulle_allocator_default;
-    
-    size_t len = cstr ? strlen(cstr) : 0;
-    
-    // Allocate structure + string data in one block
-    mulle_string *str = mulle_allocator_malloc(allocator, 
-                                               sizeof(*str) + len + 1);
-    
-    str->allocator = allocator;
-    str->data = (char *)(str + 1);  // Point to memory after struct
-    str->length = len;
-    
-    if (cstr)
-        strcpy(str->data, cstr);
-    else
-        str->data[0] = '\0';
-    
-    return str;
+   struct mulle_allocator   *allocator;
+   char                     *text;
+};
+
+
+static struct message   *message_create( char *s, struct mulle_allocator *allocator)
+{
+   struct message   *msg;
+
+   allocator = allocator ? allocator : &mulle_allocator_default;
+   msg       = mulle_allocator_malloc( allocator, sizeof( struct message));
+   msg->text = mulle_allocator_strdup( allocator, s);
+   msg->allocator = allocator;
+   return( msg);
 }
 
-void mulle_string_destroy(mulle_string *str)
-{
-    if (!str) return;
-    mulle_allocator_free(str->allocator, str);
-}
 
-int main(void)
+static void   message_destroy( struct message *msg)
 {
-    // Create string with default allocator
-    mulle_string *s1 = mulle_string_create("Hello, World!", NULL);
-    printf("String 1: %s (len: %zu)\n", s1->data, s1->length);
-    
-    // Create string with stdlib (explicit)
-    mulle_string *s2 = mulle_string_create("Another string", 
-                                           &mulle_allocator_stdlib);
-    printf("String 2: %s (len: %zu)\n", s2->data, s2->length);
-    
-    // Clean up - each string knows its own allocator
-    mulle_string_destroy(s1);
-    mulle_string_destroy(s2);
-    
-    return 0;
+   if( ! msg)
+      return;
+   mulle_allocator_free( msg->allocator, msg->text);
+   mulle_allocator_free( msg->allocator, msg);
 }
 ```
 
-### Example 2: Safe Stack Allocation with Fallback
-
-Shows automatic stack-to-heap transition for buffer management.
-
-*Source: `test/` directory examples*
+### Example 2: Scoped temporary buffer with extraction
 
 ```c
 #include <mulle-allocator/mulle-allocator.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 
-// Transform string to uppercase using temporary buffer
-char *to_uppercase(const char *input)
+static int   *build_table( unsigned int n)
 {
-    if (!input)
-        return mulle_strdup("");
-    
-    size_t len = strlen(input) + 1;
-    
-    // Stack-allocated for small strings, heap-allocated for large ones
-    mulle_alloca_do(temp, char, len)
-    {
-        for (size_t i = 0; i < len; i++)
-            temp[i] = toupper((unsigned char)input[i]);
-        
-        // Return a persistent copy (uses mulle_malloc)
-        return mulle_strdup(temp);
-    }
-    // temp is freed automatically here
-}
+   int   *result;
+   int   *p;
 
-int main(void)
-{
-    // Small string - uses stack
-    char *result1 = to_uppercase("hello");
-    printf("Result 1: %s\n", result1);
-    mulle_free(result1);
-    
-    // Large string - uses heap fallback automatically
-    char large[1000];
-    memset(large, 'a', sizeof(large) - 1);
-    large[sizeof(large) - 1] = '\0';
-    
-    char *result2 = to_uppercase(large);
-    printf("Result 2: %zu bytes processed\n", strlen(result2));
-    mulle_free(result2);
-    
-    return 0;
+   result = NULL;
+   mulle_alloca_do( values, int, n)
+   {
+      mulle_alloca_do_for( values, p)
+         *p++ = (int) n;
+
+      mulle_alloca_do_extract( values, result);
+   }
+   return( result);  /* caller frees with mulle_free */
 }
 ```
 
-### Example 3: Custom Allocator Integration
-
-Shows how to create and use a custom allocator with failure handling.
+### Example 3: Pattern fill with 32-bit value
 
 ```c
-#include <mulle-allocator/mulle-allocator.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <mulle-allocator/mulle-memset.h>
+#include <stdint.h>
 
-// Example: allocator with allocation counting
-static int allocation_count = 0;
-static int max_allocations = 10;  // Fail after 10 allocations
-
-void *counting_malloc(struct mulle_allocator *alloc, size_t size)
+static void   prepare_guarded_region( uint8_t *buf, size_t len)
 {
-    if (++allocation_count > max_allocations)
-        return NULL;  // Signal failure
-    return malloc(size);
-}
-
-void counting_fail(struct mulle_allocator *alloc, void *block, size_t size)
-{
-    fprintf(stderr, "Allocation #%d failed: %zu bytes\n", 
-            allocation_count, size);
-    exit(1);
-}
-
-int main(void)
-{
-    // Create custom allocator
-    struct mulle_allocator counting_alloc = {
-        .calloc = (void *(*)(struct mulle_allocator *, size_t, size_t))
-                  malloc,  // Simplified - real code needs proper implementation
-        .realloc = (void *(*)(struct mulle_allocator *, void *, size_t))
-                   realloc,
-        .free = (void (*)(struct mulle_allocator *, void *))free,
-        .fail = counting_fail,
-        .abafree = NULL,
-        .aba = NULL
-    };
-    
-    printf("Making allocations with custom allocator...\n");
-    for (int i = 0; i < 15; i++) {
-        int *arr = mulle_allocator_malloc(&counting_alloc, 100);
-        printf("Allocation %d succeeded\n", i + 1);
-    }
-    
-    return 0;
+   mulle_memset_uint32( buf, 0xDEADBEEF, len);
 }
 ```
 
 ## 7. Dependencies
 
-- `mulle-c11`: For portability macros (NO_RETURN, ALWAYS_INLINE, etc.)
-
+- `mulle-c11`

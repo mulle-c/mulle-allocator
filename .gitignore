@@ -80,3 +80,4 @@ test/80-package/
 .roam.json
 .roam
 .graveyard
+*.tmp.*
