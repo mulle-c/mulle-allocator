@@ -81,3 +81,5 @@ test/80-package/
 .roam
 .graveyard
 *.tmp.*
+*.test.*
+.idea

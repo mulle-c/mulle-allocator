@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.13...99.99)
 
-project( mulle-allocator VERSION 8.0.0 LANGUAGES C)
+project( mulle-allocator VERSION 8.0.1 LANGUAGES C)
 
 
 ### mulle-sde environment

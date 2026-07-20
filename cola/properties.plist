@@ -9,7 +9,7 @@
       repo="mulle-allocator";
       homepage="https://github.com/mulle-c/mulle-allocator";
       license="BSD-3-Clause";
-      version="8.0.0";
+       version="8.0.1";
    };
    dependencies =
    (
