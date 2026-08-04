@@ -6,7 +6,7 @@
    "license" : "BSD-3-Clause",
    "repo" : "mulle-c/mulle-allocator",
    "src" : [
-      "asset/dox/TOC.md",
+      "asset/dox/api/toc/index.md",
       "src/mulle-alloca.h",
       "src/mulle-allocator-struct.h",
       "src/mulle-allocator.c",

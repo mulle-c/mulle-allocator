@@ -1,5 +1,5 @@
 //
-//  mulle-alloca.c
+//  mulle-alloca.h
 //  mulle-allocator
 //
 //  Copyright (c) 2023 Nat! - Mulle kybernetiK.
