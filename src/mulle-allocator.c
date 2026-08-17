@@ -56,7 +56,7 @@ void   mulle_allocation_fail( struct mulle_allocator *p,
 
 
 MULLE_C_NONNULL_RETURN
-char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s)
+char   *_mulle_allocator_strdup( struct mulle_allocator *p, const char *s)
 {
    size_t   size;
    char     *dup;
@@ -165,7 +165,7 @@ struct mulle_allocator   mulle_allocator_stdlib_nofree =
 };
 
 
-int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
+int   mulle_allocator_is_stdlib_allocator( const struct mulle_allocator *p)
 {
    if( ! p)
       p = &mulle_default_allocator;
@@ -243,7 +243,7 @@ struct mulle_allocator   mulle_allocator_stdlib_nofree =
 };
 
 
-int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p)
+int   mulle_allocator_is_stdlib_allocator( const struct mulle_allocator *p)
 {
    if( ! p)
       p = &mulle_allocator_default;
