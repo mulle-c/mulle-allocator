@@ -146,7 +146,7 @@ typedef int   mulle_allocator_aba_t( void *,
  * @return 1 if the allocator is the `mulle_stdlib_nofree_allocator` instance, 0 otherwise.
  */
 MULLE__ALLOCATOR_GLOBAL
-int   mulle_allocator_is_stdlib_allocator( struct mulle_allocator *p);
+int   mulle_allocator_is_stdlib_allocator( const struct mulle_allocator *p);
 
 
 
@@ -629,7 +629,7 @@ static inline int   mulle_abafree( void *block)
  */
 MULLE__ALLOCATOR_GLOBAL
 MULLE_C_NONNULL_RETURN
-char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s);
+char   *_mulle_allocator_strdup( struct mulle_allocator *p, const char *s);
 
 
 # pragma mark - strdup API
@@ -646,10 +646,10 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, char *s);
  * @param s The string to duplicate.
  * @return A newly allocated string that is a copy of `s`, or `NULL` if s was NULL
  */
-static inline char   *mulle_allocator_strdup( struct mulle_allocator *p, char *s)
+static inline char   *mulle_allocator_strdup( struct mulle_allocator *p, const char *s)
 {
    if( ! s)
-      return( s);
+      return( NULL);
    return( _mulle_allocator_strdup( p ? p : &mulle_allocator_default, s));
 }
 
@@ -664,7 +664,7 @@ static inline char   *mulle_allocator_strdup( struct mulle_allocator *p, char *s
  * @return A newly allocated string that is a copy of `s`
  *
  */
-static inline char   *mulle_strdup( char *s)
+static inline char   *mulle_strdup( const char *s)
 {
    return( mulle_allocator_strdup( &mulle_allocator_default, s));
 }
