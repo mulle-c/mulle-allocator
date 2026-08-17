@@ -350,79 +350,44 @@ will return NULL.
 
 
 
-## Quickstart
-
-Install [mulle-core developer](https://github.com/MulleFoundation/foundation-developer?tab=readme-ov-file#install)
-then:
-
-
-``` sh
-mulle-sde init -d my-project -m mulle-core/c-developer executable
-cd my-project
-mulle-sde vibecoding on
-mulle-sde run
-```
-
-You are done, skip the following "Add" step.
-
-
 ## Add
 
-**This project is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library.
-As such you usually will *not* add or install it individually, unless you
-specifically do not want to link against `mulle-core`.**
+mulle-allocator is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library. So in your code include the mulle-core umbrella header:
 
-
-### Add as an individual component
-
-Use [mulle-sde](//github.com/mulle-sde) to add mulle-allocator to your project:
-
-``` sh
-mulle-sde add github:mulle-c/mulle-allocator
+``` c
+#include <mulle-core/mulle-core.h>
 ```
 
-To only add the sources of mulle-allocator with dependency
-sources use [clib](https://github.com/clibs/clib):
+### Add mulle-core to a cmake and git project
 
-
-``` sh
-clib install --out src/mulle-c mulle-c/mulle-allocator
+``` bash
+git submodule add https://github.com/mulle-core/mulle-core.git mulle-core
 ```
 
-Add `-isystem src/mulle-c` to your `CFLAGS` and compile all the sources that were downloaded with your project.
+Add this to your `CMakeLists.txt`:
 
-
-## Install
-
-Use [mulle-sde](//github.com/mulle-sde) to build and install mulle-allocator and all dependencies:
-
-``` sh
-mulle-sde install --prefix /usr/local \
-   https://github.com/mulle-c/mulle-allocator/archive/latest.tar.gz
+``` cmake
+add_subdirectory( mulle-core)
+target_link_libraries( ${PROJECT_NAME} PRIVATE mulle-core)
 ```
 
-### Legacy Installation
 
-Install the requirements:
-
-| Requirements                                 | Description
-|----------------------------------------------|-----------------------
-| [mulle-c11](https://github.com/mulle-c/mulle-c11)             | 🔀 Cross-platform C compiler glue (and some cpp conveniences)
-
-Download the latest [tar](https://github.com/mulle-c/mulle-allocator/archive/refs/tags/latest.tar.gz) or [zip](https://github.com/mulle-c/mulle-allocator/archive/refs/tags/latest.zip) archive and unpack it.
-
-Install **mulle-allocator** into `/usr/local` with [cmake](https://cmake.org):
+### Add mulle-core to a mulle-sde project
 
 ``` sh
-PREFIX_DIR="/usr/local"
-cmake -B build                               \
-      -DMULLE_SDK_PATH="${PREFIX_DIR}"       \
-      -DCMAKE_INSTALL_PREFIX="${PREFIX_DIR}" \
-      -DCMAKE_PREFIX_PATH="${PREFIX_DIR}"    \
-      -DCMAKE_BUILD_TYPE=Release &&
-cmake --build build --config Release &&
-cmake --install build --config Release
+mulle-sde add github:mulle-core/mulle-core
 ```
+
+### Embed mulle-allocator with clib
+
+``` sh
+clib install --out src mulle-c/mulle-allocator
+```
+
+Append `src` to your include path (e.g. add `-isystem src`  to your `CFLAGS`)
+and compile all the sources that were downloaded.
+
+
 
 
 ## Author

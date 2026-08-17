@@ -20,7 +20,7 @@ to the `mulle_allocator_stdlib` allocator, which is defined like this:
 ```
 struct mulle_allocator   mulle_allocator_stdlib =
 {
-   calloc, realloc, free, abort, NULL
+   calloc, realloc, free, mulle_allocation_fail, mulle_allocator_no_aba_abort, NULL
 };
 ```
 
@@ -30,7 +30,8 @@ it directly but you use `mulle_default_allocator` instead. A use case for
 expects memory to be allocated by stdlib to free or realloc it.
 
 You can modify `mulle_default_allocator`. You must do that before the first use
-`mulle_default_allocator`.
+of `mulle_default_allocator` and before spawning any threads that use it
+(allocator setup is single-threaded only).
 
 
 ## Functions

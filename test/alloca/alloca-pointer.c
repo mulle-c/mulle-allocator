@@ -19,6 +19,7 @@ int  main( int argc, char *argv[])
    // just a test that figured out that we had problems with pointers
    mulle_alloca_do( values, struct foo *, 3)
    {
+      values[ 0] = 0;
       if( p == values[ 0])
          return( 1);
    }

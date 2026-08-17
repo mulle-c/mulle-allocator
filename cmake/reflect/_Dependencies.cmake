@@ -32,7 +32,13 @@ endif()
 # Disable for this platform: `mulle-sourcetree mark mulle-c11 no-cmake-platform-${MULLE_UNAME}`
 # Disable for a sdk: `mulle-sourcetree mark mulle-c11 no-cmake-sdk-<name>`
 #
-if( NOT MULLE__C11_HEADER)
+foreach( _TMP_MULLE__C11_HEADER_TARGET_TARGET mulle-c11)
+   if( TARGET ${_TMP_MULLE__C11_HEADER_TARGET_TARGET})
+      set( MULLE__C11_HEADER_TARGET ${_TMP_MULLE__C11_HEADER_TARGET_TARGET})
+      break()
+   endif()
+endforeach()
+if( NOT MULLE__C11_HEADER AND NOT MULLE__C11_HEADER_TARGET)
    find_file( MULLE__C11_HEADER NAMES
       mulle-c11.h mulle-c11/mulle-c11.h
       NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH

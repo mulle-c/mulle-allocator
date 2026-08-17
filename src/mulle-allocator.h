@@ -196,6 +196,51 @@ static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
 
 
 
+
+# pragma mark - Size computation with underflow checking
+
+//
+// Used by consumers of this library, not by mulle_allocator itself.
+//
+// Checked size_t multiplication for allocation size calculations.
+// If the product overflows, calls allocator->fail (which does not return).
+// This prevents wrapped-around sizes from reaching the allocator, where they
+// would silently produce an undersized allocation.
+//
+// These functions will move to mulle-allocator eventually.
+//
+static inline size_t
+   mulle_allocator_size_multiply( struct mulle_allocator *allocator,
+                                  size_t a,
+                                  size_t b)
+{
+   if( a && b > (size_t) -1 / a)
+      mulle_allocation_fail( allocator, NULL, (size_t) -1);
+   return( a * b);
+}
+
+
+//
+// To be used by consumers of this library, not by mulle_allocator itself.
+//
+// Checked size_t addition for allocation size calculations.
+// If the sum overflows, calls allocator->fail (which does not return).
+//
+static inline size_t
+   mulle_allocator_size_add( struct mulle_allocator *allocator,
+                             size_t a,
+                             size_t b)
+{
+   size_t  total;
+
+   total = a + b;
+   if( total < a)
+      mulle_allocation_fail( allocator, NULL, (size_t) -1);
+   return( total);
+}
+
+
+
 # pragma mark - Vectoring
 
 
@@ -221,6 +266,7 @@ static inline void   *
    void   *q;
 
    assert( n && size);
+   assert( size <= SIZE_MAX / n);  // overflow check
 
    q = (*p->calloc)( n, size, p);
    if( MULLE_C_UNLIKELY( ! q))

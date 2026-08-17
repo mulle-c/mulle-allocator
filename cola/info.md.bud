@@ -19,7 +19,7 @@ Instead of:
       perror( "strdup:");
       exit( 1);
    }
-   if( ! realloc( s, 18);
+   if( ! realloc( s, 18))
    {
       perror( "realloc:");
       exit( 1);
@@ -303,4 +303,16 @@ without getting a failure. If you want to free memory with realloc - by
 passing a zero block size - you need to use `mulle_realloc_strict`.
 If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
+
+
+### Thread Safety
+
+The allocator functions themselves (malloc, free, realloc, etc.) are as
+thread safe as the underlying C library functions they call. You can call
+`mulle_malloc`, `mulle_free` etc. from multiple threads concurrently.
+
+However, the **setup of allocators is single-threaded**. You must configure
+`mulle_default_allocator` or any custom `mulle_allocator` struct before
+spawning threads that use it. Do not modify an allocator's function pointers
+or aba fields while other threads may be calling through it.
 
