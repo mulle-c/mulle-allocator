@@ -40,3 +40,15 @@ export MULLE_TEST_FLAGS="--no-memory-checker"
 
 
 
+#
+#
+#
+export MULLE_SDE_CLEAN_DEFAULT="mulle-allocator"
+
+
+#
+#
+#
+export MULLE_SDE_CLEAN_BEFORE_CRAFT="YES"
+
+

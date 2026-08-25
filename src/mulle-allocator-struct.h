@@ -41,13 +41,16 @@
 
 
 //
-// put the allocator in the back. It's assumed that the actual call of the
+// I put the allocator in the back. It's assumed that the actual call of the
 // vector will be inline, and that calloc will be called most often and
 // that the compiler doesn't then need to reshuffle arguments registers.
 // On many ABIs we should be able to get away with just casting "calloc",
 // but that's not easy to test...
 //
 // abafree uses aba as context
+//
+// Do not change the allocator after spawning threads. While the actual
+// vector functions will be threadsafe the struct itself is not protected.
 //
 #define MULLE_ALLOCATOR_BASE                                                                         \
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                     \

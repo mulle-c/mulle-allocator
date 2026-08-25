@@ -1,10 +1,22 @@
 ... provides a way to pass around the memory scheme du jour
 
-... has identical API to malloc, realloc, free
-
-... frees your code from having to check for errors when allocating memory
+... free your code from having to check for errors when allocating memory
 
 ... contains a safer and portable alloca
+
+... one allocation API that behaves the same on every OS
+
+... can be backed by any allocator (stdlib, arena, shared memory, leak detector)
+
+... abstracts away how wildly different `malloc` behaves on exhaustion — FreeBSD hangs, macOS crawls, Linux errors
+
+... has an API identical in signature to malloc, realloc, free, but with a stricter contract
+
+... zero-size allocations are a programming error and abort via the fail vector
+
+... failed allocations never return NULL but abort via the fail vector
+
+... special realloc_restrict functions return NULL to indicate a successful free, the default realloc will not free
 
 **mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..

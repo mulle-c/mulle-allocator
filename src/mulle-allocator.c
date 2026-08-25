@@ -92,6 +92,52 @@ void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p,
 }
 
 
+void *  _mulle_allocator_reallocarray( struct mulle_allocator *p,
+                                       void *block,
+                                       size_t n,
+                                       size_t size)
+{
+   void     *q;
+   size_t   n_size;
+
+   // zero size is a programming error, catch it in all builds
+   if( MULLE_C_UNLIKELY( ! n || ! size))
+      (*p->fail)( p, NULL, 0);
+   assert( size <= SIZE_MAX / n);  // overflow check
+
+   n_size = mulle_allocator_size_multiply( p, n, size);
+   q      = (*p->realloc)( block, n_size, p);
+   if( MULLE_C_UNLIKELY( ! q))
+      (*p->fail)( p, block, size);
+   return( q);
+}
+
+
+void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
+                                              void *block,
+                                              size_t n,
+                                              size_t size)
+{
+   void     *q;
+   size_t   n_size;
+
+   n_size = mulle_allocator_size_multiply( p, n, size);
+   if( ! n_size)
+   {
+      (*p->free)( block, p);
+      return( NULL);
+   }
+
+   assert( size <= SIZE_MAX / n);  // overflow check (n != 0 here)
+
+   q  = (*p->realloc)( block, n_size, p);
+   if( MULLE_C_UNLIKELY( ! q))
+      (*p->fail)( p, block, size);
+   return( q);
+}
+
+
+
 //
 // this function exists because gcc is paining me. But this is also "wrong"
 // because it's a supposedly int returning function that should be marked as
@@ -112,7 +158,7 @@ int   mulle_allocator_no_aba_abort( void *aba,
 }
 
 
-#pragma mark - _mulle_allocator
+// #pragma mark - _mulle_allocator
 
 void   _mulle_allocator_invalidate( struct mulle_allocator *p)
 {
