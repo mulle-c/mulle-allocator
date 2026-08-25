@@ -34,83 +34,68 @@
 //
 #include "mulle-memset.h"
 
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
+
 //
-// written by cody
+// WHY IS THIS HERE ?
 //
-void   *mulle_memset_uint32(void *dest, uint32_t value, size_t count) 
+// `mulle_memset_uint32` is a fill utility (writing a repeating 32-bit
+// pattern, as 0xDEADDEAD, into a block of memory). It has no intrinsic
+// connection to allocation, but it lives in mulle-allocator because of
+// the dependency graph:
+//
+//   Users of this function: mulle-buffer, mulle-container, mulle-rbtree,
+//   mulle-utf32buffer, mulle-vm.
+//   Other users who don't depend on mulle-data: mulle-mmap,
+//   mulle-testallocator.
+//
+//   Moving to mulle-data would force new `mulle-c/mulle-data`
+//   dependencies on mulle-mmap and mulle-testallocator, which are
+//   deliberately lean, single-dependency libraries.
+//
+//   Moving to mulle-storage is impossible, as mulle-storage depends on
+//   mulle-container, which in turn would need to depend on mulle-storage
+//   to use this function (a dependency cycle).
+//
+//   Mulle-allocator is the natural hub: every current user depends on it
+//   already. So this utility lives here, by deliberate choice, so that no
+//   library has to grow a new heavyweight dependency.
+//
+//
+// Fill a byte range with a repeating 4-byte pattern. The pattern is
+// aligned to 4-byte boundaries: for an unaligned `dest` the pattern
+// is shifted so that the bytes of a word at a 4-byte boundary always
+// read back as `value` in little-endian order. The unaligned prefix
+// and the trailing bytes are written byte-wise, the bulk is copied
+// with `memcpy` to avoid any alignment or aliasing issues.
+//
+void   *mulle_memset_uint32( void *dest, uint32_t value, size_t count)
 {
-    uint8_t *d8 = (uint8_t*)dest;
-    uint32_t *d32;
-    size_t pre_align, main_count, post_count;
-    uint32_t rot_value = value;
-    uintptr_t addr = (uintptr_t)dest;
-    size_t offset = addr & 3;
-    
-    // Handle small counts with rotated pattern
-    if (count < 4) 
-    {
-        size_t i;
-    
-        rot_value = (value >> (offset * 8)) | (value << (32 - (offset * 8)));
-        for (i = 0; i < count; i++) 
-        {
-            d8[i] = (uint8_t)(rot_value & 0xFF);
-            rot_value = (rot_value >> 8) | (rot_value << 24);
-        }
-        return dest;
-    }
-    
-    // Pre-align to 4 bytes, using already rotated value
-    pre_align = (4 - offset) & 3;
-    if (pre_align) 
-    {
-        rot_value = (value >> (offset * 8)) | (value << (32 - (offset * 8)));
-        for (size_t i = 0; i < pre_align; i++) 
-        {
-            d8[i] = (uint8_t)(rot_value & 0xFF);
-            rot_value = (rot_value >> 8) | (rot_value << 24);
-        }
-        d8 += pre_align;
-        count -= pre_align;
-    }
-    
-    // Now use the rotated value for aligned access
-    d32 = (uint32_t*)d8;
-    
-    // Process 8 words at a time
-    main_count = count >> 5;
-    while (main_count--) {
-        d32[0] = rot_value;
-        d32[1] = rot_value;
-        d32[2] = rot_value;
-        d32[3] = rot_value;
-        d32[4] = rot_value;
-        d32[5] = rot_value;
-        d32[6] = rot_value;
-        d32[7] = rot_value;
-        d32 += 8;
-        count -= 32;  // actually superflous        
-    }
-    
-    // Handle remaining 32-bit writes
-    main_count = (count & 31) >> 2;
-    while (main_count--) {
-        *d32++ = rot_value;
-        // Maintain pattern rotation for next 4 bytes
-    }
+   uint8_t   *d8;
+   size_t    offset;
+   size_t    i;
 
-    // Handle remaining bytes, continuing the pattern
-    d8 = (uint8_t*)d32;
-    post_count = count & 3;
-    for (size_t i = 0; i < post_count; i++) {
-        d8[i] = (uint8_t)(rot_value & 0xFF);
-        rot_value = (rot_value >> 8) | (rot_value << 24);
-    }
-    
-    return dest;
+   d8     = dest;
+   offset = (uintptr_t) dest & 3;
+
+   // shift the pattern so that the first byte of `value` is written
+   // to the next 4-byte boundary
+   for( i = offset; i < 4 && count; i++, count--)
+      *d8++ = (uint8_t)( value >> (i * 8));
+
+   // bulk: whole 32-bit words
+   while( count >= 4)
+   {
+      memcpy( d8, &value, sizeof( value));
+      d8    += sizeof( value);
+      count -= sizeof( value);
+   }
+
+   // trailing partial word
+   for( i = 0; i < count; i++)
+      d8[ i] = (uint8_t)( value >> (i * 8));
+
+   return( dest);
 }
-

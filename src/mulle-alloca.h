@@ -438,10 +438,10 @@ while( 0)
    mulle_alloca_do_extract( name, receiver)
 
 // not API and dangerous (s.a.)
-# define _mulle_calloca_do_return( name, value)                  \
+# define _mulle_calloca_do_return( name, value)                 \
    _mulle_alloca_do_return( name, value)
 
-# define _mulle_calloca_do_return_void( name)                    \
+# define _mulle_calloca_do_return_void( name)                   \
    _mulle_alloca_do_return_void( name)
 
 /**
