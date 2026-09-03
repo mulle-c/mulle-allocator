@@ -60,7 +60,7 @@
 #endif
 
 
-#define MULLE__ALLOCATOR_VERSION  ((8UL << 20) | (0 << 8) | 1)
+#define MULLE__ALLOCATOR_VERSION  ((9UL << 20) | (0 << 8) | 0)
 
 
 /**
@@ -182,11 +182,17 @@ typedef void  mulle_allocator_fail_t( struct mulle_allocator *allocator,
  *
  * The `f` parameter is a function pointer to the custom failure handler function that should be used when an allocation fails. If `f` is `NULL`, the `mulle_allocation_fail` function will be used as the default failure handler.
  *
+ * A fail handler may either not return (abort/exit/longjmp, like the default
+ * `mulle_allocation_fail`) or return. Returning signals "memory was recovered,
+ * retry the allocation": the library will loop and retry the failed allocation.
+ * A returning handler MUST make forward progress (free memory) or the retry
+ * loop will spin forever.
+ *
  * @param p The `mulle_allocator` instance to set the failure handler for.
  * @param f The custom failure handler function pointer, or `NULL` to use the default `mulle_allocation_fail` function.
  */
 static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
-                                               mulle_allocator_fail_t *f _MULLE_C_NO_RETURN)
+                                               mulle_allocator_fail_t *f)
 {
    if( ! p)
       p = &mulle_allocator_default;
@@ -250,11 +256,16 @@ static inline void   *
 {
    void   *q;
 
+   // zero size is a programmers error: call fail once (not retryable). If the
+   // handler wrongly returns on this, abort rather than loop or leak NULL.
    if( MULLE_C_UNLIKELY( ! size))
+   {
       (*p->fail)( p, NULL, 0);
+      mulle_allocation_fail( p, NULL, 0);
+   }
 
-   q = (*p->realloc)( NULL, size, p);
-   if( MULLE_C_UNLIKELY( ! q))
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( MULLE_C_UNLIKELY( ! (q = (*p->realloc)( NULL, size, p))))
       (*p->fail)( p, NULL, size);
    return( q);
 }
@@ -266,13 +277,17 @@ static inline void   *
 {
    void   *q;
 
-   // zero size is a programmers error, catch it in all builds
+   // zero size is a programmers error: call fail once (not retryable). If the
+   // handler wrongly returns on this, abort rather than loop or leak NULL.
    if( MULLE_C_UNLIKELY( ! n || ! size))
+   {
       (*p->fail)( p, NULL, 0);
+      mulle_allocation_fail( p, NULL, 0);
+   }
    assert( size <= SIZE_MAX / n);  // overflow check
 
-   q = (*p->calloc)( n, size, p);
-   if( MULLE_C_UNLIKELY( ! q))
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( MULLE_C_UNLIKELY( ! (q = (*p->calloc)( n, size, p))))
       (*p->fail)( p, NULL, n * size);
    return( q);
 }
@@ -288,12 +303,16 @@ static inline void *
 {
    void   *q;
 
-   // zero-size is a programming error, catch it in all builds
+   // zero-size is a programming error: call fail once (not retryable). If the
+   // handler wrongly returns on this, abort rather than loop or leak NULL.
    if( MULLE_C_UNLIKELY( ! size))
+   {
       (*p->fail)( p, NULL, 0);
+      mulle_allocation_fail( p, NULL, 0);
+   }
 
-   q = (*p->realloc)( block, size, p);
-   if( MULLE_C_UNLIKELY( ! q))
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( MULLE_C_UNLIKELY( ! (q = (*p->realloc)( block, size, p))))
       (*p->fail)( p, block, size);
    return( q);
 }
@@ -322,7 +341,11 @@ static inline void   _mulle_allocator_free( struct mulle_allocator *p,
 
 
 
-MULLE_C_NO_RETURN
+//
+// Directly invoke the fail handler. Note: the handler may return (see
+// mulle_allocator_set_fail). This is a raw passthrough with no retry loop;
+// callers wanting retry-on-recovery should use the allocation functions.
+//
 static inline void   _mulle_allocator_fail( struct mulle_allocator *p,
                                             void *block,
                                             size_t size)
@@ -567,7 +590,6 @@ static inline int   mulle_allocator_abafree( struct mulle_allocator *p,
  * @param block The block of memory that failed to be allocated.
  * @param size The size of the block of memory that failed to be allocated.
  */
-MULLE_C_NO_RETURN
 static inline void   mulle_allocator_fail( struct mulle_allocator *p,
                                            void *block,
                                            size_t size)

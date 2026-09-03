@@ -52,12 +52,21 @@
 // Do not change the allocator after spawning threads. While the actual
 // vector functions will be threadsafe the struct itself is not protected.
 //
-#define MULLE_ALLOCATOR_BASE                                                                         \
-   void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                     \
-   void   *(*realloc)( void *block, size_t size, struct mulle_allocator *allocator);                 \
-   void   (*free)( void *block, struct mulle_allocator *allocator);                                  \
-   void   (*fail)( struct mulle_allocator *allocator, void *block, size_t size) _MULLE_C_NO_RETURN;  \
-   int    (*abafree)( void *aba, void (*free)( void *, void *), void *block, void *owner);           \
+//
+// fail is NOT marked _MULLE_C_NO_RETURN anymore. A fail handler may return.
+// A return means: "I recovered some memory, retry the allocation". The library
+// loops on the failed allocation until it succeeds (see the retry loops in the
+// _mulle_allocator_... functions). A handler that returns MUST have made
+// forward progress (actually freed memory), otherwise the retry loop spins
+// forever. The default handler mulle_allocation_fail aborts and never returns,
+// so the loop degenerates to a single call for the default case.
+//
+#define MULLE_ALLOCATOR_BASE                                                              \
+   void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);          \
+   void   *(*realloc)( void *block, size_t size, struct mulle_allocator *allocator);      \
+   void   (*free)( void *block, struct mulle_allocator *allocator);                       \
+   void   (*fail)( struct mulle_allocator *allocator, void *block, size_t size);          \
+   int    (*abafree)( void *aba, void (*free)( void *, void *), void *block, void *owner); \
    void   *aba
 
 

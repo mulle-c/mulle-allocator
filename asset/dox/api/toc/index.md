@@ -10,7 +10,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 ## 2. Key Concepts & Design Philosophy
 
 - **Allocator indirection:** `struct mulle_allocator` carries function pointers (`calloc`, `realloc`, `free`, `fail`, `abafree`) plus opaque `aba` context.
-- **Fail-fast by default:** allocation wrappers call `fail` callback on failure (default implementation aborts); callers usually do not NULL-check successful paths.
+- **Fail-fast by default:** allocation wrappers call the `fail` callback on failure (default implementation aborts); callers usually do not NULL-check successful paths. A custom `fail` callback may instead recover memory and return, in which case the failed allocation is retried in a loop (fail-retry semantics). Either way, an allocation wrapper never returns NULL to its caller.
 - **Explicit strict realloc variant:** `*_realloc_strict` provides "free-and-NULL" semantics for `size == 0`.
 - **Scoped temporary storage macros:** `mulle_alloca_do`/`mulle_calloca_do` use stack for small buffers and heap fallback for larger ones, with automatic cleanup at scope exit.
 - **Portable C API surface:** mostly inline wrappers/macros around allocator vectors; no runtime object model.
@@ -25,7 +25,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
   - `calloc( n, size, allocator)` — allocate zeroed memory.
   - `realloc( block, size, allocator)` — allocate/resize.
   - `free( block, allocator)` — deallocate.
-  - `fail( allocator, block, size)` — failure handler (intended no-return).
+  - `fail( allocator, block, size)` — failure handler. May abort (default) or recover memory and return, in which case the allocation is retried.
   - `abafree( aba, free_fn, block, owner)` — optional ABA-aware release.
   - `aba` — opaque ABA context pointer.
 
@@ -44,7 +44,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 #### Standalone functions / declarations
 | Symbol | Short description |
 |---|---|
-| `mulle_allocation_fail` | Default fail callback; reports error then aborts. |
+| `mulle_allocation_fail` | Default fail callback; reports error then aborts (never returns). |
 | `mulle_allocator_no_aba_abort` | Default ABA callback; aborts when ABA free is used unconfigured. |
 | `mulle_allocator_is_stdlib_allocator` | Checks whether allocator is stdlib-backed (implementation test by function pointer). |
 | `_mulle_allocator_realloc_strict` | Core strict realloc helper (`size==0` frees and returns `NULL`). |
@@ -55,7 +55,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 | Symbol | Short description |
 |---|---|
 | `mulle_allocator_set_aba` | Sets `aba` context and ABA free callback (or abort default). |
-| `mulle_allocator_set_fail` | Sets fail callback (or default fail callback). |
+| `mulle_allocator_set_fail` | Sets fail callback (or default fail callback). Handler may abort or recover-and-return to trigger an allocation retry. |
 | `mulle_allocator_assert` | Asserts allocator function pointers are present. |
 
 #### Inline allocator API (allocator parameter, `NULL` => default allocator)
@@ -142,6 +142,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 2. Do not use pointers obtained inside `mulle_alloca_do` outside scope unless extracted with `mulle_alloca_do_extract`.
 3. Do not assume `mulle_allocator_stdlib_nofree` frees memory; it intentionally does not.
 4. Do not call `mulle_abafree` unless ABA callback/context is configured, or default abort behavior will trigger.
+5. A custom `fail` handler that returns (fail-retry semantics) MUST make forward progress by actually freeing memory. If it returns without freeing anything, the allocation retry loop spins forever. Only genuine out-of-memory is retried; zero-size and overflow are programming errors that always abort and are never retried.
 
 ### Idiomatic usage
 - Keep allocator pointer in long-lived structs if caller-chosen memory domains must be preserved for destroy/deinit.

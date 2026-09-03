@@ -4,11 +4,23 @@
 
 ... provides a way to pass around the memory scheme du jour
 
-... has identical API to malloc, realloc, free
-
-... frees your code from having to check for errors when allocating memory
+... free your code from having to check for errors when allocating memory
 
 ... contains a safer and portable alloca
+
+... one allocation API that behaves the same on every OS
+
+... can be backed by any allocator (stdlib, arena, shared memory, leak detector)
+
+... abstracts away how wildly different `malloc` behaves on exhaustion — FreeBSD hangs, macOS crawls, Linux errors
+
+... has an API identical in signature to malloc, realloc, free, but with a stricter contract
+
+... zero-size allocations are a programming error and abort via the fail vector
+
+... failed allocations never return NULL: the fail vector either aborts or recovers memory and the allocation is retried
+
+... special realloc_restrict functions return NULL to indicate a successful free, the default realloc will not free
 
 **mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
@@ -56,7 +68,7 @@ Instead of:
       perror( "strdup:");
       exit( 1);
    }
-   if( ! realloc( s, 18);
+   if( ! realloc( s, 18))
    {
       perror( "realloc:");
       exit( 1);
@@ -143,11 +155,17 @@ struct mulle_allocator
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *p);
    void   *(*realloc)( void *block, size_t size, struct mulle_allocator *p);
    void   (*free)( void *block, struct mulle_allocator *p);
-   void   (*fail)( struct mulle_allocator *p, void *block, size_t size) MULLE_C_NO_RETURN;
+   void   (*fail)( struct mulle_allocator *p, void *block, size_t size);
    int    (*abafree)( void *aba, void (*free)( void *), void *block);
    void   *aba;
 };
 ```
+
+> The `fail` vector is not marked `MULLE_C_NO_RETURN`. A `fail` handler may
+> either not return (the default handler prints an error and aborts) or return.
+> Returning means "I recovered some memory, retry the allocation": the failed
+> allocation is retried in a loop. A returning handler must make forward
+> progress (actually free memory), otherwise the retry loop spins forever.
 
 > By default `.aba` and `.abafree` are not available.
 > If you need ABA safe freeing, it is recommended to use [mulle-aba](//github.com/mulle-concurrent/mulle-aba).
@@ -332,14 +350,35 @@ header [mulle-alloca.h](src/mulle-alloca.h) for more details, including
 
 The `mulle_default_allocator` and `mulle_stdlib_allocator` never return, if the
 allocation went bad. If a mulle-allocator function detects, that an allocation
-could not be satisfied, it jumps through its fail vector. This will print an
-error message and exit the program.
+could not be satisfied, it jumps through its fail vector. By default this will
+print an error message and exit the program.
+
+Since the fail-retry semantics, a custom `fail` handler installed with
+`mulle_allocator_set_fail` may instead recover memory and return. A return
+means "retry the allocation": the library loops and retries until the
+allocation succeeds. So an allocation function still never returns NULL to its
+caller — it either succeeds (possibly after one or more recovery retries) or
+the program is aborted by the fail handler. A returning handler must make
+forward progress or the retry loop spins forever. Note that zero-size and
+overflow are programming errors: they are never retried and always abort.
 
 You can not pass a zero size to either `mulle_realloc` or `mulle_malloc`
 without getting a failure. If you want to free memory with realloc - by
 passing a zero block size - you need to use `mulle_realloc_strict`.
 If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
+
+
+### Thread Safety
+
+The allocator functions themselves (malloc, free, realloc, etc.) are as
+thread safe as the underlying C library functions they call. You can call
+`mulle_malloc`, `mulle_free` etc. from multiple threads concurrently.
+
+However, the **setup of allocators is single-threaded**. You must configure
+`mulle_default_allocator` or any custom `mulle_allocator` struct before
+spawning threads that use it. Do not modify an allocator's function pointers
+or aba fields while other threads may be calling through it.
 
 
 ### You are here
