@@ -4,11 +4,23 @@
 
 ... provides a way to pass around the memory scheme du jour
 
-... has identical API to malloc, realloc, free
-
-... frees your code from having to check for errors when allocating memory
+... free your code from having to check for errors when allocating memory
 
 ... contains a safer and portable alloca
+
+... one allocation API that behaves the same on every OS
+
+... can be backed by any allocator (stdlib, arena, shared memory, leak detector)
+
+... abstracts away how wildly different `malloc` behaves on exhaustion — FreeBSD hangs, macOS crawls, Linux errors
+
+... has an API identical in signature to malloc, realloc, free, but with a stricter contract
+
+... zero-size allocations are a programming error and abort via the fail vector
+
+... failed allocations never return NULL but abort via the fail vector
+
+... special realloc_restrict functions return NULL to indicate a successful free, the default realloc will not free
 
 **mulle-allocator** has a companion project: [mulle-testallocator](//github.com/mulle-core/mulle-testallocator).
 *mulle-testallocator* provides the error and leak detection, that was formerly a part of mulle-allocator..
@@ -56,7 +68,7 @@ Instead of:
       perror( "strdup:");
       exit( 1);
    }
-   if( ! realloc( s, 18);
+   if( ! realloc( s, 18))
    {
       perror( "realloc:");
       exit( 1);
@@ -340,6 +352,18 @@ without getting a failure. If you want to free memory with realloc - by
 passing a zero block size - you need to use `mulle_realloc_strict`.
 If you pass a zero block size and a zero block to `mulle_realloc_strict`, it
 will return NULL.
+
+
+### Thread Safety
+
+The allocator functions themselves (malloc, free, realloc, etc.) are as
+thread safe as the underlying C library functions they call. You can call
+`mulle_malloc`, `mulle_free` etc. from multiple threads concurrently.
+
+However, the **setup of allocators is single-threaded**. You must configure
+`mulle_default_allocator` or any custom `mulle_allocator` struct before
+spawning threads that use it. Do not modify an allocator's function pointers
+or aba fields while other threads may be calling through it.
 
 
 ### You are here
