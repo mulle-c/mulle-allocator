@@ -3,7 +3,7 @@
 
 ## 1. Introduction & Purpose
 
-`mulle-allocator` is a C memory utility library that provides allocator indirection (`struct mulle_allocator`), fail-fast allocation wrappers, and scoped stack/heap-fallback temporary buffers (`mulle_alloca_do` family). It solves three common problems: hard-wired `malloc` usage in reusable code, repetitive allocation error checks, and unsafe raw `alloca` usage.
+`mulle-allocator` is a C memory utility library that provides allocator indirection (`struct mulle_allocator`), fail-fast allocation wrappers, overflow-checked array reallocation (`*_reallocarray*`), checked size-arithmetic helpers, and scoped stack/heap-fallback temporary buffers (`mulle_alloca_do` family). It solves problems such as hard-wired `malloc` usage in reusable code, repetitive allocation error checks, wrapped-around `n * size` allocations, and unsafe raw `alloca` usage.
 
 At project level, this is a foundational low-level component in the mulle-c ecosystem. It depends directly on `mulle-c11` for portability/compiler macros and exposes a compact public API in headers (`mulle-allocator.h`, `mulle-alloca.h`, `mulle-memset.h`).
 
@@ -11,7 +11,9 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 
 - **Allocator indirection:** `struct mulle_allocator` carries function pointers (`calloc`, `realloc`, `free`, `fail`, `abafree`) plus opaque `aba` context.
 - **Fail-fast by default:** allocation wrappers call `fail` callback on failure (default implementation aborts); callers usually do not NULL-check successful paths.
-- **Explicit strict realloc variant:** `*_realloc_strict` provides "free-and-NULL" semantics for `size == 0`.
+- **Explicit strict realloc variant:** `*_realloc_strict` and `*_reallocarray_strict` provide "free-and-NULL" semantics for `size == 0` (respectively zero `n`/`size`).
+- **Overflow-checked arithmetic:** `mulle_allocator_size_multiply`/`mulle_allocator_size_add` compute sizes for allocation callers; on `size_t` overflow they invoke the allocator `fail` callback (which does not return) so wrapped-around sizes never reach the allocator.
+- **Array reallocation API:** `*_reallocarray*` resizes `n * size` element arrays with a checked multiplication; the non-strict variant treats zero `n`/`size` as a programming error (fail path), while the strict variant frees the block and returns `NULL`.
 - **Scoped temporary storage macros:** `mulle_alloca_do`/`mulle_calloca_do` use stack for small buffers and heap fallback for larger ones, with automatic cleanup at scope exit.
 - **Portable C API surface:** mostly inline wrappers/macros around allocator vectors; no runtime object model.
 
@@ -46,10 +48,20 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 |---|---|
 | `mulle_allocation_fail` | Default fail callback; reports error then aborts. |
 | `mulle_allocator_no_aba_abort` | Default ABA callback; aborts when ABA free is used unconfigured. |
-| `mulle_allocator_is_stdlib_allocator` | Checks whether allocator is stdlib-backed (implementation test by function pointer). |
+| `mulle_allocator_is_stdlib_allocator` | Checks whether allocator is stdlib-backed (implementation test by function pointer); takes `const struct mulle_allocator *p`. |
 | `_mulle_allocator_realloc_strict` | Core strict realloc helper (`size==0` frees and returns `NULL`). |
+| `_mulle_allocator_reallocarray` | Core array realloc helper (non-strict); zero `n`/`size` or `n * size` overflow routes to the `fail` callback. |
+| `_mulle_allocator_reallocarray_strict` | Core strict array realloc helper; if `n * size == 0` frees the block and returns `NULL`. |
 | `_mulle_allocator_invalidate` | Overwrites allocator callbacks with abort handlers (test/debug helper). |
-| `_mulle_allocator_strdup` | Allocator-based string duplication primitive. |
+| `_mulle_allocator_strdup` | Allocator-based string duplication primitive (takes `const char *s`). |
+
+#### Inline checked size-computation helpers
+| Symbol | Short description |
+|---|---|
+| `mulle_allocator_size_multiply( allocator, a, b)` | Checked `size_t` multiplication (`a * b`); on overflow calls `fail` (does not return). Declared `static inline`, returns the product. |
+| `mulle_allocator_size_add( allocator, a, b)` | Checked `size_t` addition (`a + b`); on wraparound calls `fail` (does not return). Declared `static inline`, returns the sum. |
+
+Both helpers are intended for consumers of the library when computing allocation sizes; they pass the allocator whose `fail` handler is invoked on overflow, so a `NULL` allocator argument must be normalized by the caller prior to use.
 
 #### Inline configuration and checks
 | Symbol | Short description |
@@ -65,6 +77,8 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 | `mulle_allocator_calloc` | Allocate zeroed `n * size`; fail callback on failure. |
 | `mulle_allocator_realloc` | Resize/allocate; fail callback on failure. |
 | `mulle_allocator_realloc_strict` | Strict realloc semantics (`size==0` frees and returns `NULL`). |
+| `mulle_allocator_reallocarray` | Array realloc (`n` elements of `size` bytes) with checked multiply; zero `n`/`size` or overflow triggers fail callback. |
+| `mulle_allocator_reallocarray_strict` | Array realloc; if `n * size == 0` frees the block and returns `NULL`. |
 | `mulle_allocator_free` | Free block if non-NULL. |
 | `mulle_allocator_abafree` | ABA-aware free dispatch; returns status from callback. |
 | `mulle_allocator_fail` | Force allocator fail path. |
@@ -77,6 +91,8 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 | `mulle_calloc` | Default allocator calloc wrapper. |
 | `mulle_realloc` | Default allocator realloc wrapper. |
 | `mulle_realloc_strict` | Default allocator strict realloc wrapper. |
+| `mulle_reallocarray` | Default allocator array realloc wrapper. |
+| `mulle_reallocarray_strict` | Default allocator strict array realloc wrapper. |
 | `mulle_free` | Default allocator free wrapper. |
 | `mulle_abafree` | Default allocator ABA-free wrapper. |
 | `mulle_strdup` | Default allocator string duplicate wrapper. |
@@ -120,6 +136,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 
 - **Allocator wrappers (`mulle_*`, `mulle_allocator_*`):** underlying allocator complexity dominates (typically `malloc`/`realloc`/`free` behavior of libc).
 - **Wrapper overhead:** O(1) dispatch via function pointer and branch for failure handling.
+- **`*_reallocarray*` and size helpers:** O(1) checked multiply/add overhead; the underlying resize is that of the backend `realloc`. The `*_strict` zero-size path is an O(1) free.
 - **`mulle_alloca_do`/`mulle_calloca_do`:**
   - setup/cleanup O(1),
   - `*_realloc` O(n) when copying from stack storage to heap or when heap realloc moves.
@@ -134,14 +151,16 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 1. In reusable libraries, take `struct mulle_allocator *allocator` arguments and route all allocations through `mulle_allocator_*`.
 2. Normalize allocator input with `allocator ? allocator : &mulle_allocator_default` only when storing allocator pointers; otherwise wrapper functions already do this.
 3. Use `mulle_alloca_do`/`mulle_calloca_do` for temporary buffers whose size may vary significantly.
-4. Use `mulle_allocator_realloc_strict` when you need explicit `size==0` free-to-`NULL` semantics.
-5. Use `mulle_allocator_set_fail` and `mulle_allocator_set_aba` in tests/specialized runtimes to install custom behavior.
+4. Use `mulle_allocator_realloc_strict` when you need explicit `size==0` free-to-`NULL` semantics; use `mulle_allocator_reallocarray(_strict)` for element-array resizing with overflow-checked `n * size`.
+5. Compute allocation sizes with `mulle_allocator_size_multiply`/`mulle_allocator_size_add` when caller-supplied counts could overflow; they route overflow to the `fail` handler instead of wrapping.
+6. Use `mulle_allocator_set_fail` and `mulle_allocator_set_aba` in tests/specialized runtimes to install custom behavior.
 
 ### Common pitfalls
 1. Do not describe `mulle_allocator_realloc_strict` as "returns NULL on allocation failure"; failure still routes to fail callback. `NULL` is the defined result for `size==0` (after free).
-2. Do not use pointers obtained inside `mulle_alloca_do` outside scope unless extracted with `mulle_alloca_do_extract`.
-3. Do not assume `mulle_allocator_stdlib_nofree` frees memory; it intentionally does not.
-4. Do not call `mulle_abafree` unless ABA callback/context is configured, or default abort behavior will trigger.
+2. Do not pass `n == 0` or `size == 0` to non-strict `mulle_allocator_reallocarray` expecting a free; zero is a programming error routed to the `fail` callback in all builds. Use the `_strict` variant to get free-and-`NULL` behavior.
+3. Do not use pointers obtained inside `mulle_alloca_do` outside scope unless extracted with `mulle_alloca_do_extract`.
+4. Do not assume `mulle_allocator_stdlib_nofree` frees memory; it intentionally does not.
+5. Do not call `mulle_abafree` unless ABA callback/context is configured, or default abort behavior will trigger.
 
 ### Idiomatic usage
 - Keep allocator pointer in long-lived structs if caller-chosen memory domains must be preserved for destroy/deinit.
@@ -205,7 +224,30 @@ static int   *build_table( unsigned int n)
 }
 ```
 
-### Example 3: Pattern fill with 32-bit value
+### Example 3: Array reallocation with overflow-checked size
+
+```c
+#include <mulle-allocator/mulle-allocator.h>
+
+static int   *grow_int_array( int *p, size_t new_n)
+{
+   return( mulle_allocator_reallocarray( NULL, p, new_n, sizeof( int)));
+   /* overflow of new_n * sizeof(int) (or new_n == 0) triggers the fail
+      callback instead of silently wrapping; pass NULL allocator for the
+      default allocator */
+}
+
+
+static int   *clear_int_array( int *p)
+{
+   return( mulle_allocator_reallocarray_strict( NULL, p, 0, sizeof( int)));
+   /* strict variant frees the block and returns NULL */
+}
+```
+
+Contents of the old block (up to the smaller of old/new size) are preserved on grow/shrink, see `test/reallocarray/reallocarray.c`.
+
+### Example 4: Pattern fill with 32-bit value
 
 ```c
 #include <mulle-allocator/mulle-memset.h>
