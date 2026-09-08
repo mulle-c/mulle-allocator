@@ -14,7 +14,7 @@
 
 ... zero-size allocations are a programming error and abort via the fail vector
 
-... failed allocations never return NULL but abort via the fail vector
+... failed allocations never return NULL: the fail vector either aborts or recovers memory and the allocation is retried
 
 ... special realloc_restrict functions return NULL to indicate a successful free, the default realloc will not free
 

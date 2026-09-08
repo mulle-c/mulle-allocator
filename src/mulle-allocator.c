@@ -62,12 +62,10 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, const char *s)
    char     *dup;
 
    size = strlen( s) + 1;
-   dup  = (*p->realloc)( NULL, size, p);
-   if( dup)
-      memcpy( dup, s, size);
-   else
-   // keep like this for benefit of tests
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( ! (dup = (*p->realloc)( NULL, size, p)))
       (*p->fail)( p, NULL, size);
+   memcpy( dup, s, size);
    return( dup);
 }
 
@@ -85,8 +83,8 @@ void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p,
       return( NULL);
    }
 
-   q = (*p->realloc)( block, size, p);
-   if( ! q)
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( ! (q = (*p->realloc)( block, size, p)))
       (*p->fail)( p, block, size);
    return( q);
 }
@@ -100,14 +98,18 @@ void *  _mulle_allocator_reallocarray( struct mulle_allocator *p,
    void     *q;
    size_t   n_size;
 
-   // zero size is a programming error, catch it in all builds
+   // zero size is a programming error: call fail once (not retryable). If the
+   // handler wrongly returns on this, abort rather than loop or leak NULL.
    if( MULLE_C_UNLIKELY( ! n || ! size))
+   {
       (*p->fail)( p, NULL, 0);
+      mulle_allocation_fail( p, NULL, 0);
+   }
    assert( size <= SIZE_MAX / n);  // overflow check
 
    n_size = mulle_allocator_size_multiply( p, n, size);
-   q      = (*p->realloc)( block, n_size, p);
-   if( MULLE_C_UNLIKELY( ! q))
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( MULLE_C_UNLIKELY( ! (q = (*p->realloc)( block, n_size, p))))
       (*p->fail)( p, block, size);
    return( q);
 }
@@ -130,8 +132,8 @@ void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
 
    assert( size <= SIZE_MAX / n);  // overflow check (n != 0 here)
 
-   q  = (*p->realloc)( block, n_size, p);
-   if( MULLE_C_UNLIKELY( ! q))
+   // OOM is retryable: fail may return meaning "recovered, retry"
+   while( MULLE_C_UNLIKELY( ! (q = (*p->realloc)( block, n_size, p))))
       (*p->fail)( p, block, size);
    return( q);
 }
