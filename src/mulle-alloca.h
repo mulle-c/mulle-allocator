@@ -124,6 +124,7 @@
     ? _mulle_alloca_stackitems( size, type)                       \
     : 1)
 
+
 #define _mulle_alloca_do_get_size_as_length( name)                \
    (sizeof( name ## __storage) / sizeof( name ## __storage[ 0]))
 
@@ -171,10 +172,10 @@ while( 0)
  *
  * If `name` is currently using the stack-allocated `name__storage` buffer, and
  * the new size exceeds the capacity of the buffer, the memory is reallocated
- * using `mulle_malloc` and the contents of the buffer are copied over.
+ * using `mulle_allocarray` and the contents of the buffer are copied over.
  *
  * If `name` is already using dynamically allocated memory, it is reallocated
- * using `mulle_realloc`. If the new size is 0, the memory is reallocated to a
+ * using `mulle_reallocarray`. If the new size is 0, the memory is reallocated to a
  * single element.
  *
  * The `name__count` variable is updated to reflect the new size in elements.
@@ -189,24 +190,24 @@ while( 0)
 #define mulle_alloca_do_realloc( name, count)                     \
 do                                                                \
 {                                                                 \
-	uintptr_t  _count = (count);                                   \
+   uintptr_t  _count = (count);                                   \
                                                                   \
-	if( name == name ## __storage)                                 \
-	{                                                              \
+   if( name == name ## __storage)                                 \
+   {                                                              \
       if( _count > _mulle_alloca_do_get_size_as_length( name))    \
-		{                                                           \
-			name = mulle_malloc( sizeof( *name) * _count);           \
-			memcpy( name,                                            \
-				     name ## __storage,                               \
-				     ((uintptr_t) name ## __count) * sizeof( *name)); \
-		}                                                           \
-	}                                                              \
-	else                                                           \
-	{                                                              \
+      {                                                           \
+         name = mulle_allocarray( (size_t) _count, sizeof( *name)); \
+         memcpy( name,                                            \
+                 name ## __storage,                               \
+                 (size_t) (uintptr_t) name ## __count * sizeof( *name)); \
+      }                                                           \
+   }                                                              \
+   else                                                           \
+   {                                                              \
       _count = _count ? _count : 1;                               \
-		name   = mulle_realloc( name, _count * sizeof( *name));     \
-	}                                                              \
-	name ## __count = (void *) _count;                             \
+      name   = mulle_reallocarray( name, (size_t) _count, sizeof( *name)); \
+   }                                                              \
+   name ## __count = (void *) _count;                             \
 }                                                                 \
 while( 0)
 
@@ -217,7 +218,7 @@ while( 0)
  * `mulle_alloca_do` code block.
  *
  * If `name` is currently using the stack-allocated `name__storage` buffer, the
- * memory is reallocated using `mulle_malloc` and the contents of the buffer are
+ * memory is reallocated using `mulle_allocarray` and the contents of the buffer are
  * copied over before being assigned to `receiver`. If `name` is already using
  * dynamically allocated memory, it is simply assigned to `receiver` and `name`
  * is set to `NULL`.
@@ -243,10 +244,10 @@ do                                                                          \
 {                                                                           \
    if( name == name ## __storage)                                           \
    {                                                                        \
-      name = mulle_malloc( ((uintptr_t) name ## __count) * sizeof( *name)); \
+      name = mulle_allocarray( (size_t) (uintptr_t) name ## __count, sizeof( *name)); \
       memcpy( name,                                                         \
               name ## __storage,                                            \
-              ((uintptr_t) name ## __count) * sizeof( *name));              \
+              (size_t) (uintptr_t) name ## __count * sizeof( *name));       \
    }                                                                        \
    receiver = name;                                                         \
    name     = NULL;                                                         \
@@ -257,7 +258,7 @@ while( 0)
 /**
  * This macro defines a flexible block of memory that can be allocated either on
  * the stack or dynamically on the heap, depending on the size required. The
- * memory block is allocated using `mulle_malloc` if the requested size exceeds
+ * memory block is allocated using `mulle_allocarray` if the requested size exceeds
  * the stack size, or from the stack-allocated `name__storage` array otherwise.
  *
  * The macro takes the following parameters:
@@ -279,15 +280,19 @@ while( 0)
 // the type (like struct foo *), the '*' is only applied to the first variable
 // of the for variables.
 //
+// Caveat: element counts are stored in a void * and cast back, so this assumes
+// a flat address space; and the heap fallback always uses the default
+// allocator (mulle_malloc/free), never a caller-supplied one.
+//
 #define mulle_alloca_do( name, type, count)                                                          \
    for( type name ## __storage[ _mulle_alloca_stackitems_1( MULLE_ALLOCA_STACKSIZE, type)],          \
         *name ## __count = (void *) (uintptr_t) (count),                                             \
         *name ## __k = NULL;                                                                         \
         ! name ## __k;                                                                               \
-        name ## __k++)                                                                               \
+        name ## __k = (void *) 1)                                                                    \
       for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
                      ? name ## __storage                                                             \
-                     : mulle_malloc( sizeof( type) * (uintptr_t) (void *) name ## __count),          \
+                     : mulle_allocarray( (size_t) (uintptr_t) (void *) name ## __count, sizeof( type)),                    \
            *name ## __j = NULL;                                                                      \
            ! name ## __j;                                                                            \
            name ## __j = _mulle_alloca_do_free( name)                                                \
@@ -299,7 +304,7 @@ while( 0)
 /**
  * This macro defines a flexible block of memory that can be allocated either on
  * the stack or dynamically on the heap, depending on the size required. The
- * memory block is allocated using `mulle_malloc` if the requested size exceeds
+ * memory block is allocated using `mulle_allocarray` if the requested size exceeds
  * the stack size, or from the stack-allocated `name__storage` array otherwise.
  *
  * The macro takes the following parameters:
@@ -320,11 +325,11 @@ while( 0)
         *name ## __count = (void *) (uintptr_t) (count),                                             \
         *name ## __k = NULL;                                                                         \
         ! name ## __k;                                                                               \
-        name ## __k++)                                                                               \
+        name ## __k = (void *) 1)                                                                    \
                                                                                                      \
       for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
                      ? name ## __storage                                                             \
-                     : mulle_malloc( sizeof( type) * (uintptr_t) (void *) name ## __count),          \
+                     : mulle_allocarray( (size_t) (uintptr_t) (void *) name ## __count, sizeof( type)),                    \
            *name ## __j = NULL;                                                                      \
            ! name ## __j;                                                                            \
            name ## __j = _mulle_alloca_do_free( name)                                                \
@@ -340,7 +345,7 @@ while( 0)
 // complements mulle_alloca_do
 //         
 /**
- * This macro defines a block of memory that is allocated on the heap using `mulle_malloc`.
+ * This macro defines a block of memory that is allocated on the heap using `mulle_allocarray`.
  * The memory block is automatically freed at the end of the loop.
  *
  * The macro takes the following parameters:
@@ -353,7 +358,7 @@ while( 0)
  * accessed using the `name` variable within the loop.
  */
 #define mulle_malloc_do( name, type, count)                                 \
-   for( type *name = mulle_malloc( sizeof( type) * (count));                \
+   for( type *name = mulle_allocarray( (count), sizeof( type));             \
         name;                                                               \
         name = (mulle_free( name), NULL)                                    \
       )                                                                     \
@@ -449,11 +454,11 @@ while( 0)
  *
  * This macro is used to reallocate a buffer that was originally allocated using
  * `mulle_alloca_do`. It will automatically handle the case where the buffer was
- * allocated on the stack (using `name__storage`) or on the heap (using `mulle_malloc`).
+ * allocated on the stack (using `name__storage`) or on the heap (using `mulle_allocarray`).
  *
  * If the new size fits within the existing stack-allocated buffer, the macro will
  * simply return without performing any reallocation. Otherwise, it will reallocate
- * the buffer on the heap using `mulle_realloc`.
+ * the buffer on the heap using `mulle_reallocarray`.
  *
  * @param name The name of the dynamically allocated buffer to be reallocated.
  * @param count The new size (in elements) for the buffer.
@@ -467,9 +472,12 @@ do                                                              \
    if( name == name ## __storage)                               \
    {                                                            \
       if( _count <= _mulle_alloca_do_get_size_as_length( name)) \
+      {                                                         \
+         name ## __count = (void *) _count;                     \
          break;                                                 \
+      }                                                         \
                                                                 \
-      name = mulle_malloc( sizeof( *name) * _count);            \
+      name = mulle_allocarray( (size_t) _count, sizeof( *name)); \
       memcpy( name,                                             \
               name ## __storage,                                \
               _oldcount * sizeof( *name));                      \
@@ -477,7 +485,7 @@ do                                                              \
    else                                                         \
    {                                                            \
       _count = _count ? _count : 1;                             \
-      name   = mulle_realloc( name, _count * sizeof( *name));   \
+      name   = mulle_reallocarray( name, (size_t) _count, sizeof( *name)); \
    }                                                            \
                                                                 \
    if( _count > _oldcount)                                      \
@@ -511,7 +519,7 @@ while( 0)
         *name ## __count = (void *) (uintptr_t) (count),                                             \
         *name ## __k = NULL;                                                                         \
         ! name ## __k;                                                                               \
-        name ## __k++)                                                                               \
+        name ## __k = (void *) 1)                                                                    \
       for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
                      ? name ## __storage                                                             \
                      : mulle_calloc( (size_t) (void *) name ## __count, sizeof( type)),              \
@@ -551,7 +559,7 @@ while( 0)
         *name ## __count = (void *) (uintptr_t) (count),                                             \
         *name ## __k = NULL;                                                                         \
         ! name ## __k;                                                                               \
-        name ## __k++)                                                                               \
+        name ## __k = (void *) 1)                                                                    \
       for( type *name = ((uintptr_t) name ## __count) <= _mulle_alloca_do_get_size_as_length( name)  \
                      ? name ## __storage                                                             \
                      : mulle_calloc( (size_t) (void *) name ## __count, sizeof( type)),              \
@@ -566,22 +574,14 @@ while( 0)
 
 
 /**
- * Allocates a dynamically sized zeroed buffer on the stack or heap, depending on the
- * requested size and a specified stack size limit. The buffer is automatically freed
- * at the end of the loop.
+ * Iterates over a dynamically allocated buffer, like `mulle_malloc_for`.
  *
- * This macro is used to allocate a buffer that can grow dynamically, but still
- * take advantage of stack-based allocation when possible. It will allocate the
- * buffer on the stack if the requested size fits within the specified stack size
- * limit, otherwise it will allocate the buffer on the heap using `mulle_calloc`.
- *
- * The buffer is automatically freed at the end of the loop using the
- * `_mulle_alloca_do_free` function.
+ * This is an alias of `mulle_malloc_for`; the name reflects that the buffer
+ * was created with one of the zeroing `*calloca*` variants.
  *
  * @param name The name of the dynamically allocated buffer.
- * @param type The type of the elements in the buffer.
- * @param stacksize The maximum size (in bytes) of the buffer to allocate on the stack.
- * @param count The initial size (in elements) of the buffer.
+ * @param len The number of elements in the buffer.
+ * @param p A pointer variable that will be used to iterate over the buffer.
  */
 #define mulle_calloc_for( name, len, p) \
    mulle_malloc_for( name, len, p)

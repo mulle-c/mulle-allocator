@@ -46,7 +46,7 @@ void   mulle_allocation_fail( struct mulle_allocator *p,
                               void *block,
                               size_t size)
 {
-   perror( "memory allocation:");
+   fprintf( stderr, "mulle-allocator: memory allocation of %zu bytes failed\n", size);
    abort();
 
    MULLE_C_UNUSED( p);
@@ -62,10 +62,12 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, const char *s)
    char     *dup;
 
    size = strlen( s) + 1;
-   // OOM is retryable: fail may return meaning "recovered, retry"
-   while( ! (dup = (*p->realloc)( NULL, size, p)))
+   dup  = (*p->reallocarray)( NULL, 1, size, p);
+   if( dup)
+      memcpy( dup, s, size);
+   else
+      // fail must not return
       (*p->fail)( p, NULL, size);
-   memcpy( dup, s, size);
    return( dup);
 }
 
@@ -79,37 +81,13 @@ void   *_mulle_allocator_realloc_strict( struct mulle_allocator *p,
 
    if( ! size)
    {
-      (*p->free)( block, p);
+      if( block)
+         (*p->free)( block, p);
       return( NULL);
    }
 
-   // OOM is retryable: fail may return meaning "recovered, retry"
-   while( ! (q = (*p->realloc)( block, size, p)))
-      (*p->fail)( p, block, size);
-   return( q);
-}
-
-
-void *  _mulle_allocator_reallocarray( struct mulle_allocator *p,
-                                       void *block,
-                                       size_t n,
-                                       size_t size)
-{
-   void     *q;
-   size_t   n_size;
-
-   // zero size is a programming error: call fail once (not retryable). If the
-   // handler wrongly returns on this, abort rather than loop or leak NULL.
-   if( MULLE_C_UNLIKELY( ! n || ! size))
-   {
-      (*p->fail)( p, NULL, 0);
-      mulle_allocation_fail( p, NULL, 0);
-   }
-   assert( size <= SIZE_MAX / n);  // overflow check
-
-   n_size = mulle_allocator_size_multiply( p, n, size);
-   // OOM is retryable: fail may return meaning "recovered, retry"
-   while( MULLE_C_UNLIKELY( ! (q = (*p->realloc)( block, n_size, p))))
+   q = (*p->reallocarray)( block, 1, size, p);
+   if( ! q)
       (*p->fail)( p, block, size);
    return( q);
 }
@@ -120,20 +98,18 @@ void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
                                               size_t n,
                                               size_t size)
 {
-   void     *q;
-   size_t   n_size;
+   void   *q;
 
-   n_size = mulle_allocator_size_multiply( p, n, size);
-   if( ! n_size)
+   // stdlib-like: free and return NULL, instead of being a programmer error
+   if( ! n || ! size)
    {
-      (*p->free)( block, p);
+      if( block)
+         (*p->free)( block, p);
       return( NULL);
    }
 
-   assert( size <= SIZE_MAX / n);  // overflow check (n != 0 here)
-
-   // OOM is retryable: fail may return meaning "recovered, retry"
-   while( MULLE_C_UNLIKELY( ! (q = (*p->realloc)( block, n_size, p))))
+   q = (*p->reallocarray)( block, n, size, p);
+   if( MULLE_C_UNLIKELY( ! q))
       (*p->fail)( p, block, size);
    return( q);
 }
@@ -141,104 +117,140 @@ void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
 
 
 //
-// this function exists because gcc is paining me. But this is also "wrong"
-// because it's a supposedly int returning function that should be marked as
-// "no-return". It's a classical type tragedy.
+// The default abafree reclaimer: no ABA-safe freeing is configured, which is
+// a programmer error. Returns int to match the abafree vector, but never
+// returns: it aborts.
 //
-// MULLE_C_NO_RETURN
+MULLE_C_NO_RETURN
 int   mulle_allocator_no_aba_abort( void *aba,
                                     void (*free)( void *, void *),
                                     void *block,
                                     void *owner)
 {
-   abort();
-
    MULLE_C_UNUSED( aba);
    MULLE_C_UNUSED( free);
    MULLE_C_UNUSED( block);
    MULLE_C_UNUSED( owner);
+
+   abort();
+}
+
+
+//
+// The allocator's deferred-free adapter. An ABA reclaimer calls this with the
+// owner it was given (always the owning allocator); the block is released
+// through that allocator's own `free`. The type is exactly
+// mulle_allocator_deferred_free_t, so no function pointer is ever cast.
+//
+void   _mulle_allocator_deferred_free( void *block, void *owner)
+{
+   struct mulle_allocator   *p;
+
+   p = owner;
+   (*p->free)( block, p);
+}
+
+
+//
+// The default reallocarray vector. reallocarray(3) is not standard C, so this
+// is built on standard realloc. That means we perform the count*size
+// multiplication ourselves and therefore we MUST check it. A zero count/size
+// is likewise our programmer error. Both are routed through the allocator's
+// `fail` vector. It backs malloc, realloc, allocarray and reallocarray alike.
+//
+static void   *v_reallocarray( void *block,
+                               size_t n,
+                               size_t size,
+                               struct mulle_allocator *allocator)
+{
+   if( MULLE_C_UNLIKELY( ! n || ! size))
+      _mulle_allocator_abort( allocator, block, 0);
+
+   return( realloc( block, mulle_allocator_size_multiply( allocator, n, size)));
 }
 
 
 // #pragma mark - _mulle_allocator
 
+//
+// Typed abort stubs for _mulle_allocator_invalidate. Using real functions with
+// the vector signatures avoids casting `abort` to an incompatible function
+// pointer type.
+//
+MULLE_C_NO_RETURN
+static void   *v_abort_calloc( size_t n,
+                               size_t size,
+                               struct mulle_allocator *allocator)
+{
+   MULLE_C_UNUSED( n);
+   MULLE_C_UNUSED( size);
+   MULLE_C_UNUSED( allocator);
+   abort();
+}
+
+
+MULLE_C_NO_RETURN
+static void   *v_abort_reallocarray( void *block,
+                                     size_t n,
+                                     size_t size,
+                                     struct mulle_allocator *allocator)
+{
+   MULLE_C_UNUSED( block);
+   MULLE_C_UNUSED( n);
+   MULLE_C_UNUSED( size);
+   MULLE_C_UNUSED( allocator);
+   abort();
+}
+
+
+MULLE_C_NO_RETURN
+static void   v_abort_free( void *block, struct mulle_allocator *allocator)
+{
+   MULLE_C_UNUSED( block);
+   MULLE_C_UNUSED( allocator);
+   abort();
+}
+
+
+MULLE_C_NO_RETURN
+static void   v_abort_fail( struct mulle_allocator *allocator,
+                            void *block,
+                            size_t size)
+{
+   MULLE_C_UNUSED( allocator);
+   MULLE_C_UNUSED( block);
+   MULLE_C_UNUSED( size);
+   abort();
+}
+
+
 void   _mulle_allocator_invalidate( struct mulle_allocator *p)
 {
-   p->calloc  = (void *(*)( size_t, size_t, struct mulle_allocator *)) abort;
-   p->realloc = (void *(*)( void *, size_t, struct mulle_allocator *)) abort;
-   p->free    = (void (*)( void *, struct mulle_allocator *)) abort;
-   p->abafree = mulle_allocator_no_aba_abort;
+   p->calloc       = v_abort_calloc;
+   p->reallocarray = v_abort_reallocarray;
+   p->free         = v_abort_free;
+   p->fail         = v_abort_fail;
+   p->abafree      = mulle_allocator_no_aba_abort;
+   p->aba          = NULL;
 }
 
-
-#ifdef NO_STDLIB_TRAMPOLINE_NEEDED
-
-static void   no_free( void *ignored)
-{
-   MULLE_C_UNUSED( ignored);
-}
-
-
-struct mulle_allocator   mulle_allocator_stdlib =
-{
-   calloc,
-   realloc,
-   free,
-   mulle_allocation_fail,
-   mulle_allocator_no_aba_abort,
-   NULL
-};
-
-
-// this will be patched by the foundation
-struct mulle_allocator   mulle_allocator_default =
-{
-   calloc,
-   realloc,
-   free,
-   mulle_allocation_fail,
-   mulle_allocator_no_aba_abort,
-   NULL
-};
-
-
-struct mulle_allocator   mulle_allocator_stdlib_nofree =
-{
-   calloc,
-   realloc,
-   no_free,
-   mulle_allocation_fail,
-   mulle_allocator_no_aba_abort,
-   NULL
-};
-
-
-int   mulle_allocator_is_stdlib_allocator( const struct mulle_allocator *p)
-{
-   if( ! p)
-      p = &mulle_default_allocator;
-   return( p->calloc == calloc);
-}
-
-#else
 
 static void   *v_calloc( size_t n,
                          size_t size,
                          struct mulle_allocator *allocator)
 {
-   MULLE_C_UNUSED( allocator);
+   // zero count/size is always our programmer error
+   if( MULLE_C_UNLIKELY( ! n || ! size))
+      _mulle_allocator_abort( allocator, NULL, 0);
+
+#if ! MULLE_ALLOCATOR_TRUST_STDLIB
+   // calloc does the count*size multiplication itself; only check it when we
+   // do not trust the platform to have done so
+   if( MULLE_C_UNLIKELY( size > SIZE_MAX / n))
+      _mulle_allocator_abort( allocator, NULL, (size_t) -1);
+#endif
 
    return( calloc( n, size));
-}
-
-
-static void   *v_realloc( void *block,
-                          size_t size,
-                          struct mulle_allocator *allocator)
-{
-   MULLE_C_UNUSED( allocator);
-
-   return( realloc( block, size));
 }
 
 
@@ -260,7 +272,7 @@ static void   v_no_free( void *ignored, struct mulle_allocator *allocator)
 struct mulle_allocator   mulle_allocator_stdlib =
 {
    v_calloc,
-   v_realloc,
+   v_reallocarray,
    v_free,
    mulle_allocation_fail,
    mulle_allocator_no_aba_abort,
@@ -272,7 +284,7 @@ struct mulle_allocator   mulle_allocator_stdlib =
 struct mulle_allocator   mulle_allocator_default =
 {
    v_calloc,
-   v_realloc,
+   v_reallocarray,
    v_free,
    mulle_allocation_fail,
    mulle_allocator_no_aba_abort,
@@ -283,7 +295,7 @@ struct mulle_allocator   mulle_allocator_default =
 struct mulle_allocator   mulle_allocator_stdlib_nofree =
 {
    v_calloc,
-   v_realloc,
+   v_reallocarray,
    v_no_free,
    mulle_allocation_fail,
    mulle_allocator_no_aba_abort,
@@ -297,5 +309,3 @@ int   mulle_allocator_is_stdlib_allocator( const struct mulle_allocator *p)
       p = &mulle_allocator_default;
    return( p->calloc == v_calloc);
 }
-
-#endif

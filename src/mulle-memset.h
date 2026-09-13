@@ -45,6 +45,10 @@
 // 8 bit quantity like memset. Chief use is for writing 0xdead into memory
 // regions.
 //
+// The value is written in the host's native byte order: a uint32_t read at a
+// 4-byte boundary yields `value`. On a little-endian host the bytes are
+// therefore LSB first, on a big-endian host MSB first.
+//
 MULLE__ALLOCATOR_GLOBAL
 void   *mulle_memset_uint32( void *dest, uint32_t value, size_t count);
 

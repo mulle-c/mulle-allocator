@@ -10,10 +10,19 @@ if( NOT __INSTALL_CMAKE_INCLUDE__CMAKE__)
       message( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
    endif()
 
-   #
-   # convenient way to figure out, if we are added as a subdirectory
-   # if we aren't, there is no point in doing this or ?
-   if( NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+   option( MULLE_TRANSITIVE_SOURCE_INCLUDE
+           "Propagate source include directories to add_subdirectory consumers"
+           ON)
+   set( _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE OFF)
+   if( MULLE_TRANSITIVE_SOURCE_INCLUDE
+       AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${LIBRARY_NAME}")
+      set( _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE ON)
+   endif()
+
+   if( _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE)
+      target_include_directories( "${LIBRARY_NAME}" INTERFACE
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+   elseif( NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
       list( APPEND INSTALL_TMP_HEADERS ${INSTALL_PUBLIC_HEADERS} ${INSTALL_PRIVATE_HEADERS})
 
@@ -42,6 +51,9 @@ if( NOT __INSTALL_CMAKE_INCLUDE__CMAKE__)
 
          add_custom_target( ${LIBRARY_NAME}-headers ALL DEPENDS ${HEADER_OUTPUTS})
          add_dependencies( ${LIBRARY_NAME} ${LIBRARY_NAME}-headers)
+         set_property( GLOBAL APPEND PROPERTY
+                       MULLE_HEADER_STAGING_TARGETS
+                       "${LIBRARY_NAME}")
 
          target_include_directories(${LIBRARY_NAME} INTERFACE
              $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>

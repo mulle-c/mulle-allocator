@@ -11,9 +11,8 @@ struct foo
 };
 
 
-int  main( int argc, char *argv[])
+int  main( void)
 {
-   unsigned int   count = 3;
    struct foo     *p = (struct foo*) 0x20;
 
    // just a test that figured out that we had problems with pointers

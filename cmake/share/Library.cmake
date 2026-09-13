@@ -157,6 +157,38 @@ if( LIBRARY_SOURCES OR OTHER_LIBRARY_OBJECT_FILES OR OTHER_${LIBRARY_UPCASE_IDEN
       if( BUILD_SHARED_LIBS)
          set_property( TARGET ${LIBRARY_STAGE2_TARGET} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
       endif()
+
+      #
+      # OVERRIDE FIX (cmake/Library.cmake, precedes cmake/share on module path):
+      #
+      # Mirror the stage-1 "add_subdirectory support" block for stage 2. The
+      # upstream cmake/share/Library.cmake applies dependency-target linking
+      # ONLY to the stage-1 OBJECT library (_1_${LIBRARY_NAME}); stage 2
+      # (_2_${LIBRARY_NAME}) never links the dependency targets, so it does not
+      # inherit their INTERFACE_INCLUDE_DIRECTORIES (the shared amalgamated
+      # header dir) nor the build ordering. In a mulle-craft / prebuilt-SDK
+      # build that is invisible because headers come from DEPENDENCY_DIR via
+      # -isystem. But for an external consumer that builds the dependencies from
+      # source with add_subdirectory() (no SDK), stage-2 sources such as
+      # MulleObjC*Foundation that #include <mulle-objc-runtime/...> fail to find
+      # the headers. Linking the resolved dependency targets here gives stage 2
+      # the same usage requirements and ordering as stage 1.
+      #
+      foreach( _dep_lib
+               ${DEPENDENCY_LIBRARIES}
+               ${OPTIONAL_DEPENDENCY_LIBRARIES}
+               ${ALL_LOAD_DEPENDENCY_LIBRARIES}
+               ${ALL_LOAD_OPTIONAL_DEPENDENCY_LIBRARIES}
+               ${FORCE_ALL_LOAD_DEPENDENCY_LIBRARIES}
+               ${STARTUP_DEPENDENCY_LIBRARIES}
+               ${STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES}
+               ${FORCE_STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES})
+         if( TARGET "${_dep_lib}")
+            message( STATUS "${LIBRARY_STAGE2_TARGET} inherits usage requirements of target \"${_dep_lib}\"")
+            target_link_libraries( ${LIBRARY_STAGE2_TARGET} PRIVATE "${_dep_lib}")
+         endif()
+      endforeach()
+      unset( _dep_lib)
    else()
       if( STAGE2_HEADERS)
          message( SEND_ERROR "No STAGE2_SOURCES found but STAGE2_HEADERS exist")
@@ -164,6 +196,32 @@ if( LIBRARY_SOURCES OR OTHER_LIBRARY_OBJECT_FILES OR OTHER_${LIBRARY_UPCASE_IDEN
       unset( LIBRARY_STAGE2_TARGET)
    endif()
 
+   get_property( _mulle_header_staging_targets GLOBAL
+                 PROPERTY MULLE_HEADER_STAGING_TARGETS)
+   if( _mulle_header_staging_targets)
+      foreach( _staging_target ${_mulle_header_staging_targets})
+         if( TARGET "${_staging_target}")
+            string( MAKE_C_IDENTIFIER "${_staging_target}"
+                    _staging_identifier)
+            set( _staging_stamp
+                 "${CMAKE_CURRENT_BINARY_DIR}/.${_staging_identifier}-headers-staged")
+            add_custom_command(
+               OUTPUT "${_staging_stamp}"
+               COMMAND ${CMAKE_COMMAND} -E touch "${_staging_stamp}"
+               DEPENDS "${_staging_target}"
+               COMMENT "Waiting for ${_staging_target} headers"
+            )
+            foreach( _source ${LIBRARY_SOURCES} ${STAGE2_SOURCES})
+               set_property( SOURCE "${_source}" APPEND
+                             PROPERTY OBJECT_DEPENDS "${_staging_stamp}")
+            endforeach()
+         endif()
+      endforeach()
+   endif()
+   unset( _mulle_header_staging_targets)
+   unset( _staging_target)
+   unset( _staging_identifier)
+   unset( _staging_stamp)
 
    if( LINK_PHASE)
 
@@ -248,54 +306,59 @@ if( LIBRARY_SOURCES OR OTHER_LIBRARY_OBJECT_FILES OR OTHER_${LIBRARY_UPCASE_IDEN
       # Ordinary dependencies can be propagated as target names. All-load
       # dependencies are handled separately below because reducing them to
       # ordinary target names loses their whole-archive semantics.
-      set( _INTERFACE_LIBS )
-      foreach( _item
-         ${DEPENDENCY_LIBRARIES}
-         ${DEPENDENCY_FRAMEWORKS}
-         ${OPTIONAL_DEPENDENCY_LIBRARIES}
-         ${OPTIONAL_DEPENDENCY_FRAMEWORKS}
-         ${STARTUP_DEPENDENCY_LIBRARIES}
-         ${STARTUP_DEPENDENCY_FRAMEWORKS}
-         ${OS_SPECIFIC_LIBRARIES}
-         ${OS_SPECIFIC_FRAMEWORKS}
-      )
-         if( TARGET "${_item}")
-            list( APPEND _INTERFACE_LIBS "${_item}")
-         endif()
-      endforeach()
-      unset( _item)
-
-      if( _INTERFACE_LIBS)
-         target_link_libraries( "${LIBRARY_NAME}" INTERFACE ${_INTERFACE_LIBS})
-      endif()
-      unset( _INTERFACE_LIBS)
-
-      # Keep all-load semantics for add_subdirectory consumers. The raw
-      # ALL_LOAD_* variables contain library names/targets; the FORCE_* lists
-      # are platform-specific linker fragments produced by AllLoadC and must
-      # not be propagated as ordinary CMake targets.
-      set( _INTERFACE_ALL_LOAD_LIBS )
-      if( CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+      option( MULLE_TRANSITIVE_LINK_LIBRARIES
+              "Propagate dependency libraries through target interfaces"
+              ON)
+      if( MULLE_TRANSITIVE_LINK_LIBRARIES)
+         set( _INTERFACE_LIBS )
          foreach( _item
-            ${ALL_LOAD_DEPENDENCY_LIBRARIES}
-            ${ALL_LOAD_OPTIONAL_DEPENDENCY_LIBRARIES}
-            ${STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES}
+            ${DEPENDENCY_LIBRARIES}
+            ${DEPENDENCY_FRAMEWORKS}
+            ${OPTIONAL_DEPENDENCY_LIBRARIES}
+            ${OPTIONAL_DEPENDENCY_FRAMEWORKS}
+            ${STARTUP_DEPENDENCY_LIBRARIES}
+            ${STARTUP_DEPENDENCY_FRAMEWORKS}
+            ${OS_SPECIFIC_LIBRARIES}
+            ${OS_SPECIFIC_FRAMEWORKS}
          )
             if( TARGET "${_item}")
-               list( APPEND _INTERFACE_ALL_LOAD_LIBS
-                  "$<LINK_LIBRARY:WHOLE_ARCHIVE,${_item}>"
-               )
+               list( APPEND _INTERFACE_LIBS "${_item}")
             endif()
          endforeach()
          unset( _item)
 
-         if( _INTERFACE_ALL_LOAD_LIBS)
-            target_link_libraries( "${LIBRARY_NAME}" INTERFACE
-               ${_INTERFACE_ALL_LOAD_LIBS}
-            )
+         if( _INTERFACE_LIBS)
+            target_link_libraries( "${LIBRARY_NAME}" INTERFACE ${_INTERFACE_LIBS})
          endif()
+         unset( _INTERFACE_LIBS)
+
+         # Keep all-load semantics for add_subdirectory consumers. The raw
+         # ALL_LOAD_* variables contain library names/targets; the FORCE_* lists
+         # are platform-specific linker fragments produced by AllLoadC and must
+         # not be propagated as ordinary CMake targets.
+         set( _INTERFACE_ALL_LOAD_LIBS )
+         if( CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+            foreach( _item
+               ${ALL_LOAD_DEPENDENCY_LIBRARIES}
+               ${ALL_LOAD_OPTIONAL_DEPENDENCY_LIBRARIES}
+               ${STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES}
+            )
+               if( TARGET "${_item}")
+                  list( APPEND _INTERFACE_ALL_LOAD_LIBS
+                     "$<LINK_LIBRARY:WHOLE_ARCHIVE,${_item}>"
+                  )
+               endif()
+            endforeach()
+            unset( _item)
+
+            if( _INTERFACE_ALL_LOAD_LIBS)
+               target_link_libraries( "${LIBRARY_NAME}" INTERFACE
+                  ${_INTERFACE_ALL_LOAD_LIBS}
+               )
+            endif()
+         endif()
+         unset( _INTERFACE_ALL_LOAD_LIBS)
       endif()
-      unset( _INTERFACE_ALL_LOAD_LIBS)
 
       #
       # MEMO: We deliberately do NOT export INCLUDE_DIRS here, one INTERFACE

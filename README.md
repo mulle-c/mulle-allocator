@@ -8,7 +8,7 @@
 
 ... contains a safer and portable alloca
 
-... one allocation API that behaves the same on every OS
+... one allocation API that behaves the same on every OS, with the built-in allocators
 
 ... can be backed by any allocator (stdlib, arena, shared memory, leak detector)
 
@@ -16,9 +16,11 @@
 
 ... has an API identical in signature to malloc, realloc, free, but with a stricter contract
 
-... zero-size allocations are a programming error and abort via the fail vector
+... with the built-in allocators, zero-size allocations are a programming error and abort via the fail vector
 
-... failed allocations never return NULL: the fail vector either aborts or recovers memory and the allocation is retried
+... with the built-in allocators, failed allocations never return NULL: a vector either succeeds or the terminal fail vector aborts
+
+... trusts the allocator vectors you install to validate their own arguments
 
 ... special realloc_restrict functions return NULL to indicate a successful free, the default realloc will not free
 
@@ -153,19 +155,35 @@ added pointer for `aba` and looks like this:
 struct mulle_allocator
 {
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *p);
-   void   *(*realloc)( void *block, size_t size, struct mulle_allocator *p);
+   void   *(*reallocarray)( void *block, size_t n, size_t size, struct mulle_allocator *p);
    void   (*free)( void *block, struct mulle_allocator *p);
-   void   (*fail)( struct mulle_allocator *p, void *block, size_t size);
-   int    (*abafree)( void *aba, void (*free)( void *), void *block);
+   void   (*fail)( struct mulle_allocator *p, void *block, size_t size) MULLE_C_NO_RETURN;
+   int    (*abafree)( void *aba, void (*free)( void *, void *), void *block, void *owner);
    void   *aba;
 };
 ```
 
-> The `fail` vector is not marked `MULLE_C_NO_RETURN`. A `fail` handler may
-> either not return (the default handler prints an error and aborts) or return.
-> Returning means "I recovered some memory, retry the allocation": the failed
-> allocation is retried in a loop. A returning handler must make forward
-> progress (actually free memory), otherwise the retry loop spins forever.
+> The `fail` vector is marked `MULLE_C_NO_RETURN`. It is terminal: when an
+> allocation cannot be satisfied the handler is expected to abort, exit or
+> longjmp, not to return. The default handler prints an error and aborts.
+>
+> `fail` is deliberately **not** a recovery or retry hook. Recovering from
+> memory pressure is an allocation strategy and belongs in the `calloc` and
+> `reallocarray` vectors, which know their own arena, locks and free lists and
+> can release memory and retry the request themselves before returning. The
+> library calls a vector once and only invokes `fail` if that vector ultimately
+> returns NULL. This keeps the failure policy orthogonal and avoids retry loops,
+> retry counters and the livelock and reentrancy hazards of recovering from
+> `fail`.
+
+> The library **trusts the vector functions you install**. The `reallocarray`
+> funnel and the `calloc` path pass `block`/`n`/`size` straight through and
+> never validate them; your vector must reject a zero `n`/`size` and an
+> overflowing `n * size` itself. The built-in `mulle_allocator_default` and
+> `mulle_allocator_stdlib` always do. See
+> `mulle-allocator-struct.h` for the exact contract. If you install a
+> third-party allocator, read its documentation before relying on the
+> zero-size/overflow behaviour described above.
 
 > By default `.aba` and `.abafree` are not available.
 > If you need ABA safe freeing, it is recommended to use [mulle-aba](//github.com/mulle-concurrent/mulle-aba).
@@ -353,14 +371,31 @@ allocation went bad. If a mulle-allocator function detects, that an allocation
 could not be satisfied, it jumps through its fail vector. By default this will
 print an error message and exit the program.
 
-Since the fail-retry semantics, a custom `fail` handler installed with
-`mulle_allocator_set_fail` may instead recover memory and return. A return
-means "retry the allocation": the library loops and retries until the
-allocation succeeds. So an allocation function still never returns NULL to its
-caller — it either succeeds (possibly after one or more recovery retries) or
-the program is aborted by the fail handler. A returning handler must make
-forward progress or the retry loop spins forever. Note that zero-size and
-overflow are programming errors: they are never retried and always abort.
+A custom `fail` handler installed with `mulle_allocator_set_fail` is terminal
+as well: it must not return. It can log a diagnosis and then abort, but it can
+not make the failed allocation succeed. If you want an allocation to survive
+memory pressure, do not put the recovery in `fail` — put it in the allocator's
+`calloc`/`reallocarray` vector, which is the proper place for an allocation
+strategy. Such a vector can release memory and retry the request itself and
+return a valid block; the library then never calls `fail`. Note that zero-size
+and overflow are programming errors: they are routed through `fail` as well, so
+a custom handler still gets to log a diagnosis, but they are not retryable and
+the handler is still terminal.
+
+If you need ENOMEM style behaviour for a specific allocation — typically a
+large, optional buffer that you can gracefully skip — do not fight the
+never-NULL contract. Call the stdlib `malloc`/`calloc`/`realloc` directly for
+that allocation and handle a NULL return; keep using `mulle_malloc` and friends
+everywhere else. Mixing the two styles at the few call sites that actually care
+is simpler and safer than giving the whole program recoverable-allocation
+semantics.
+
+The zero-size and overflow guarantees above describe the **built-in**
+allocators. For an allocator you install yourself, the library passes your
+arguments through untouched and the guarantee is yours to provide: reject a
+zero `n`/`size` and check an overflowing `n * size` inside your `calloc` and
+`reallocarray` vectors. This keeps custom vectors (arenas, shared memory,
+leak detectors) free of hidden policy, at the cost of that one responsibility.
 
 You can not pass a zero size to either `mulle_realloc` or `mulle_malloc`
 without getting a failure. If you want to free memory with realloc - by
@@ -391,40 +426,72 @@ or aba fields while other threads may be calling through it.
 
 ## Add
 
-mulle-allocator is a component of the [mulle-core](//github.com/mulle-core/mulle-core) library. So in your code include the mulle-core umbrella header:
+### Add as part of mulle-core
+
+mulle-allocator is a component of the
+[mulle-core/mulle-core](//github.com/mulle-core/mulle-core) library. In your code
+include its umbrella header:
 
 ``` c
 #include <mulle-core/mulle-core.h>
 ```
 
-### Add mulle-core to a cmake and git project
+Add mulle-core as a git submodule and link against it:
 
 ``` bash
-git submodule add https://github.com/mulle-core/mulle-core.git mulle-core
+git submodule add -f "https://github.com/mulle-core/mulle-core.git" \
+                     "stash/mulle-core"
+git submodule update --init --recursive
 ```
-
-Add this to your `CMakeLists.txt`:
 
 ``` cmake
-add_subdirectory( mulle-core)
-target_link_libraries( ${PROJECT_NAME} PRIVATE mulle-core)
+include_directories( SYSTEM "stash/mulle-core/src")
+add_subdirectory( stash/mulle-core)
+target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-core)
 ```
 
-
-### Add mulle-core to a mulle-sde project
+Or let [mulle-sde](//github.com/mulle-sde) do it:
 
 ``` sh
-mulle-sde add github:mulle-core/mulle-core
+mulle-sde add mulle-core/mulle-core
 ```
 
-### Embed mulle-allocator with clib
+
+
+
+### Add mulle-allocator as subproject
+
+In your code include its header:
+
+``` c
+#include <mulle-allocator/mulle-allocator.h>
+```
+
+``` bash
+git submodule add -f --name "mulle-c11" \
+                            "https://github.com/mulle-c/mulle-c11.git" \
+                            "stash/mulle-c11"
+git submodule add -f --name "mulle-allocator" \
+                        "https://github.com/mulle-c/mulle-allocator" \
+                        "stash/mulle-allocator"
+git submodule update --init --recursive
+```
+
+``` cmake
+include_directories( SYSTEM "${CMAKE_BINARY_DIR}/include")
+
+add_subdirectory( stash/mulle-c11)
+add_subdirectory( stash/mulle-allocator)
+
+target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-c11)
+target_link_libraries( ${PROJECT_NAME} PUBLIC mulle-allocator)
+```
+
+Or let [mulle-sde](//github.com/mulle-sde) do it:
 
 ``` sh
-clib install --out src mulle-c/mulle-allocator
+mulle-sde add github:mulle-c/mulle-allocator
 ```
-
-Append `src` to your include path (e.g. add `-isystem src`  to your `CFLAGS`)
-and compile all the sources that were downloaded.
 
 
 

@@ -39,6 +39,31 @@
 
 
 //
+// The pattern is 4 bytes and alignment is done with & 3. Bail out if that
+// assumption is wrong.
+//
+typedef char   _mulle_memset_uint32_word_guard[ sizeof( uint32_t) == 4 ? 1 : -1];
+
+//
+// `mulle_memset_uint32` writes the *native* byte image of `value`, which is
+// only well-defined once the byte order is known. mulle-c11 (pulled in via
+// mulle-allocator.h) detects it; if it can't, fail the build instead of
+// silently writing the wrong pattern.
+//
+#if ! defined( __LITTLE_ENDIAN__) && ! defined( __BIG_ENDIAN__)
+# error "mulle_memset_uint32 needs a known byte order"
+#endif
+
+#if defined( __BIG_ENDIAN__) && __BIG_ENDIAN__
+# define _mulle_memset_uint32_byte( value, i)                          \
+   ((uint8_t) ((value) >> (((sizeof( uint32_t) - 1) - (i)) * 8)))
+#else
+# define _mulle_memset_uint32_byte( value, i)                          \
+   ((uint8_t) ((value) >> ((i) * 8)))
+#endif
+
+
+//
 // WHY IS THIS HERE ?
 //
 // `mulle_memset_uint32` is a fill utility (writing a repeating 32-bit
@@ -64,12 +89,12 @@
 //   library has to grow a new heavyweight dependency.
 //
 //
-// Fill a byte range with a repeating 4-byte pattern. The pattern is
-// aligned to 4-byte boundaries: for an unaligned `dest` the pattern
-// is shifted so that the bytes of a word at a 4-byte boundary always
-// read back as `value` in little-endian order. The unaligned prefix
-// and the trailing bytes are written byte-wise, the bulk is copied
-// with `memcpy` to avoid any alignment or aliasing issues.
+// Fill a byte range with a repeating 4-byte pattern in the host's native byte
+// order. The pattern is aligned to 4-byte boundaries: for an unaligned `dest`
+// the pattern is shifted so that a uint32_t read at a 4-byte boundary always
+// yields `value`. The unaligned prefix and the trailing bytes are written
+// byte-wise, the bulk is copied with `memcpy` to avoid any alignment or
+// aliasing issues.
 //
 void   *mulle_memset_uint32( void *dest, uint32_t value, size_t count)
 {
@@ -78,15 +103,14 @@ void   *mulle_memset_uint32( void *dest, uint32_t value, size_t count)
    size_t    i;
 
    d8     = dest;
-   offset = (uintptr_t) dest & 3;
+   offset = (uintptr_t) dest & (sizeof( uint32_t) - 1);
 
-   // shift the pattern so that the first byte of `value` is written
-   // to the next 4-byte boundary
-   for( i = offset; i < 4 && count; i++, count--)
-      *d8++ = (uint8_t)( value >> (i * 8));
+   // prefix: bytes of the native image that fall before the next boundary
+   for( i = offset; i < sizeof( value) && count; i++, count--)
+      *d8++ = _mulle_memset_uint32_byte( value, i);
 
-   // bulk: whole 32-bit words
-   while( count >= 4)
+   // bulk: whole words, identical to the native representation
+   while( count >= sizeof( value))
    {
       memcpy( d8, &value, sizeof( value));
       d8    += sizeof( value);
@@ -95,7 +119,7 @@ void   *mulle_memset_uint32( void *dest, uint32_t value, size_t count)
 
    // trailing partial word
    for( i = 0; i < count; i++)
-      d8[ i] = (uint8_t)( value >> (i * 8));
+      d8[ i] = _mulle_memset_uint32_byte( value, i);
 
    return( dest);
 }

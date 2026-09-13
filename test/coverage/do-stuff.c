@@ -50,7 +50,7 @@ static int  test( struct mulle_allocator *allocator)
 }
 
 
-int  main( int argc, char *argv[])
+int  main( void)
 {
    int  rc;
 

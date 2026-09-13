@@ -9,11 +9,12 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 
 ## 2. Key Concepts & Design Philosophy
 
-- **Allocator indirection:** `struct mulle_allocator` carries function pointers (`calloc`, `realloc`, `free`, `fail`, `abafree`) plus opaque `aba` context.
+- **Allocator indirection:** `struct mulle_allocator` carries function pointers (`calloc`, `reallocarray`, `free`, `fail`, `abafree`) plus opaque `aba` context.
 - **Fail-fast by default:** allocation wrappers call `fail` callback on failure (default implementation aborts); callers usually do not NULL-check successful paths.
 - **Explicit strict realloc variant:** `*_realloc_strict` and `*_reallocarray_strict` provide "free-and-NULL" semantics for `size == 0` (respectively zero `n`/`size`).
-- **Overflow-checked arithmetic:** `mulle_allocator_size_multiply`/`mulle_allocator_size_add` compute sizes for allocation callers; on `size_t` overflow they invoke the allocator `fail` callback (which does not return) so wrapped-around sizes never reach the allocator.
-- **Array reallocation API:** `*_reallocarray*` resizes `n * size` element arrays with a checked multiplication; the non-strict variant treats zero `n`/`size` as a programming error (fail path), while the strict variant frees the block and returns `NULL`.
+- **Overflow-checked arithmetic:** `mulle_allocator_size_multiply`/`mulle_allocator_size_add` compute sizes for allocation callers; on `size_t` overflow they route through the allocator's `fail` vector (default `mulle_allocation_fail`, which aborts) so wrapped-around sizes never reach the allocator.
+- **Array reallocation API:** `*_reallocarray*` resizes `n * size` element arrays. The default vector performs the checked multiplication; a zero `n`/`size` or `n * size` overflow is a programmer error routed to the `fail` vector. The strict variant frees the block and returns `NULL` on zero.
+- **Trusted vectors:** the library dispatches straight to the vector functions you install and never validates their arguments (trust "up"); each vector owns its zero/overflow handling. The built-in default vector always rejects a zero `n`/`size` itself and always checks the `count * size` multiplication for `reallocarray` (built on standard `realloc`). For `calloc`, whose stdlib call does the multiplication itself, the extra check is skipped when `MULLE_ALLOCATOR_TRUST_STDLIB` (default `0`) is set to `1`.
 - **Scoped temporary storage macros:** `mulle_alloca_do`/`mulle_calloca_do` use stack for small buffers and heap fallback for larger ones, with automatic cleanup at scope exit.
 - **Portable C API surface:** mostly inline wrappers/macros around allocator vectors; no runtime object model.
 
@@ -24,11 +25,11 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 #### `struct mulle_allocator`
 - **Purpose:** pluggable allocation vector passed through APIs.
 - **Key fields:**
-  - `calloc( n, size, allocator)` — allocate zeroed memory.
-  - `realloc( block, size, allocator)` — allocate/resize.
+  - `calloc( n, size, allocator)` — allocate zeroed memory. The vector must reject zero `n`/`size` and `n * size` overflow itself.
+  - `reallocarray( block, n, size, allocator)` — allocate/resize; backs `mulle_malloc`, `mulle_realloc`, `mulle_allocarray` and `mulle_reallocarray` alike. The vector must reject zero `n`/`size` and `n * size` overflow itself.
   - `free( block, allocator)` — deallocate.
-  - `fail( allocator, block, size)` — failure handler. May abort (default) or recover memory and return, in which case the allocation is retried.
-  - `abafree( aba, free_fn, block, owner)` — optional ABA-aware release.
+  - `fail( allocator, block, size)` — failure handler. Terminal: must not return (default aborts). The wrapper invokes it on OOM; the default vector also routes programmer errors (zero size, `n * size` overflow) here. It is not a retry hook; recovery belongs in the allocation vectors.
+  - `abafree( aba, deferred_free, block, owner)` — optional ABA-aware release. The reclaimer must eventually call `deferred_free( block, owner)` exactly once; mulle-allocator supplies the owning allocator as `owner`, so the block is released through the allocator's own `free`. The reclaimer is trusted like the other vectors.
   - `aba` — opaque ABA context pointer.
 
 ### 3.2. `mulle-allocator.h`
@@ -37,7 +38,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 | Symbol | Short description |
 |---|---|
 | `mulle_allocator_default` | Default global allocator used by convenience wrappers. |
-| `mulle_allocator_stdlib` | Stdlib-backed allocator (`calloc`/`realloc`/`free`). |
+| `mulle_allocator_stdlib` | Stdlib-backed allocator (`calloc`/`reallocarray`/`free`). |
 | `mulle_allocator_stdlib_nofree` | Stdlib allocation but no-op free function. |
 | `mulle_default_allocator` | Legacy macro alias to `mulle_allocator_default`. |
 | `mulle_stdlib_allocator` | Legacy macro alias to `mulle_allocator_stdlib`. |
@@ -50,7 +51,7 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 | `mulle_allocator_no_aba_abort` | Default ABA callback; aborts when ABA free is used unconfigured. |
 | `mulle_allocator_is_stdlib_allocator` | Checks whether allocator is stdlib-backed (implementation test by function pointer); takes `const struct mulle_allocator *p`. |
 | `_mulle_allocator_realloc_strict` | Core strict realloc helper (`size==0` frees and returns `NULL`). |
-| `_mulle_allocator_reallocarray` | Core array realloc helper (non-strict); zero `n`/`size` or `n * size` overflow routes to the `fail` callback. |
+| `_mulle_allocator_reallocarray` | Inline core array realloc helper; dispatches to the `reallocarray` vector and routes a NULL result to the `fail` callback. The vector validates `n`/`size`. |
 | `_mulle_allocator_reallocarray_strict` | Core strict array realloc helper; if `n * size == 0` frees the block and returns `NULL`. |
 | `_mulle_allocator_invalidate` | Overwrites allocator callbacks with abort handlers (test/debug helper). |
 | `_mulle_allocator_strdup` | Allocator-based string duplication primitive (takes `const char *s`). |
@@ -58,26 +59,27 @@ At project level, this is a foundational low-level component in the mulle-c ecos
 #### Inline checked size-computation helpers
 | Symbol | Short description |
 |---|---|
-| `mulle_allocator_size_multiply( allocator, a, b)` | Checked `size_t` multiplication (`a * b`); on overflow calls `fail` (does not return). Declared `static inline`, returns the product. |
-| `mulle_allocator_size_add( allocator, a, b)` | Checked `size_t` addition (`a + b`); on wraparound calls `fail` (does not return). Declared `static inline`, returns the sum. |
+| `mulle_allocator_size_multiply( allocator, a, b)` | Checked `size_t` multiplication (`a * b`); on overflow routes to the allocator's `fail` vector (default aborts). Declared `always_inline`, returns the product. |
+| `mulle_allocator_size_add( allocator, a, b)` | Checked `size_t` addition (`a + b`); on wraparound routes to the allocator's `fail` vector (default aborts). Declared `always_inline`, returns the sum. |
 
-Both helpers are intended for consumers of the library when computing allocation sizes; they pass the allocator whose `fail` handler is invoked on overflow, so a `NULL` allocator argument must be normalized by the caller prior to use.
+Both helpers are intended for consumers of the library when computing allocation sizes; they pass the allocator whose `fail` handler is invoked on overflow. A `NULL` allocator selects the default allocator.
 
 #### Inline configuration and checks
 | Symbol | Short description |
 |---|---|
 | `mulle_allocator_set_aba` | Sets `aba` context and ABA free callback (or abort default). |
-| `mulle_allocator_set_fail` | Sets fail callback (or default fail callback). Handler may abort or recover-and-return to trigger an allocation retry. |
+| `mulle_allocator_set_fail` | Sets fail callback (or default fail callback). Terminal handler: must not return; not a retry hook. |
 | `mulle_allocator_assert` | Asserts allocator function pointers are present. |
 
 #### Inline allocator API (allocator parameter, `NULL` => default allocator)
 | Symbol | Short description |
 |---|---|
 | `mulle_allocator_malloc` | Allocate bytes; fail callback on allocation failure. |
-| `mulle_allocator_calloc` | Allocate zeroed `n * size`; fail callback on failure. |
+| `mulle_allocator_allocarray` | Allocate an `n * size` array with checked multiply; fail callback on failure. |
+| `mulle_allocator_calloc` | Allocate zeroed `n * size`; dispatches to the `calloc` vector and routes a NULL result to the fail callback. The vector validates `n`/`size`. |
 | `mulle_allocator_realloc` | Resize/allocate; fail callback on failure. |
 | `mulle_allocator_realloc_strict` | Strict realloc semantics (`size==0` frees and returns `NULL`). |
-| `mulle_allocator_reallocarray` | Array realloc (`n` elements of `size` bytes) with checked multiply; zero `n`/`size` or overflow triggers fail callback. |
+| `mulle_allocator_reallocarray` | Array realloc (`n` elements of `size` bytes); dispatches to the `reallocarray` vector and routes a NULL result to the fail callback. The vector validates `n`/`size`. |
 | `mulle_allocator_reallocarray_strict` | Array realloc; if `n * size == 0` frees the block and returns `NULL`. |
 | `mulle_allocator_free` | Free block if non-NULL. |
 | `mulle_allocator_abafree` | ABA-aware free dispatch; returns status from callback. |
@@ -88,6 +90,7 @@ Both helpers are intended for consumers of the library when computing allocation
 | Symbol | Short description |
 |---|---|
 | `mulle_malloc` | Default allocator malloc wrapper. |
+| `mulle_allocarray` | Default allocator array allocation wrapper. |
 | `mulle_calloc` | Default allocator calloc wrapper. |
 | `mulle_realloc` | Default allocator realloc wrapper. |
 | `mulle_realloc_strict` | Default allocator strict realloc wrapper. |
@@ -130,7 +133,7 @@ Both helpers are intended for consumers of the library when computing allocation
 
 | Symbol | Short description |
 |---|---|
-| `mulle_memset_uint32( dest, value, count)` | Byte-count fill using repeated 32-bit pattern, including unaligned starts. |
+| `mulle_memset_uint32( dest, value, count)` | Fill `count` bytes so that a `uint32_t` read at a 4-byte boundary yields `value` (native byte order); leading bytes are the rotated image. |
 
 ## 4. Performance Characteristics
 
@@ -152,16 +155,16 @@ Both helpers are intended for consumers of the library when computing allocation
 2. Normalize allocator input with `allocator ? allocator : &mulle_allocator_default` only when storing allocator pointers; otherwise wrapper functions already do this.
 3. Use `mulle_alloca_do`/`mulle_calloca_do` for temporary buffers whose size may vary significantly.
 4. Use `mulle_allocator_realloc_strict` when you need explicit `size==0` free-to-`NULL` semantics; use `mulle_allocator_reallocarray(_strict)` for element-array resizing with overflow-checked `n * size`.
-5. Compute allocation sizes with `mulle_allocator_size_multiply`/`mulle_allocator_size_add` when caller-supplied counts could overflow; they route overflow to the `fail` handler instead of wrapping.
+5. Compute allocation sizes with `mulle_allocator_size_multiply`/`mulle_allocator_size_add` when caller-supplied counts could overflow; they route to the `fail` vector (terminal) on overflow instead of wrapping.
 6. Use `mulle_allocator_set_fail` and `mulle_allocator_set_aba` in tests/specialized runtimes to install custom behavior.
 
 ### Common pitfalls
 1. Do not describe `mulle_allocator_realloc_strict` as "returns NULL on allocation failure"; failure still routes to fail callback. `NULL` is the defined result for `size==0` (after free).
-2. Do not pass `n == 0` or `size == 0` to non-strict `mulle_allocator_reallocarray` expecting a free; zero is a programming error routed to the `fail` callback in all builds. Use the `_strict` variant to get free-and-`NULL` behavior.
+2. Do not pass `n == 0` or `size == 0` to non-strict `mulle_allocator_reallocarray` expecting a free; for the default vector zero and `n * size` overflow are programming errors routed to the `fail` vector. A custom vector must enforce this contract itself. Use the `_strict` variant to get free-and-`NULL` behavior.
 3. Do not use pointers obtained inside `mulle_alloca_do` outside scope unless extracted with `mulle_alloca_do_extract`.
 4. Do not assume `mulle_allocator_stdlib_nofree` frees memory; it intentionally does not.
 5. Do not call `mulle_abafree` unless ABA callback/context is configured, or default abort behavior will trigger.
-6. A custom `fail` handler that returns (fail-retry semantics) MUST make forward progress by actually freeing memory. If it returns without freeing anything, the allocation retry loop spins forever. Only genuine out-of-memory is retried; zero-size and overflow are programming errors that always abort and are never retried.
+6. `fail` is terminal: a custom handler must not return (it aborts, exits or longjmps). It is not a retry hook. To survive memory pressure, implement recovery in the `calloc`/`reallocarray` vector, which can free memory and retry before returning. If a handler were to return without aborting, the compiler may have placed a trap after the call.
 
 ### Idiomatic usage
 - Keep allocator pointer in long-lived structs if caller-chosen memory domains must be preserved for destroy/deinit.

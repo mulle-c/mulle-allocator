@@ -38,7 +38,7 @@ static int  test( unsigned int amount)
 
       mulle_calloca_do_realloc( values, amount);
       for( i = 0; i < amount; i++)
-         if( values[ i] != i)
+         if( values[ i] != (int) i)
          {
             fprintf( stderr, "3. %u of %u\n", j, amount);
             return( 1);
@@ -87,7 +87,7 @@ static int  test_extract( unsigned int amount)
 
    mulle_calloc_for( buf, amount, p)
    {
-      if( *p++ != amount)
+      if( *p++ != (int) amount)
       {
          fprintf( stderr, "4. %u of %u\n", (unsigned int) (p - buf), amount);
          return( 1);
@@ -100,7 +100,7 @@ static int  test_extract( unsigned int amount)
 
 
 //  MEMO: leaks should be caught by valgrind
-int  main( int argc, char *argv[])
+int  main( void)
 {
    int      rc;
    int      i;

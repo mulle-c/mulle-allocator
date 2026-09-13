@@ -11,26 +11,41 @@ Link against `mulle_allocator` and
 
 ## Global Variables
 
-**mulle-allocator** provides three allocators: `mulle_allocator_stdlib` and
-`mulle_default_allocator` and `mulle_allocator_stdlib_no_free`.
+**mulle-allocator** provides three allocators: `mulle_allocator_stdlib`,
+`mulle_allocator_default` and `mulle_allocator_stdlib_nofree`.
 
-The default allocator `mulle_default_allocator` is initially defined identical
+The default allocator `mulle_allocator_default` is initially defined identical
 to the `mulle_allocator_stdlib` allocator, which is defined like this:
 
 ```
 struct mulle_allocator   mulle_allocator_stdlib =
 {
-   calloc, realloc, free, mulle_allocation_fail, mulle_allocator_no_aba_abort, NULL
+   v_calloc, v_reallocarray, v_free, mulle_allocation_fail,
+   mulle_allocator_no_aba_abort, NULL
 };
 ```
 
+The leading parameters of a vector mimic the corresponding standard C
+function, with a `struct mulle_allocator *` appended. `calloc` is the zeroing
+allocator; `reallocarray` backs `mulle_malloc`, `mulle_realloc`,
+`mulle_allocarray` and `mulle_reallocarray` alike (see
+`mulle-allocator-struct.h` for the exact contract).
+
+> **The library trusts the vectors you install.** The `reallocarray` funnel and
+> the `calloc` path pass `block`/`n`/`size` straight through and never validate
+> them. A vector must reject a zero `n`/`size` and an overflowing `n * size`
+> itself. The built-in `mulle_allocator_default` and `mulle_allocator_stdlib`
+> always do; a third-party allocator owns that guarantee. The zero-size and
+> overflow behaviour described in this document therefore applies to the
+> built-in allocators unless the vector documents otherwise.
+
 Your code should not modify `mulle_allocator_stdlib` and usually you do not use
-it directly but you use `mulle_default_allocator` instead. A use case for
+it directly but you use `mulle_allocator_default` instead. A use case for
 `mulle_allocator_stdlib` is, when you are interfacing with other code, that
 expects memory to be allocated by stdlib to free or realloc it.
 
-You can modify `mulle_default_allocator`. You must do that before the first use
-of `mulle_default_allocator` and before spawning any threads that use it
+You can modify `mulle_allocator_default`. You must do that before the first use
+of `mulle_allocator_default` and before spawning any threads that use it
 (allocator setup is single-threaded only).
 
 
@@ -44,7 +59,7 @@ of `mulle_default_allocator` and before spawning any threads that use it
 ### stdlib interface
 
 **mulle-allocator** functions are just like the stdlib allocation
-functions with a `mulle_` prefix (they will use the `mulle_default_allocator`):
+functions with a `mulle_` prefix (they will use the `mulle_allocator_default`):
 
 | stdlib  | mulle_allocator
 |---------|--------------------------
@@ -61,7 +76,7 @@ functions with a `mulle_` prefix (they will use the `mulle_default_allocator`):
 
 If you want to specify a custom allocator, you use the `mulle_allocator_` prefix
 and a pointer to your allocator as the first parameter (if the pointer is NULL
-`mulle_default_allocator` will be used):
+`mulle_allocator_default` will be used):
 
 | stdlib  | mulle_allocator
 |---------|--------------------------

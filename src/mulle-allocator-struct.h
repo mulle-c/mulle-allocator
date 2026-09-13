@@ -40,33 +40,112 @@
 #include <stddef.h>
 
 
+// Forward declaration so the deferred-free callback can name the allocator.
+struct mulle_allocator;
+
+
 //
-// I put the allocator in the back. It's assumed that the actual call of the
-// vector will be inline, and that calloc will be called most often and
-// that the compiler doesn't then need to reshuffle arguments registers.
-// On many ABIs we should be able to get away with just casting "calloc",
-// but that's not easy to test...
+// A deferred free. An ABA reclaimer eventually calls free(block, owner)
+// exactly once, once `block` may safely be reclaimed. `owner` is the value
+// the caller of the abafree vector supplied; mulle-allocator always supplies
+// the owning struct mulle_allocator *.
 //
-// abafree uses aba as context
+typedef void (*mulle_allocator_deferred_free_t)( void *block, void *owner);
+
+
+//
+// The ABA reclaimer. `aba` is the reclaimer's own opaque context. Like every
+// other vector it is trusted: it must eventually release `block` exactly once
+// through the supplied free callback. The return value is the reclaimer's
+// status (for example thread registration), 0 on success.
+//
+typedef int   mulle_allocator_aba_t( void *aba,
+                                     mulle_allocator_deferred_free_t free,
+                                     void *block,
+                                     void *owner);
+typedef mulle_allocator_aba_t   *mulle_allocator_abafree_t;
+
+
+//
+// I put the allocator in the back. The leading parameters of a vector mimic
+// the corresponding standard C function; the allocator is appended. It's
+// assumed that the actual call of the vector will be inline, and that
+// calloc/reallocarray will be called most often and that the compiler doesn't
+// then need to reshuffle argument registers.
+//
+// abafree uses aba as its opaque context. It hands `block` to an ABA reclaimer
+// (identified by aba); the reclaimer must eventually call the supplied
+// deferred free callback exactly once, as free( block, owner). mulle-allocator
+// supplies the owning allocator as owner, so the block is released through the
+// allocator's own `free` vector. The reclaimer is trusted like every other
+// vector, and the owning allocator must outlive every deferred block.
 //
 // Do not change the allocator after spawning threads. While the actual
 // vector functions will be threadsafe the struct itself is not protected.
 //
 //
-// fail is NOT marked _MULLE_C_NO_RETURN anymore. A fail handler may return.
-// A return means: "I recovered some memory, retry the allocation". The library
-// loops on the failed allocation until it succeeds (see the retry loops in the
-// _mulle_allocator_... functions). A handler that returns MUST have made
-// forward progress (actually freed memory), otherwise the retry loop spins
-// forever. The default handler mulle_allocation_fail aborts and never returns,
-// so the loop degenerates to a single call for the default case.
+// calloc and reallocarray are array shaped: they take an element count and an
+// element size. The library TRUSTS the vector functions you install (the
+// direction "up"): the funnel and the calloc path pass block/n/size straight
+// through and never validate them. A vector must therefore reject a zero
+// count/size and an overflowing count*size itself. Everything funnels through
+// reallocarray: malloc( size) is reallocarray( NULL, 1, size),
+// realloc( block, size) is reallocarray( block, 1, size) and
+// allocarray( n, size) is reallocarray( NULL, n, size).
 //
-#define MULLE_ALLOCATOR_BASE                                                              \
-   void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);          \
-   void   *(*realloc)( void *block, size_t size, struct mulle_allocator *allocator);      \
-   void   (*free)( void *block, struct mulle_allocator *allocator);                       \
-   void   (*fail)( struct mulle_allocator *allocator, void *block, size_t size);          \
-   int    (*abafree)( void *aba, void (*free)( void *, void *), void *block, void *owner); \
+// The built-in default vector always rejects a zero count/size itself. Because
+// reallocarray is built on standard realloc, it performs (and therefore always
+// checks) the count*size multiplication. calloc does the multiplication
+// itself, so the multiplicative check is skipped when
+// MULLE_ALLOCATOR_TRUST_STDLIB is set.
+//
+// Honour the calloc/reallocarray contract in your own vector. The library does
+// not, and cannot, defend against a vector that ignores a zero count or
+// overflows internally.
+//
+//
+// fail is terminal: it is called when an allocation can not be satisfied and
+// it must NOT return (hence MULLE_C_NO_RETURN on the vector). The default
+// handler mulle_allocation_fail prints an error and aborts.
+//
+// fail is NOT a recovery or retry hook. If you want to survive memory
+// pressure, implement that where it belongs: inside your own
+// calloc/reallocarray vector. Such a vector knows its own arena, locks and
+// free lists, can release memory and retry the request itself before
+// returning. The library calls the vector once and only invokes fail if the
+// vector ultimately returns NULL. This keeps the failure policy orthogonal,
+// avoids retry loops and counters, and removes the livelock and reentrancy
+// hazards of recovering from fail.
+//
+// fail handler contract:
+//
+//    * fail is invoked only as a consequence of a rejected allocation request
+//      (out of memory, or a programmer error), never of a free. It runs on
+//      the thread whose allocation failed.
+//    * fail must not return. It may abort, exit or longjmp. Returning is
+//      undefined behaviour; the compiler may place a trap after the call.
+//    * fail runs in an arbitrary context: there may be no autorelease pool or
+//      runloop, a lock may be held, and it may be reached from inside a
+//      consumer's own free/reclaim path. Do not assume a "clean" context and
+//      do not call back into arbitrary application, ObjC or Foundation code.
+//    * fail should be allocation free and, where possible, lock free. As it
+//      can not recover, a handler normally only logs/diagnoses and aborts.
+//    * Programmer errors (zero size, size overflow) are routed through fail
+//      by the default vector (see _mulle_allocator_abort). A custom vector
+//      decides for itself; if it treats them as fatal it should route through
+//      fail the same way. There is nothing to recover, so the handler must not
+//      return here either.
+//    * In a multithreaded program do not attempt global "garbage collection"
+//      from fail. Global reclamation belongs on a separate asynchronous path
+//      (a memory pressure notification or a cleanup thread); recovery of
+//      thread-local or arena-owned memory belongs in the vector.
+//
+#define MULLE_ALLOCATOR_BASE                                                                             \
+   void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                        \
+   void   *(*reallocarray)( void *block, size_t n, size_t size, struct mulle_allocator *allocator);     \
+   void   (*free)( void *block, struct mulle_allocator *allocator);                                     \
+   void   (*fail)( struct mulle_allocator *allocator, void *block, size_t size) MULLE_C_NO_RETURN;     \
+   mulle_allocator_abafree_t abafree;                                                                   \
    void   *aba
 
 

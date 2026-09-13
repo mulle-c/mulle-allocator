@@ -6,6 +6,7 @@
 
 void handle_sigabrt(int sig)
 {
+   MULLE_C_UNUSED( sig);
    // Handle the SIGABRT signal here.
    // For example, you could print a message and exit with a zero status.
    printf("Expected crash occurred.\n");
@@ -14,7 +15,7 @@ void handle_sigabrt(int sig)
 
 
 
-int  main( int argc, char *argv[])
+int  main( void)
 {
    signal( SIGABRT, handle_sigabrt);
 

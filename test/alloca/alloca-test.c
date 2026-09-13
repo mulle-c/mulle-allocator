@@ -20,7 +20,7 @@ static int  test( unsigned int amount)
       amount /= 2;
       mulle_alloca_do_realloc( values, amount);
       for( i = 0; i < amount; i++)
-         if( values[ i] != i)
+         if( values[ i] != (int) i)
             return( 1);
    }
    return( 0);
@@ -66,7 +66,7 @@ static int  test_extract( unsigned int amount)
 
    mulle_malloc_for( buf, amount, p)
    {
-      if( *p++ != amount)
+      if( *p++ != (int) amount)
          return( -1);
    }
 
@@ -76,7 +76,7 @@ static int  test_extract( unsigned int amount)
 
 
 //  MEMO: leaks should be caught by valgrind
-int  main( int argc, char *argv[])
+int  main( void)
 {
    int      rc;
    int      i;
