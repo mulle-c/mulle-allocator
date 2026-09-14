@@ -229,9 +229,6 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
  * See MULLE_ALLOCATOR_BASE in mulle-allocator-struct.h for the full handler
  * contract.
  */
-typedef void  mulle_allocator_fail_t( struct mulle_allocator *allocator,
-                                      void *,
-                                      size_t);
 
 /**
  * Sets the failure handler function for the given `mulle_allocator` instance.
@@ -251,7 +248,7 @@ typedef void  mulle_allocator_fail_t( struct mulle_allocator *allocator,
  * @param f The custom failure handler function pointer, or `NULL` to use the default `mulle_allocation_fail` function.
  */
 static inline void   mulle_allocator_set_fail( struct mulle_allocator *p,
-                                               mulle_allocator_fail_t *f MULLE_C_NO_RETURN)
+                                               mulle_allocator_fail_t f)
 {
    if( ! p)
       p = &mulle_allocator_default;

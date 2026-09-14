@@ -140,11 +140,20 @@ typedef mulle_allocator_aba_t   *mulle_allocator_abafree_t;
 //      (a memory pressure notification or a cleanup thread); recovery of
 //      thread-local or arena-owned memory belongs in the vector.
 //
+// The fail handler. It is terminal, so it is stored as a noreturn-qualified
+// function pointer. Declaring it as a pointer typedef (not a function type)
+// keeps the struct member and mulle_allocator_set_fail's parameter the exact
+// same qualified type, so the assignment needs no cast under -Werror.
+//
+typedef void  (*mulle_allocator_fail_t)( struct mulle_allocator *allocator,
+                                         void *block,
+                                         size_t size) MULLE_C_NO_RETURN;
+//
 #define MULLE_ALLOCATOR_BASE                                                                             \
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                        \
    void   *(*reallocarray)( void *block, size_t n, size_t size, struct mulle_allocator *allocator);     \
    void   (*free)( void *block, struct mulle_allocator *allocator);                                     \
-   void   (*fail)( struct mulle_allocator *allocator, void *block, size_t size) MULLE_C_NO_RETURN;     \
+   mulle_allocator_fail_t fail;                                                                         \
    mulle_allocator_abafree_t abafree;                                                                   \
    void   *aba
 

@@ -32,7 +32,7 @@
 
 | Release Version                                       | Release Notes  | AI Documentation
 |-------------------------------------------------------|----------------|---------------
-| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg)](//github.com/mulle-c/mulle-allocator/actions) ![Coverage](https://img.shields.io/badge/coverage-100%25%C2%A0-2acf49) | [RELEASENOTES](RELEASENOTES.md) | [DeepWiki for mulle-allocator](https://deepwiki.com/mulle-c/mulle-allocator)
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/mulle-c/mulle-allocator.svg) [![Build Status](https://github.com/mulle-c/mulle-allocator/workflows/CI/badge.svg)](//github.com/mulle-c/mulle-allocator/actions) ![Coverage](https://img.shields.io/badge/coverage-98%25%C2%A0-2acf49) | [RELEASENOTES](RELEASENOTES.md) | [DeepWiki for mulle-allocator](https://deepwiki.com/mulle-c/mulle-allocator)
 
 
 ## API
@@ -317,7 +317,7 @@ stack space for a temporary allocation.
 
 > ### Note
 >
-> What is a safe amount ? The author thinks `double[8]` should be fine.
+> What is a safe amount ? The author thinks `double[16]` should be fine.
 > If your system is very tiny or very large, you can set MULLE_ALLOCA_STACKSIZE
 > to a size of your liking. Remember though, that if you call other functions
 > that also use `mulle_alloca_do` the reasonable stack size is halved (and
@@ -511,7 +511,7 @@ cmake -S "mulle-allocator" -B "${BUILD_DIR}"    \
   -DCMAKE_INSTALL_PREFIX="${PREFIX}"            \
   -DCMAKE_PREFIX_PATH="${PREFIX}"               \
   -DCMAKE_C_FLAGS="-I"${PREFIX}"/include"       \
-&& cmake --build "${BUILD_DIR}" &&              \
+&& cmake --build "${BUILD_DIR}"  --parallel     \
 && cmake --install "${BUILD_DIR}"
 ```
 

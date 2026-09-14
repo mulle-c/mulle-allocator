@@ -266,7 +266,7 @@ stack space for a temporary allocation.
 
 > ### Note
 >
-> What is a safe amount ? The author thinks `double[8]` should be fine.
+> What is a safe amount ? The author thinks `double[16]` should be fine.
 > If your system is very tiny or very large, you can set MULLE_ALLOCA_STACKSIZE
 > to a size of your liking. Remember though, that if you call other functions
 > that also use `mulle_alloca_do` the reasonable stack size is halved (and
