@@ -1,21 +1,51 @@
 {
-    "branch_covered": 8,
-    "branch_percent": 100.0,
-    "branch_total": 8,
+    "branch_covered": 41,
+    "branch_percent": 85.4,
+    "branch_total": 48,
     "files": [
         {
-            "branch_covered": 8,
-            "branch_percent": 1.0,
-            "branch_total": 8,
+            "branch_covered": 27,
+            "branch_percent": 90.0,
+            "branch_total": 30,
             "filename": "mulle-allocator.c",
-            "line_covered": 39,
-            "line_percent": 1.0,
-            "line_total": 39
+            "function_covered": 16,
+            "function_percent": 100.0,
+            "function_total": 16,
+            "line_covered": 69,
+            "line_percent": 100.0,
+            "line_total": 69
+        },
+        {
+            "branch_covered": 6,
+            "branch_percent": 60.0,
+            "branch_total": 10,
+            "filename": "mulle-allocator.h",
+            "function_covered": 1,
+            "function_percent": 100.0,
+            "function_total": 1,
+            "line_covered": 6,
+            "line_percent": 85.7,
+            "line_total": 7
+        },
+        {
+            "branch_covered": 8,
+            "branch_percent": 100.0,
+            "branch_total": 8,
+            "filename": "mulle-memset.c",
+            "function_covered": 1,
+            "function_percent": 100.0,
+            "function_total": 1,
+            "line_covered": 12,
+            "line_percent": 100.0,
+            "line_total": 12
         }
     ],
-    "gcovr/summary_format_version": "0.2",
-    "line_covered": 39,
-    "line_percent": 100.0,
-    "line_total": 39,
-    "root": "../../src"
+    "function_covered": 18,
+    "function_percent": 100.0,
+    "function_total": 18,
+    "gcovr/summary_format_version": "0.6",
+    "line_covered": 87,
+    "line_percent": 98.9,
+    "line_total": 88,
+    "root": "../src"
 }
