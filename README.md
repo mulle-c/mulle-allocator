@@ -426,23 +426,25 @@ or aba fields while other threads may be calling through it.
 
 ## Add
 
-### Add as part of mulle-core
+### Add mulle-allocator via mulle-core
 
 mulle-allocator is a component of the
-[mulle-core/mulle-core](//github.com/mulle-core/mulle-core) library. In your code
-include its umbrella header:
+[mulle-core](//github.com/mulle-core/mulle-core) library.
+In your code include its umbrella header:
 
 ``` c
 #include <mulle-core/mulle-core.h>
 ```
 
-Add mulle-core as a git submodule and link against it:
+In your project add mulle-core as a git submodule and link against it:
 
 ``` bash
 git submodule add -f "https://github.com/mulle-core/mulle-core.git" \
                      "stash/mulle-core"
 git submodule update --init --recursive
 ```
+
+then add these comands to your `CMakeLists.txt`:
 
 ``` cmake
 include_directories( SYSTEM "stash/mulle-core/src")
@@ -459,13 +461,16 @@ mulle-sde add mulle-core/mulle-core
 
 
 
-### Add mulle-allocator as subproject
+### Add mulle-allocator as a cmake subproject
 
 In your code include its header:
 
 ``` c
 #include <mulle-allocator/mulle-allocator.h>
 ```
+
+Add mulle-allocator and dependencies as git submodules and link against
+them:
 
 ``` bash
 git submodule add -f --name "mulle-c11" \
@@ -493,7 +498,22 @@ Or let [mulle-sde](//github.com/mulle-sde) do it:
 mulle-sde add github:mulle-c/mulle-allocator
 ```
 
+## Individual Install
 
+Install all the prerequisites.
+
+``` bash
+PREFIX=/tmp/usr/local
+BUILD_DIR="mulle-allocator/build"
+
+cmake -S "mulle-allocator" -B "${BUILD_DIR}"    \
+  -DCMAKE_BUILD_TYPE="Release"                  \
+  -DCMAKE_INSTALL_PREFIX="${PREFIX}"            \
+  -DCMAKE_PREFIX_PATH="${PREFIX}"               \
+  -DCMAKE_C_FLAGS="-I"${PREFIX}"/include"       \
+&& cmake --build "${BUILD_DIR}" &&              \
+&& cmake --install "${BUILD_DIR}"
+```
 
 
 ## Author

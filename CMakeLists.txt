@@ -39,8 +39,8 @@ include( InstallLibrary)
 if( LINK_PHASE)
    # we don't need these headers, during compile so fine if we do it during
    # link only
-   include( InstallCMakeInclude)
-   include( InstallCMakePackage)
+   include( AddSubdirectorySupport)
+   include( FindPackageSupport)
 
 #   # can do this multiple times
 #   install( TARGETS ${LIBRARY_NAME}

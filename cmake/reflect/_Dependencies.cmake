@@ -38,7 +38,11 @@ foreach( _TMP_MULLE__C11_HEADER_TARGET_TARGET mulle-c11)
       break()
    endif()
 endforeach()
-if( NOT MULLE__C11_HEADER AND NOT MULLE__C11_HEADER_TARGET)
+if( MULLE__C11_HEADER_TARGET)
+   set( MULLE__C11_HEADER ${MULLE__C11_HEADER_TARGET})
+endif()
+
+if( NOT MULLE__C11_HEADER)
    find_file( MULLE__C11_HEADER NAMES
       mulle-c11.h mulle-c11/mulle-c11.h
       NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH
@@ -49,19 +53,19 @@ if( NOT MULLE__C11_HEADER AND NOT MULLE__C11_HEADER_TARGET)
       )
    endif()
    message( STATUS "MULLE__C11_HEADER is ${MULLE__C11_HEADER}")
+endif()
 
-   #
-   # Add MULLE__C11_HEADER to HEADER_ONLY_LIBRARIES list.
-   # Disable with: `mulle-sourcetree mark mulle-c11 no-cmake-add`
-   #
-   set( HEADER_ONLY_LIBRARIES
-      ${MULLE__C11_HEADER}
-      ${HEADER_ONLY_LIBRARIES}
-   )
-   if( MULLE__C11_HEADER)
-      # intentionally left blank
-   else()
-      # Disable with: `mulle-sourcetree mark mulle-c11 no-require`
-      message( SEND_ERROR "MULLE__C11_HEADER was not found in mulle-c11.h mulle-c11/mulle-c11.h")
-   endif()
+#
+# Add MULLE__C11_HEADER to HEADER_ONLY_LIBRARIES list.
+# Disable with: `mulle-sourcetree mark mulle-c11 no-cmake-add`
+#
+set( HEADER_ONLY_LIBRARIES
+   ${MULLE__C11_HEADER}
+   ${HEADER_ONLY_LIBRARIES}
+)
+if( MULLE__C11_HEADER)
+   # intentionally left blank
+else()
+   # Disable with: `mulle-sourcetree mark mulle-c11 no-require`
+   message( SEND_ERROR "MULLE__C11_HEADER was not found in mulle-c11.h mulle-c11/mulle-c11.h")
 endif()

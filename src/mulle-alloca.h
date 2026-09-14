@@ -192,6 +192,7 @@ do                                                                \
 {                                                                 \
    uintptr_t  _count = (count);                                   \
                                                                   \
+   _count = _count ? _count : 1;                                  \
    if( name == name ## __storage)                                 \
    {                                                              \
       if( _count > _mulle_alloca_do_get_size_as_length( name))    \
@@ -204,8 +205,7 @@ do                                                                \
    }                                                              \
    else                                                           \
    {                                                              \
-      _count = _count ? _count : 1;                               \
-      name   = mulle_reallocarray( name, (size_t) _count, sizeof( *name)); \
+      name = mulle_reallocarray( name, (size_t) _count, sizeof( *name)); \
    }                                                              \
    name ## __count = (void *) _count;                             \
 }                                                                 \
@@ -244,7 +244,10 @@ do                                                                          \
 {                                                                           \
    if( name == name ## __storage)                                           \
    {                                                                        \
-      name = mulle_allocarray( (size_t) (uintptr_t) name ## __count, sizeof( *name)); \
+      size_t   _count = (size_t) (uintptr_t) name ## __count;               \
+      if( ! _count)                                                         \
+         _count = 1;                                                        \
+      name = mulle_allocarray( _count, sizeof( *name));                     \
       memcpy( name,                                                         \
               name ## __storage,                                            \
               (size_t) (uintptr_t) name ## __count * sizeof( *name));       \
@@ -469,6 +472,7 @@ do                                                              \
    uintptr_t  _count    = (count);                              \
    uintptr_t  _oldcount = (uintptr_t) name ## __count;          \
                                                                 \
+   _count = _count ? _count : 1;                                \
    if( name == name ## __storage)                               \
    {                                                            \
       if( _count <= _mulle_alloca_do_get_size_as_length( name)) \
@@ -484,8 +488,7 @@ do                                                              \
    }                                                            \
    else                                                         \
    {                                                            \
-      _count = _count ? _count : 1;                             \
-      name   = mulle_reallocarray( name, (size_t) _count, sizeof( *name)); \
+      name = mulle_reallocarray( name, (size_t) _count, sizeof( *name)); \
    }                                                            \
                                                                 \
    if( _count > _oldcount)                                      \

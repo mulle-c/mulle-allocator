@@ -339,7 +339,7 @@ static inline void   *
    // the installed vector is trusted to validate block/n/size
    q = (*p->reallocarray)( block, n, size, p);
    if( MULLE_C_UNLIKELY( ! q))
-      (*p->fail)( p, block, n * size);
+      (*p->fail)( p, block, mulle_allocator_size_multiply( p, n, size));
    return( q);
 }
 
@@ -369,7 +369,7 @@ static inline void   *
    // the installed vector is trusted to validate n/size
    q = (*p->calloc)( n, size, p);
    if( MULLE_C_UNLIKELY( ! q))
-      (*p->fail)( p, NULL, n * size);
+      (*p->fail)( p, NULL, mulle_allocator_size_multiply( p, n, size));
    return( q);
 }
 
@@ -654,8 +654,8 @@ static inline void   mulle_allocator_free( struct mulle_allocator *p,
 
 
 /**
- * Frees a block of memory using the given allocator, and returns a flag indicating
- * whether the block was actually freed.
+ * Frees a block of memory using the given allocator, handing it to the
+ * allocator's ABA reclaimer if one is installed.
  *
  * If the `p` parameter is `NULL`, the default allocator (`mulle_default_allocator`)
  * will be used.
@@ -663,7 +663,9 @@ static inline void   mulle_allocator_free( struct mulle_allocator *p,
  * @param p The allocator to use for the free operation. Can be `NULL` to use the
  *          default allocator.
  * @param block The block of memory to free.
- * @return A non-zero value if the block was freed, zero if the block was not freed.
+ * @return Zero if `block` is `NULL`, otherwise the ABA reclaimer's status
+ *         (zero on success). This is not a "was the block freed" flag: a
+ *         reclaimer may reclaim the block asynchronously or later.
  */
 static inline int   mulle_allocator_abafree( struct mulle_allocator *p,
                                              void *block)
@@ -889,7 +891,7 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, const char *s);
  *
  * This function allocates a new string that is a copy of the input string `s`,
  * using the specified allocator `p`. If `p` is `NULL`, the default allocator
- * `mulle_default_allocator` is used.
+ * `mulle_default_allocator` is used. If `s` is NULL, NULL is returned.
  *
  * @param p The allocator to use for the new string. Can be `NULL` to use the
  *          default allocator.

@@ -46,12 +46,12 @@ void   mulle_allocation_fail( struct mulle_allocator *p,
                               void *block,
                               size_t size)
 {
-   fprintf( stderr, "mulle-allocator: memory allocation of %zu bytes failed\n", size);
-   abort();
-
    MULLE_C_UNUSED( p);
    MULLE_C_UNUSED( block);
    MULLE_C_UNUSED( size);
+
+   fprintf( stderr, "mulle-allocator: memory allocation of %zu bytes failed\n", size);
+   abort();
 }
 
 
@@ -60,6 +60,9 @@ char   *_mulle_allocator_strdup( struct mulle_allocator *p, const char *s)
 {
    size_t   size;
    char     *dup;
+
+   // NULL check is in mulle_allocator_strdup(s)
+   // this crashes by design
 
    size = strlen( s) + 1;
    dup  = (*p->reallocarray)( NULL, 1, size, p);
@@ -110,7 +113,7 @@ void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
 
    q = (*p->reallocarray)( block, n, size, p);
    if( MULLE_C_UNLIKELY( ! q))
-      (*p->fail)( p, block, size);
+      (*p->fail)( p, block, mulle_allocator_size_multiply( p, n, size));
    return( q);
 }
 

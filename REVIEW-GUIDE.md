@@ -34,32 +34,10 @@ things. If a point below is wrong or stale, *that* is worth reporting.
   `value`. It lives here for dependency-graph reasons.
 - **`mulle_alloca_do` stores element counts as `void *`.** Documented and
   intentional; it assumes a flat address space.
-- **`abafree` / deferred free:** the allocator hands the reclaimer
-  `_mulle_allocator_deferred_free`, a function of exactly the reclaimer's
-  callback type; the owning allocator arrives as `owner`. There is no
-  function-pointer punning.
 - **`is_stdlib_allocator` is coarse by design** (it cannot distinguish
   `stdlib_nofree`); documented.
-- **"Consumption is mulle-sde-shaped" is only half true.** You do not need
-  mulle-sde to *build* it: vendor `src/` plus a compatible `mulle-c11` (or use
-  `clib`) and compile with any build system. What is still missing is a
-  first-class CMake package (`find_package`/pkg-config): the checked-in
-  `CMakeLists.txt` resolves dependencies through the mulle-sde toolchain, so a
-  plain `add_subdirectory`/`FetchContent` does not configure yet.
 
 ## Known and tracked (no need to re-file)
 
-- No `find_package`/pkg-config package yet; `clib.json` pins `mulle-c11`
-  loosely.
-- The worktree carries uncommitted 9.0.0 work. Generated files
-  (`cmake/share`, `cmake/reflect`, `.mulle/share`) are tool-managed; don't
-  review them.
+- `clib.json` pins `mulle-c11` loosely.
 
-## How to check the code
-
-```sh
-mulle-sde retest
-```
-
-and compile `src/mulle-allocator.c` with `-Wall -Wextra -Werror` in both
-`MULLE_ALLOCATOR_TRUST_STDLIB=0` and `=1` modes.
