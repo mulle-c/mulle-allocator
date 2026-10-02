@@ -617,7 +617,11 @@ while( 0)
 
 
 // backwards compatibility
-#define mulle_flexarray_do( a, b, c, d)    mulle_alloca_do( a, b, d)
+// MEMO: the old mulle_flexarray_do took the stack space as a count of `type`
+//       elements, whereas mulle_alloca_do_flexible takes it in bytes, so
+//       convert. (Dropping `c` and using MULLE_ALLOCA_STACKSIZE silently
+//       ignored the caller supplied stack size.)
+#define mulle_flexarray_do( a, b, c, d)    mulle_alloca_do_flexible( a, b, (c) * sizeof( b), d)
 #define mulle_flexarray_realloc( a, b)     mulle_alloca_do_realloc( a, b)
 #define _mulle_flexarray_return( a, b)     _mulle_alloca_do_return( a, b)
 #define _mulle_flexarray_return_void( a)   _mulle_alloca_do_return_void( a)

@@ -10,7 +10,8 @@ things. If a point below is wrong or stale, *that* is worth reporting.
   longjmps. It is not a retry/recovery hook. Recovery from memory pressure
   belongs in the `calloc`/`reallocarray` vector, which can free memory and
   retry before returning. Retry-from-`fail` was tried and dropped (livelock,
-  reentrancy).
+  reentrancy). Notice the "longjmp" possibility you can throw an exception
+  here and catch it somewhere, your app need not terminate necessarily.
 - **Aborting on OOM is intentional.** This library is for programs that own
   their process. For ENOMEM-style handling of one optional allocation, call
   stdlib `malloc` directly for that allocation.

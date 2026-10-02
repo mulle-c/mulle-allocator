@@ -124,10 +124,18 @@ typedef mulle_allocator_aba_t   *mulle_allocator_abafree_t;
 //      the thread whose allocation failed.
 //    * fail must not return. It may abort, exit or longjmp. Returning is
 //      undefined behaviour; the compiler may place a trap after the call.
-//    * fail runs in an arbitrary context: there may be no autorelease pool or
-//      runloop, a lock may be held, and it may be reached from inside a
-//      consumer's own free/reclaim path. Do not assume a "clean" context and
-//      do not call back into arbitrary application, ObjC or Foundation code.
+//    * abort, exit and longjmp are safe with respect to the allocator. The
+//      library raises fail after the calloc/reallocarray vector has returned,
+//      so the allocator's own lock and internal state are not held and are
+//      consistent when fail runs. The raise is never made from inside the
+//      allocation vector, so this holds for every allocator, not just one
+//      implementation.
+//    * That is not a promise that no lock anywhere is held. fail still runs in
+//      an arbitrary context: there may be no autorelease pool or runloop, a
+//      lock held by the caller (not by the allocator) may be held, and it may
+//      be reached from inside a consumer's own free/reclaim path. Do not
+//      assume a "clean" context and do not call back into arbitrary
+//      application, ObjC or Foundation code.
 //    * fail should be allocation free and, where possible, lock free. As it
 //      can not recover, a handler normally only logs/diagnoses and aborts.
 //    * Programmer errors (zero size, size overflow) are routed through fail
@@ -149,7 +157,7 @@ typedef void  (*mulle_allocator_fail_t)( struct mulle_allocator *allocator,
                                          void *block,
                                          size_t size) MULLE_C_NO_RETURN;
 //
-#define MULLE_ALLOCATOR_BASE                                                                             \
+#define MULLE_ALLOCATOR_BASE                                                                            \
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                        \
    void   *(*reallocarray)( void *block, size_t n, size_t size, struct mulle_allocator *allocator);     \
    void   (*free)( void *block, struct mulle_allocator *allocator);                                     \

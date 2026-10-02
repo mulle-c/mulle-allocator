@@ -7,16 +7,29 @@
 #    Decides what an add_subdirectory() consumer inherits from this library.
 #    Two things, each with its own option:
 #
-#    Headers, one of two mutually exclusive ways:
+#    Headers, two separate things:
 #
-#    1) export the source directory directly, when
-#       MULLE_TRANSITIVE_SOURCE_INCLUDE is on and src/${LIBRARY_NAME} exists
-#    2) otherwise, and only when embedded via add_subdirectory(), copy the
-#       public headers into "${CMAKE_BINARY_DIR}/include" during the build
-#       and export that single amalgamated directory, which mirrors the
-#       layout an installed dependency has
+#    1) staging: an embedded library copies its public headers into
+#       "${CMAKE_BINARY_DIR}/include" during the build, so its consumer sees
+#       the layout an installed dependency has. This is not a matter of
+#       transitivity and does not depend on the option below; it is what an
+#       embedded library offers.
 #
-#    If neither applies, no include directory is exported.
+#       Only a library that can be flattened stages anything. The copy keeps
+#       the basename only, so an amalgamation - src/${LIBRARY_NAME} is a
+#       directory of constituent directories and several constituents ship an
+#       include.h - would map several headers onto one output file, and cmake
+#       refuses to configure on the duplicate custom rule. Such a library hands
+#       out its source directory instead.
+#
+#    2) the include directory the consumer is handed automatically, as
+#       -isystem. That is what MULLE_TRANSITIVE_SOURCE_INCLUDE decides, and all
+#       it decides: the source directory directly when src/${LIBRARY_NAME}
+#       exists, otherwise the single staged "${CMAKE_BINARY_DIR}/include".
+#       With the option off the consumer names the include roots it wants
+#       itself; the staged headers are there to be named.
+#
+#    A top level build has no consumer, so it neither stages nor exports.
 #
 #    Libraries, when MULLE_TRANSITIVE_LINK_LIBRARIES is on: re-export those
 #    dependencies that resolved to cmake targets, so that a plain
@@ -37,9 +50,9 @@
 #                              Dependencies. Only the entries that are cmake
 #                              targets are re-exported
 #    CMAKE_SOURCE_DIR          compared against
-#    CMAKE_CURRENT_SOURCE_DIR  ... to detect being embedded, which is what
-#                              enables the second way
-#    INSTALL_PUBLIC_HEADERS    copied by the second way
+#    CMAKE_CURRENT_SOURCE_DIR  ... to detect being embedded; only an embedded
+#                              project stages headers or exports a directory
+#    INSTALL_PUBLIC_HEADERS    copied into "${CMAKE_BINARY_DIR}/include"
 #    INSTALL_PRIVATE_HEADERS   likewise
 #    RESOLVE_INSTALLABLE_HEADER_SYMLINKS
 #                              copy symlinked headers as files, for embedded
@@ -48,9 +61,12 @@
 #
 # OPTIONS
 #    MULLE_TRANSITIVE_SOURCE_INCLUDE
-#                        ON    let add_subdirectory consumers compile against
-#                              the src directory. Note that this only takes
-#                              effect when src/${LIBRARY_NAME} exists
+#                        ON    hand the include directory to add_subdirectory
+#                              consumers automatically, as -isystem: their src
+#                              directory when src/${LIBRARY_NAME} exists, the
+#                              staged ${CMAKE_BINARY_DIR}/include otherwise
+#                        OFF   export no include directory; the consumer names
+#                              the roots itself. Staging is unaffected
 #    MULLE_TRANSITIVE_LINK_LIBRARIES
 #                        ON    re-export dependencies that resolved to cmake
 #                              targets through this librarys INTERFACE, so an
@@ -62,11 +78,15 @@
 #                              semantics, which needs cmake 3.24 or better
 #
 # OUTPUT
-#    _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE   which of the two ways was chosen
+#    _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE   the source directory is the one to
+#                              hand out, i.e. src/${LIBRARY_NAME} exists
+#    _MULLE_INTERFACE_INCLUDE   the include directory a consumer would be handed
+#                              automatically, empty when there is none
 #
-#    Side effect: target_include_directories( ${LIBRARY_NAME} INTERFACE ...)
-#    for whichever way applies, plus the custom commands that copy headers,
-#    plus target_link_libraries( ${LIBRARY_NAME} INTERFACE ...) for the
+#    Side effect: the custom commands that copy headers and the staging target
+#    they belong to, target_include_directories( ${LIBRARY_NAME} INTERFACE ...)
+#    when MULLE_TRANSITIVE_SOURCE_INCLUDE is on, plus
+#    target_link_libraries( ${LIBRARY_NAME} INTERFACE ...) for the
 #    dependencies that resolved to targets.
 #
 # GUARD
@@ -91,10 +111,22 @@ if( NOT __ADD_SUBDIRECTORY_SUPPORT__CMAKE__)
       set( _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE ON)
    endif()
 
+   #
+   # Where our headers are, for a consumer. Two things, deliberately separate:
+   #
+   #  * the staging below happens for every embedded library that can be
+   #    flattened, so that the consumer sees the layout an installed dependency
+   #    has. Not a matter of transitivity, and not the business of the option.
+   #  * the include directory handed to the consumer automatically, as -isystem,
+   #    is what MULLE_TRANSITIVE_SOURCE_INCLUDE decides, and all it decides.
+   #
+   set( _MULLE_INTERFACE_INCLUDE)
+
    if( _MULLE_USE_TRANSITIVE_SOURCE_INCLUDE)
-      target_include_directories( "${LIBRARY_NAME}" INTERFACE
-         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
-   elseif( NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+      set( _MULLE_INTERFACE_INCLUDE
+           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+   elseif( NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
+           AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/${LIBRARY_NAME}")
 
       list( APPEND INSTALL_TMP_HEADERS ${INSTALL_PUBLIC_HEADERS} ${INSTALL_PRIVATE_HEADERS})
 
@@ -127,13 +159,22 @@ if( NOT __ADD_SUBDIRECTORY_SUPPORT__CMAKE__)
                        MULLE_HEADER_STAGING_TARGETS
                        "${LIBRARY_NAME}")
 
-         target_include_directories(${LIBRARY_NAME} INTERFACE
-             $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-             $<INSTALL_INTERFACE:include>
-         )
+         set( _MULLE_INTERFACE_INCLUDE
+              $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+              $<INSTALL_INTERFACE:include>)
       endif()
 
    endif()
+
+   #
+   # Hand the include directory to the consumer, or don't. With the option off
+   # the consumer names the roots it wants itself - the staged headers above are
+   # there to be named.
+   # MEMO: not doing this anymore to no ill effect so far
+   # if( MULLE_TRANSITIVE_SOURCE_INCLUDE AND _MULLE_INTERFACE_INCLUDE)
+   #    target_include_directories( "${LIBRARY_NAME}" INTERFACE
+   #       ${_MULLE_INTERFACE_INCLUDE})
+   # endif()
 
    #
    # We deliberately do NOT export one INTERFACE include directory per

@@ -136,7 +136,9 @@ void   mulle_allocation_fail( struct mulle_allocator *allocator,
 
 /**
  * The default `abafree` reclaimer. It is used whenever ABA-safe freeing is
- * attempted without installing a real reclaimer, and it simply aborts.
+ * attempted without installing a real reclaimer. It prints what is missing --
+ * no ABA reclaimer, a concurrent container tried to free retired storage
+ * through this allocator -- names the remedy (`mulle_aba_init()`) and aborts.
  *
  * It never returns: it is declared `MULLE_C_NO_RETURN` although it returns
  * `int`, to match the `abafree` vector type.
@@ -215,6 +217,21 @@ static inline void   mulle_allocator_set_aba( struct mulle_allocator *p,
  * `fail` if that vector ultimately returns NULL. This keeps the failure
  * policy orthogonal and avoids retry loops, retry counters, livelock and the
  * reentrancy problems of recovering from `fail`.
+ *
+ * Because the library raises `fail` itself, it does so *after* the
+ * `calloc`/`realloc` vector has already returned (see
+ * `_mulle_allocator_reallocarray` and friends). At that point the allocator's
+ * own lock and internal state are not held and are consistent, so `abort`,
+ * `exit` or `longjmp` out of `fail` is safe with respect to the allocator.
+ * The raise is never made from inside an allocation vector, so this holds for
+ * every allocator, not just one implementation.
+ *
+ * That is not a promise that no lock anywhere is held. The caller may hold a
+ * lock of its own, or `fail` may be reached from inside a consumer's
+ * free/reclaim path; the handler contract in mulle-allocator-struct.h
+ * therefore still warns to assume an arbitrary context. What is excluded is
+ * specifically the allocator's own lock, held only for the duration of a
+ * `calloc`/`realloc` vector, which has already been released.
  *
  * Programmer errors (zero size, size overflow) are validated by the default
  * vector and routed through the same `fail` vector (see

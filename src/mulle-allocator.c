@@ -122,7 +122,7 @@ void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
 //
 // The default abafree reclaimer: no ABA-safe freeing is configured, which is
 // a programmer error. Returns int to match the abafree vector, but never
-// returns: it aborts.
+// returns: it explains what is missing and aborts.
 //
 MULLE_C_NO_RETURN
 int   mulle_allocator_no_aba_abort( void *aba,
@@ -135,6 +135,13 @@ int   mulle_allocator_no_aba_abort( void *aba,
    MULLE_C_UNUSED( block);
    MULLE_C_UNUSED( owner);
 
+   fprintf( stderr,
+            "mulle-allocator: this allocator has no ABA reclaimer installed, "
+            "but a concurrent container tried to free retired storage through "
+            "it.\n"
+            "Call mulle_aba_init( NULL) once before using a concurrent "
+            "container, or install an abafree reclaimer with "
+            "mulle_allocator_set_aba().\n");
    abort();
 }
 
