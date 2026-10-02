@@ -88,3 +88,8 @@ test/80-package/
 TODO.md
 REVIEW.md
 scratch/
+.vscode/
+.touch
+*.orig
+*.workspace
+*.*-workspace
