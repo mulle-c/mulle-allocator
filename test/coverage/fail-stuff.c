@@ -1,6 +1,7 @@
 #include <mulle-allocator/mulle-allocator.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -30,15 +31,16 @@ static void   fail_free( void *block, struct mulle_allocator *allocator)
 }
 
 
-// ARGH! CAN'T DO THAT ANYMORE, BECAUSE CLANG PLACES AN INVALID
-// OPCODE THERE TO "CATCH" THE ERROR.
-// MULLE_C_NO_RETURN
+// `fail` is terminal (MULLE_C_NO_RETURN): a handler that returns is undefined
+// behavior and clang emits an invalid opcode. Terminate after the first failure,
+// like test/fails/fail-realloc.c does.
+MULLE_C_NO_RETURN
 void   fail_fail( struct mulle_allocator *p, void *block, size_t size)
 {
    MULLE_C_UNUSED( block);
    MULLE_C_UNUSED( p);
    printf( "failed for %zd bytes\n", size);
-   // returns intentionally
+   exit( 0);
 }
 
 

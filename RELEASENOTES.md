@@ -1,6 +1,10 @@
 # 9.0.0
 
 
+* Terminate via `exit(0)` in the fail handler instead of returning, since the handler is declared ``MULLE_C_NO_RETURN`` and returning triggers an invalid opcode in clang
+* Update expected output to stop after the first failure
+
+
 * Document the ``mulle_allocator_fail_t`` noreturn function-pointer typedef, its definition, and why it is declared as a pointer type
 * Clarify that ``mulle_allocator_abafree`` returns zero for `NULL` blocks and otherwise the reclaimer status, which is not a "was freed" flag
 * Note that the default ``mulle_allocator_no_aba_abort`` callback prints the missing reclaimer and the ``mulle_aba_init()`` remedy before aborting
