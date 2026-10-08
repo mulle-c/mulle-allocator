@@ -2,6 +2,7 @@
 
 
 
+
 * Terminate via `exit(0)` in the fail handler instead of returning, since the handler is declared ``MULLE_C_NO_RETURN`` and returning triggers an invalid opcode in clang
 * Update expected output to stop after the first failure
 
