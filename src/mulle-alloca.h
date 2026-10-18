@@ -137,23 +137,14 @@
 
 
 //
-// These two macros are only useful to return from a single `mulle_alloca_do`.
-// They won't magically do the right thing in nested mulle_alloca_dos.
+// This macro is only useful to return from a single `mulle_alloca_do`.
+// It won't magically do the right thing in nested mulle_alloca_dos.
 // So use with caution, better: Don't use! `break` instead and
 // `return` outside of `mulle_alloca_do`. Therefore not part of API.
 //
-#define _mulle_alloca_do_return( name, value)                     \
-do                                                                \
-{                                                                 \
-   MULLE_C_TYPE_OF( value) name ## __tmp = (value);               \
-                                                                  \
-   (void) _mulle_alloca_do_free( name);                           \
-   MULLE_C_CONFINED_RETURN                                        \
-   return( name ## __tmp);                                        \
-}                                                                 \
-while( 0)
-
-
+// The value-returning counterpart `_mulle_alloca_do_return` needs __typeof__
+// and lives in mulle-alloca-c23.h.
+//
 #define _mulle_alloca_do_return_void( name)                       \
 do                                                                \
 {                                                                 \
@@ -397,59 +388,18 @@ while( 0)
 
 
 
-/**
- * This macro defines a loop that iterates over a dynamically allocated buffer.
- *
- * The macro takes the following parameters:
- * @param name: The name of the dynamically allocated buffer.
- * @param len: The number of elements in the buffer.
- * @param p: A pointer variable that will be used to iterate over the buffer.
- *
- * The macro creates a `for` loop that initializes the `p` pointer to the start of
- * the buffer, and iterates until the pointer reaches the end of the buffer. The
- * `p` pointer can be used within the loop to access the elements of the buffer.
- */
-// This macro works outside of mulle_alloca_do, you have to give it
-// the number of elements in "name" though.
-// name and "p" must be a pointer of the correct type.
-// name is the mulle_malloced buffer, p can be uninitialized.
 //
-#define mulle_malloc_for( name, len, p)                         \
-   for( __typeof__( name) name ## __sentinel =                  \
-         (p = name, &p[ (len)]);                                \
-        p < name ## __sentinel;                                 \
-        ++p)
+// `mulle_malloc_for`, `mulle_alloca_do_for` and `mulle_calloc_for` need
+// __typeof__ and live in mulle-alloca-c23.h. That header is included
+// automatically when MULLE_C_HAS_TYPEOF (gcc, clang, tcc) is set.
+//
 
-/**
- * This macro defines a loop that iterates over a dynamically allocated buffer created by `mulle_alloca_do`.
- *
- * The macro takes the following parameters:
- * @param name: The name of the dynamically allocated buffer.
- * @param p: A pointer variable that will be used to iterate over the buffer.
- *
- * The macro creates a `for` loop that initializes the `p` pointer to the start of
- * the buffer, and iterates until the pointer reaches the end of the buffer. The
- * `p` pointer can be used within the loop to access the elements of the buffer.
- *
- * This macro is intended to be used within the scope of a `mulle_alloca_do` block,
- * where the size of the buffer is known.
- */
-//
-// This function only works inside mulle_alloca_do
-// 'p' needs to be declared outside, for mental consistency with
-// mulle_container loops, where this can't be avoided.
-//
-#define mulle_alloca_do_for( name, p)                           \
-   mulle_malloc_for( name, (uintptr_t) name ## __count, p)
 
 #define mulle_calloca_do_extract( name, receiver)               \
    mulle_alloca_do_extract( name, receiver)
 
 // not API and dangerous (s.a.)
-# define _mulle_calloca_do_return( name, value)                 \
-   _mulle_alloca_do_return( name, value)
-
-# define _mulle_calloca_do_return_void( name)                   \
+# define _mulle_calloca_do_return_void( name)                 \
    _mulle_alloca_do_return_void( name)
 
 /**
@@ -576,44 +526,10 @@ while( 0)
               name ## __i++)
 
 
-/**
- * Iterates over a dynamically allocated buffer, like `mulle_malloc_for`.
- *
- * This is an alias of `mulle_malloc_for`; the name reflects that the buffer
- * was created with one of the zeroing `*calloca*` variants.
- *
- * @param name The name of the dynamically allocated buffer.
- * @param len The number of elements in the buffer.
- * @param p A pointer variable that will be used to iterate over the buffer.
- */
-#define mulle_calloc_for( name, len, p) \
-   mulle_malloc_for( name, len, p)
-
-/**
- * Allocates a dynamically sized zeroed buffer on the stack or heap, depending on the
- * requested size and a specified stack size limit. The buffer is automatically freed
- * at the end of the loop.
- *
- * This macro is used to allocate a buffer that can grow dynamically, but still
- * take advantage of stack-based allocation when possible. It will allocate the
- * buffer on the stack if the requested size fits within the specified stack size
- * limit, otherwise it will allocate the buffer on the heap using `mulle_calloc`.
- *
- * The buffer is automatically freed at the end of the loop using the
- * `_mulle_alloca_do_free` function.
- *
- * @param name The name of the dynamically allocated buffer.
- * @param type The type of the elements in the buffer.
- * @param stacksize The maximum size (in bytes) of the buffer to allocate on the stack.
- * @param count The initial size (in elements) of the buffer.
- */
 //
-// This function only works inside mulle_alloca_do
-// 'p' needs to be declared outside, for mental consistency with
-// mulle_container loops, where this can't be avoided.
+// `mulle_calloc_for` and `mulle_calloca_do_for` need __typeof__ and live in
+// mulle-alloca-c23.h.
 //
-#define mulle_calloca_do_for( name, p)   \
-   mulle_alloca_do_for( name, p)
 
 
 // backwards compatibility
@@ -623,7 +539,19 @@ while( 0)
 //       ignored the caller supplied stack size.)
 #define mulle_flexarray_do( a, b, c, d)    mulle_alloca_do_flexible( a, b, (c) * sizeof( b), d)
 #define mulle_flexarray_realloc( a, b)     mulle_alloca_do_realloc( a, b)
-#define _mulle_flexarray_return( a, b)     _mulle_alloca_do_return( a, b)
 #define _mulle_flexarray_return_void( a)   _mulle_alloca_do_return_void( a)
+
+
+//
+// The macros that need __typeof__ (`mulle_malloc_for`, `mulle_alloca_do_for`,
+// `mulle_calloc_for`, `_mulle_alloca_do_return`, ...) are C23 and live in their
+// own header, so that this one stays usable with every C99/C11 compiler:
+//
+//    #include <mulle-allocator/mulle-alloca-c23.h>
+//
+#if MULLE_C_HAS_TYPEOF
+# include "mulle-alloca-c23.h"
+#endif
+
 
 #endif

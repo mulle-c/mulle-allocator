@@ -106,8 +106,15 @@ int main() {
             // Clear entire region
             memset(test_region, GUARD_VALUE, sizeof(test_region));
             
-            // Calculate our test buffer position with alignment
-            uint8_t* aligned_base = (uint8_t*)(((uintptr_t)test_region + 8) & ~(uintptr_t)max_align);
+            // Calculate our test buffer position with alignment. Round *up*,
+            // and start the search one guard below the top of the slack: the
+            // buffer is moved forwards by `align` and read back one guard
+            // ahead, so the base has to leave GUARD_SIZE bytes of region below
+            // it. Rounding the address down (as this did before) puts
+            // before_guard outside test_region whenever the array is not
+            // already 8-aligned, which is legal - tcc places it at addr % 8
+            // == 4.
+            uint8_t* aligned_base = (uint8_t*)(((uintptr_t)test_region + max_align + GUARD_SIZE) & ~(uintptr_t)max_align);
             uint8_t* buf = aligned_base + align;
             
             // Guards are everything before buf and everything after buf+size

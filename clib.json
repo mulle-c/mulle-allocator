@@ -7,6 +7,7 @@
    "repo" : "mulle-c/mulle-allocator",
    "src" : [
       "asset/dox/api/toc/index.md",
+      "src/mulle-alloca-c23.h",
       "src/mulle-alloca.h",
       "src/mulle-allocator-struct.h",
       "src/mulle-allocator.c",

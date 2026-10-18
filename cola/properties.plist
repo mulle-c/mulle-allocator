@@ -4,12 +4,12 @@
       description="🔄 Flexible C memory allocation scheme";
       domain="github";
       language="c";
+      dialect="c";
       name="mulle-allocator";
       user="mulle-c";
       repo="mulle-allocator";
       homepage="https://github.com/mulle-c/mulle-allocator";
       license="BSD-3-Clause";
-       version="8.1.0";
    };
    dependencies =
    (

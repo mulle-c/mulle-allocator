@@ -48,6 +48,7 @@ static int  test( unsigned int amount)
 }
 
 
+#if MULLE_C_HAS_TYPEOF
 static double  test_return( unsigned int amount)
 {
    mulle_calloca_do( values, int, amount)
@@ -57,8 +58,10 @@ static double  test_return( unsigned int amount)
    }
    return( 0.0);
 }
+#endif
 
 
+#if MULLE_C_HAS_TYPEOF
 static int  *_test_extract( unsigned int amount)
 {
    int  *p;
@@ -97,6 +100,7 @@ static int  test_extract( unsigned int amount)
    mulle_free( buf);
    return( 0);
 }
+#endif
 
 
 //  MEMO: leaks should be caught by valgrind
@@ -104,17 +108,22 @@ int  main( void)
 {
    int      rc;
    int      i;
-   double   v;
 
    rc = 0;
    for( i = 0; i < 256; i = i ? i * 2 : 1)
       rc |= test( i);
 
-   v   = test_return( 1000);
-   rc |= v != 1000.0;
+#if MULLE_C_HAS_TYPEOF
+   {
+      double   v;
 
-   rc  |= test_extract( 8);
-   rc  |= test_extract( 1848);
+      v   = test_return( 1000);
+      rc |= v != 1000.0;
+
+      rc  |= test_extract( 8);
+      rc  |= test_extract( 1848);
+   }
+#endif
 
    return( rc);
 }

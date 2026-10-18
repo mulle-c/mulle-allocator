@@ -175,6 +175,7 @@ static int   test_flexarray_do( unsigned int count)
 }
 
 
+#if MULLE_C_HAS_TYPEOF
 static double  test_flexarray_return( unsigned int amount)
 {
    mulle_flexarray_do( values, int, 8, amount)
@@ -183,6 +184,7 @@ static double  test_flexarray_return( unsigned int amount)
    }
    return( 0.0);
 }
+#endif
 
 
 static void  test_flexarray_return_void( unsigned int amount)
@@ -226,8 +228,10 @@ int  main( void)
    rc |= test_flexarray_do( 32);           // stack, grows to heap
    rc |= test_flexarray_do( 33);           // heap
 
+#if MULLE_C_HAS_TYPEOF
    if( test_flexarray_return( 1000) != 1000.0)
       rc |= 1;
+#endif
 
    did_return_void = 0;
    test_flexarray_return_void( 4);
