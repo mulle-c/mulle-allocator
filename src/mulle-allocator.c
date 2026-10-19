@@ -124,7 +124,7 @@ void *  _mulle_allocator_reallocarray_strict( struct mulle_allocator *p,
 // a programmer error. Returns int to match the abafree vector, but never
 // returns: it explains what is missing and aborts.
 //
-MULLE_C_NO_RETURN
+_MULLE_C_NO_RETURN
 int   mulle_allocator_no_aba_abort( void *aba,
                                     void (*free)( void *, void *),
                                     void *block,
@@ -193,7 +193,7 @@ static void   *v_reallocarray( void *block,
 // the vector signatures avoids casting `abort` to an incompatible function
 // pointer type.
 //
-MULLE_C_NO_RETURN
+_MULLE_C_NO_RETURN
 static void   *v_abort_calloc( size_t n,
                                size_t size,
                                struct mulle_allocator *allocator)
@@ -211,7 +211,7 @@ static void   *v_abort_calloc( size_t n,
 }
 
 
-MULLE_C_NO_RETURN
+_MULLE_C_NO_RETURN
 static void   *v_abort_reallocarray( void *block,
                                      size_t n,
                                      size_t size,

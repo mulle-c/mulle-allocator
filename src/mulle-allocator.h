@@ -140,7 +140,7 @@ void   mulle_allocation_fail( struct mulle_allocator *allocator,
  * no ABA reclaimer, a concurrent container tried to free retired storage
  * through this allocator -- names the remedy (`mulle_aba_init()`) and aborts.
  *
- * It never returns: it is declared `MULLE_C_NO_RETURN` although it returns
+ * It never returns: it is declared `_MULLE_C_NO_RETURN` although it returns
  * `int`, to match the `abafree` vector type.
  *
  * @param aba    the opaque ABA context (unused).
@@ -149,7 +149,7 @@ void   mulle_allocation_fail( struct mulle_allocator *allocator,
  * @param owner  the opaque owner supplied by the allocator.
  */
 MULLE__ALLOCATOR_GLOBAL
-MULLE_C_NO_RETURN
+_MULLE_C_NO_RETURN
 int   mulle_allocator_no_aba_abort( void *aba,
                                     void (*free)( void *, void *),
                                     void *block,
