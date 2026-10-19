@@ -3,6 +3,27 @@
 
 
 
+
+
+* make C23 code an optional include
+* Add infinite loops after `abort()` calls in mulle-allocator.c to prevent non-void functions from falling through, since tcc does not treat `abort()` as noreturn
+
+feature: split ``__typeof__`` macros out so mulle-alloca.h is strict ANSI C11
+
+* mulle-alloca.h no longer requires ``__typeof__`` and compiles as strict ANSI/ISO C11 with extensions off
+* new mulle-alloca-c23.h provides ``mulle_malloc_for`,` ``mulle_alloca_do_for`,` ``mulle_calloc_for`,` ``mulle_calloca_do_for`` and the value-returning ``_mulle_alloca_do_return``
+* the C23 header is included automatically when ``MULLE_C_HAS_TYPEOF`` is available (gcc, clang, tcc)
+* **BREAKING** on compilers without `typeof`, those macros are no longer available via mulle-alloca.h; include mulle-alloca-c23.h explicitly
+* ``add_subdirectory`` consumers again inherit the interface include directories, fixing ``<mulle-allocator/...>`` includes
+
+
+
+
+
+
+
+
+
 * Terminate via `exit(0)` in the fail handler instead of returning, since the handler is declared ``MULLE_C_NO_RETURN`` and returning triggers an invalid opcode in clang
 * Update expected output to stop after the first failure
 
