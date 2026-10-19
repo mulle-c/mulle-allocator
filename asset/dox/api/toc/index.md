@@ -5,7 +5,7 @@
 
 `mulle-allocator` is a C memory utility library that provides allocator indirection (`struct mulle_allocator`), fail-fast allocation wrappers, overflow-checked array reallocation (`*_reallocarray*`), checked size-arithmetic helpers, and scoped stack/heap-fallback temporary buffers (`mulle_alloca_do` family). It solves problems such as hard-wired `malloc` usage in reusable code, repetitive allocation error checks, wrapped-around `n * size` allocations, and unsafe raw `alloca` usage.
 
-At project level, this is a foundational low-level component in the mulle-c ecosystem. It depends directly on `mulle-c11` for portability/compiler macros and exposes a compact public API in headers (`mulle-allocator.h`, `mulle-alloca.h`, `mulle-memset.h`).
+At project level, this is a foundational low-level component in the mulle-c ecosystem. It depends directly on `mulle-c11` for portability/compiler macros and exposes a compact public API in headers (`mulle-allocator.h`, `mulle-alloca.h`, `mulle-alloca-c23.h`, `mulle-memset.h`).
 
 ## 2. Key Concepts & Design Philosophy
 
@@ -115,26 +115,37 @@ Both helpers are intended for consumers of the library when computing allocation
 | `mulle_alloca_do_flexible( name, type, stacksize, count)` | Same as above with per-use stack threshold. |
 | `mulle_alloca_do_realloc( name, count)` | Reallocates active `mulle_alloca_do` buffer (inside scope only). |
 | `mulle_alloca_do_extract( name, receiver)` | Moves/copies active buffer out of scope ownership. |
-| `mulle_alloca_do_for( name, p)` | Iterator helper over active alloca buffer. |
 | `mulle_malloc_do( name, type, count)` | Scoped heap allocation wrapper with auto free. |
 | `mulle_calloc_do( name, type, count)` | Scoped zeroed heap allocation wrapper with auto free. |
-| `mulle_malloc_for( name, len, p)` | Pointer iteration helper for heap buffers. |
 | `mulle_calloca_do( name, type, count)` | Zeroed variant of `mulle_alloca_do`. |
 | `mulle_calloca_do_flexible( name, type, stacksize, count)` | Flexible zeroed variant. |
 | `mulle_calloca_do_realloc( name, count)` | Realloc for `mulle_calloca_do`, zero-fills newly grown tail. |
 | `mulle_calloca_do_extract( name, receiver)` | Alias of extract helper. |
-| `mulle_calloca_do_for( name, p)` | Alias of iterator helper for `mulle_calloca_do` scope. |
-| `mulle_calloc_for( name, len, p)` | Alias to `mulle_malloc_for`. |
+
+The `*_for` iterators (`mulle_malloc_for`, `mulle_alloca_do_for`, `mulle_calloc_for`, `mulle_calloca_do_for`) need `typeof` and live in `mulle-alloca-c23.h` (§3.4). This header includes that one automatically when `MULLE_C_HAS_TYPEOF` (from `mulle-c11`) is set.
 
 #### Compatibility aliases (legacy names)
 | Symbol | Short description |
 |---|---|
 | `mulle_flexarray_do` | Alias to `mulle_alloca_do_flexible`; the legacy stack-size argument is a count of `type` elements and is converted to bytes as `(c) * sizeof( b)`. |
 | `mulle_flexarray_realloc` | Alias to `mulle_alloca_do_realloc`. |
-| `_mulle_flexarray_return` | Alias to `_mulle_alloca_do_return` (advanced/internal). |
 | `_mulle_flexarray_return_void` | Alias to `_mulle_alloca_do_return_void` (advanced/internal). |
 
-### 3.4. `mulle-memset.h`
+### 3.4. `mulle-alloca-c23.h`
+
+Contains the macros that rely on `__typeof__`/`typeof` (a GNU extension that became standard as `typeof` with C23), so that `mulle-alloca.h` itself stays strict C99/C11 clean. It is included automatically from `mulle-alloca.h` when `MULLE_C_HAS_TYPEOF` (from `mulle-c11/mulle-c11-feature.h`) is set; including it directly on a compiler without `typeof` is an error by design.
+
+| Symbol | Short description |
+|---|---|
+| `mulle_malloc_for( name, len, p)` | Pointer iteration helper for heap buffers. |
+| `mulle_alloca_do_for( name, p)` | Iterator helper over the active `mulle_alloca_do` buffer (uses the scope's element count). |
+| `mulle_calloc_for( name, len, p)` | Alias to `mulle_malloc_for`. |
+| `mulle_calloca_do_for( name, p)` | Alias of `mulle_alloca_do_for` for the `mulle_calloca_do` scope. |
+| `_mulle_alloca_do_return( name, value)` | Value-returning early return from a single `mulle_alloca_do` scope; needs `typeof` (advanced/internal). |
+| `_mulle_calloca_do_return( name, value)` | Alias to `_mulle_alloca_do_return` (advanced/internal). |
+| `_mulle_flexarray_return` | Alias to `_mulle_alloca_do_return` (advanced/internal). |
+
+### 3.5. `mulle-memset.h`
 
 | Symbol | Short description |
 |---|---|
