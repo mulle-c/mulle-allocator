@@ -143,6 +143,12 @@ int   mulle_allocator_no_aba_abort( void *aba,
             "container, or install an abafree reclaimer with "
             "mulle_allocator_set_aba().\n");
    abort();
+#ifdef __TINYC__
+   // tcc misses noreturn on abort(), so keep the non-void function from
+   // falling through
+   for(;;)
+      ;
+#endif
 }
 
 
@@ -196,6 +202,12 @@ static void   *v_abort_calloc( size_t n,
    MULLE_C_UNUSED( size);
    MULLE_C_UNUSED( allocator);
    abort();
+#ifdef __TINYC__
+   // tcc misses noreturn on abort(), so keep the non-void function from
+   // falling through
+   for(;;)
+      ;
+#endif
 }
 
 
@@ -210,6 +222,12 @@ static void   *v_abort_reallocarray( void *block,
    MULLE_C_UNUSED( size);
    MULLE_C_UNUSED( allocator);
    abort();
+#ifdef __TINYC__
+   // tcc misses noreturn on abort(), so keep the non-void function from
+   // falling through
+   for(;;)
+      ;
+#endif
 }
 
 
