@@ -105,7 +105,7 @@ typedef mulle_allocator_aba_t   *mulle_allocator_abafree_t;
 //
 //
 // fail is terminal: it is called when an allocation can not be satisfied and
-// it must NOT return (hence MULLE_C_NO_RETURN on the vector). The default
+// it must NOT return (hence _MULLE_C_NO_RETURN on the vector). The default
 // handler mulle_allocation_fail prints an error and aborts.
 //
 // fail is NOT a recovery or retry hook. If you want to survive memory
@@ -155,7 +155,7 @@ typedef mulle_allocator_aba_t   *mulle_allocator_abafree_t;
 //
 typedef void  (*mulle_allocator_fail_t)( struct mulle_allocator *allocator,
                                          void *block,
-                                         size_t size) MULLE_C_NO_RETURN;
+                                         size_t size) _MULLE_C_NO_RETURN;
 //
 #define MULLE_ALLOCATOR_BASE                                                                            \
    void   *(*calloc)( size_t n, size_t size, struct mulle_allocator *allocator);                        \
